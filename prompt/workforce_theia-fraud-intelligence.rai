@@ -1,0 +1,73 @@
+{
+  "workforce_metadata": {
+    "name": "Theia Fraud Intelligence",
+    "type": "default",
+    "last_run_date": "2026-02-26T14:13:47.717Z",
+    "active_version_id": "721311c7-6988-4cdb-8ea8-a33fecfe7f7b",
+    "public": true,
+    "embeddable": true,
+    "workforce_graph_link": {
+      "content_hash": "94a63a52c48a8528889ba713d253c2ca",
+      "version": 0
+    }
+  },
+  "workforce_graph": {
+    "nodes": [
+      {
+        "node_id": "9fa49539-d6c2-40e8-b55f-f5b884934372",
+        "type": "trigger",
+        "config": {
+          "type": "manual"
+        },
+        "metadata": {
+          "position": {
+            "x": -270,
+            "y": -270,
+            "z": 1
+          }
+        }
+      },
+      {
+        "node_id": "30ee0036-419c-4cce-8782-78b288fc5472",
+        "type": "agent",
+        "config": {
+          "entity_link": {
+            "agent_id": "1e3305e0-8484-45e8-9ea6-74d8cbb76df6",
+            "project": "38c1fd02-ab72-445f-bba9-2e712bb34daa",
+            "region": "d7b62b"
+          },
+          "entity_information": {
+            "name": "Theia Super-Squad Fraud Intelligence",
+            "description": "Central command centre for a comprehensive multi-agent fraud detection Super-Squad. Orchestrates sophisticated workflows combining advanced AI capabilities with regulatory compliance and supervisory oversight. Commands specialised agents from Phase 0 (Data Acquisition) through Phase 5 (Compliance & Audit) to achieve unprecedented fraud detection accuracy with human approval, machine learning precision and reasoning-level speed.",
+            "emoji": "https://cdn.jsdelivr.net/gh/RelevanceAI/content-cdn@latest/agents/agent_avatars/agent_avatar_11.svg",
+            "copied_at": "2026-02-26T14:08:35.761Z"
+          }
+        },
+        "metadata": {
+          "position": {
+            "x": -270,
+            "y": -150,
+            "z": 1
+          }
+        }
+      }
+    ],
+    "edges": [
+      {
+        "edge_id": "2f3d0280-04cf-4baf-a97e-0e6428e3c81f",
+        "source_node_id": "9fa49539-d6c2-40e8-b55f-f5b884934372",
+        "target_node_id": "30ee0036-419c-4cce-8782-78b288fc5472",
+        "source_type": "trigger",
+        "target_type": "agent",
+        "config": {
+          "edge_type": "forced-handover",
+          "config": {
+            "threading_behavior": {
+              "type": "always-same"
+            }
+          }
+        }
+      }
+    ]
+  }
+}

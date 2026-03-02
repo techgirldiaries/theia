@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@keyframes bounce {
+
+  0%,
+  50%,
+  100% {
+    transform: translateY(0);
+  }
+
+  20% {
+    transform: translateY(-1rem);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+.typing-dot {
+  @apply text-2xl leading-0 py-2;
+  animation: bounce 1s infinite ease-in-out;
+}
+
+.typing-dot-delay-1 {
+  animation-delay: 0.15s;
+}
+
+.typing-dot-delay-2 {
+  animation-delay: 0.3s;
+}

@@ -1,5 +1,7 @@
 import * as Avatar from "@radix-ui/react-avatar";
+import { FileText } from "lucide-react";
 import TimeAgo from "react-timeago";
+import type { Attachment } from "@relevanceai/sdk";
 
 type Message = {
   id: string;
@@ -7,6 +9,7 @@ type Message = {
   text: string;
   createdAt: Date;
   isAgent: () => boolean;
+  attachments?: Attachment[];
 };
 
 interface UserMessageProps {
@@ -40,8 +43,26 @@ export function UserMessage({ message }: UserMessageProps) {
             </span>
           )}
         </small>
-        <div class="py-2 px-4 rounded-3xl rounded-tr-xs bg-indigo-500 dark:bg-indigo-600 text-white transition-colors">
-          <p class="text-end">{message.text}</p>
+        <div class="flex flex-col gap-y-2 items-end">
+          <div class="py-2 px-4 rounded-3xl rounded-tr-xs bg-indigo-500 dark:bg-indigo-600 text-white transition-colors">
+            <p class="text-end">{message.text}</p>
+          </div>
+          {message.attachments && message.attachments.length > 0 && (
+            <div class="flex flex-col gap-y-1">
+              {message.attachments.map((attachment) => (
+                <a
+                  key={attachment.fileUrl}
+                  href={attachment.fileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="flex items-center gap-x-2 px-3 py-1.5 bg-indigo-100 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800 rounded-full text-sm text-indigo-700 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition-colors"
+                >
+                  <FileText size={14} strokeWidth={2} />
+                  <span class="truncate max-w-40">{attachment.fileName}</span>
+                </a>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

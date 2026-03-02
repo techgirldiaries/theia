@@ -1,16 +1,23 @@
 import { For, Show } from "@preact/signals/utils";
 import { AgentMessage } from "@/components/agent-message";
 import { AgentTyping } from "@/components/agent-typing";
+import { AnalyticsDashboard } from "@/components/analytics-dashboard";
 import { EmptyState } from "@/components/empty-state";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { UserMessage } from "@/components/user-message";
+import { Toast } from "@/components/toast";
+import { StopButton } from "@/components/stop-button";
 import {
+  dismissToast,
   isAgentTyping,
   isInitialized,
   loadingError,
   messages,
+  showAnalytics,
+  toasts,
 } from "@/signals";
+import type { Attachment } from "@relevanceai/sdk";
 
 type Message = {
   id: string;
@@ -18,6 +25,7 @@ type Message = {
   text: string;
   createdAt: Date;
   isAgent: () => boolean;
+  attachments?: Attachment[];
 };
 
 export function App() {
@@ -83,6 +91,22 @@ export function App() {
         </div>
       </main>
       <Footer />
+      <StopButton />
+      {/* Toast notifications */}
+      <For each={toasts}>
+        {(toast) => (
+          <Toast
+            key={toast.id}
+            message={toast.message}
+            type={toast.type}
+            onClose={() => dismissToast(toast.id)}
+          />
+        )}
+      </For>
+      {/* Analytics Dashboard */}
+      <Show when={showAnalytics}>
+        <AnalyticsDashboard />
+      </Show>
     </div>
   );
 }

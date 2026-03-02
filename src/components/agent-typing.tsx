@@ -1,5 +1,6 @@
 import * as Avatar from "@radix-ui/react-avatar";
-import { agentAvatar, agentInitials, agentName } from "@/signals";
+import { agentAvatar, agentInitials, agentName, taskStatus } from "@/signals";
+import { TaskStatusIndicator } from "@/components/task-status-indicator";
 
 export function AgentTyping() {
   return (
@@ -18,9 +19,9 @@ export function AgentTyping() {
           <span class="text-zinc-700 dark:text-zinc-300 transition-colors">
             {agentName}
           </span>{" "}
-          <span class="text-zinc-500 dark:text-zinc-400 transition-colors">
-            typing...
-          </span>
+          {taskStatus.value && (
+            <TaskStatusIndicator status={taskStatus.value} compact />
+          )}
         </small>
         <div class="py-3 px-4 rounded-3xl rounded-tl-xs bg-zinc-200 dark:bg-zinc-800 transition-colors">
           <div class="flex">

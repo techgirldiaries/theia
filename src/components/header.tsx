@@ -1,5 +1,5 @@
 import * as Avatar from "@radix-ui/react-avatar";
-import { Moon, Sun, Trash2 } from "lucide-react";
+import { BarChart3, Moon, Sun, Trash2 } from "lucide-react";
 import {
   agentAvatar,
   agentInitials,
@@ -7,7 +7,9 @@ import {
   clearChatHistory,
   isDarkMode,
   messages,
+  showAnalytics,
 } from "@/signals";
+import { ConnectionStatus } from "@/components/connection-status";
 
 export function Header() {
   const toggleDarkMode = () => {
@@ -20,6 +22,10 @@ export function Header() {
         clearChatHistory();
       }
     }
+  };
+
+  const toggleAnalytics = () => {
+    showAnalytics.value = !showAnalytics.value;
   };
 
   return (
@@ -38,10 +44,23 @@ export function Header() {
             <h1 class="font-medium text-md leading-none text-zinc-800 dark:text-white transition-colors">
               Theia Fraud Intelligence
             </h1>
-            <h2 class="text-xs text-zinc-500 dark:text-zinc-400 leading-none">
-              Detect Risk Early. Act Decisively. Stay Compliant.
-            </h2>
+            <div class="flex items-center gap-x-2">
+              <h2 class="text-xs text-zinc-500 dark:text-zinc-400 leading-none">
+                Detect Risk Early. Act Decisively. Stay Compliant.
+              </h2>
+              <span class="text-zinc-300 dark:text-zinc-600">•</span>
+              <ConnectionStatus />
+            </div>
           </hgroup>
+          <button
+            type="button"
+            onClick={toggleAnalytics}
+            class="p-2 rounded-lg text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+            aria-label="View analytics"
+            title="Performance Analytics"
+          >
+            <BarChart3 size={20} strokeWidth={1.5} />
+          </button>
           <button
             type="button"
             onClick={handleClearHistory}

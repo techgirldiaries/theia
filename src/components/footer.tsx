@@ -1,7 +1,17 @@
 import { Paperclip, SendHorizonal, X } from "lucide-react";
 import type { SubmitEventHandler } from "preact";
 import { useCallback, useRef, useState } from "preact/hooks";
-import { agent, isAgentTyping, messages, task, workforce } from "@/signals";
+import {
+  addDataset,
+  agent,
+  client,
+  isAgentTyping,
+  messages,
+  startPerformanceTracking,
+  task,
+  workforce,
+} from "@/signals";
+import type { Attachment } from "@relevanceai/sdk";
 
 type Message = {
   id: string;
@@ -9,12 +19,14 @@ type Message = {
   text: string;
   createdAt: Date;
   isAgent: () => boolean;
+  attachments?: Attachment[];
 };
 
 export function Footer() {
   const input = useRef<HTMLInputElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleFileSelect = useCallback(() => {
     fileInput.current?.click();
@@ -38,15 +50,53 @@ export function Footer() {
     async (e) => {
       e.preventDefault();
 
-      if (isAgentTyping.value) {
+      if (isAgentTyping.value || isUploading) {
         return;
       }
 
       const form = e.currentTarget;
       const data = new FormData(form);
       const message = data.get("message") as string | null;
-      if (!message?.trim()) {
+      if (!message?.trim() && selectedFiles.length === 0) {
         return;
+      }
+
+      // Upload files first if any are selected
+      let uploadedAttachments: Attachment[] = [];
+      if (selectedFiles.length > 0 && client.value) {
+        setIsUploading(true);
+        try {
+          uploadedAttachments = await Promise.all(
+            selectedFiles.map((file) => client.value!.uploadTempFile(file)),
+          );
+
+          // Store dataset info for multi-agent access
+          uploadedAttachments.forEach((attachment, index) => {
+            const file = selectedFiles[index];
+            addDataset({
+              id: `dataset-${Date.now()}-${index}`,
+              fileName: attachment.fileName,
+              fileUrl: attachment.fileUrl,
+              uploadedAt: new Date(),
+              size: file.size,
+            });
+          });
+        } catch (error) {
+          console.error("Failed to upload files:", error);
+          alert("Failed to upload files. Please try again.");
+          setIsUploading(false);
+          return;
+        }
+        setIsUploading(false);
+      }
+
+      // Build message with file information
+      let messageText = message?.trim() || "";
+      if (uploadedAttachments.length > 0) {
+        const fileList = uploadedAttachments
+          .map((att) => `- ${att.fileName}`)
+          .join("\n");
+        messageText = `${messageText}\n\nAttached files:\n${fileList}`;
       }
 
       messages.value = [
@@ -54,9 +104,10 @@ export function Footer() {
         {
           id: "optimistic",
           type: "user-message",
-          text: message,
+          text: message?.trim() || "[Files attached]",
           createdAt: new Date(),
           isAgent: () => false,
+          attachments: uploadedAttachments,
         } as Message,
       ];
 
@@ -65,10 +116,16 @@ export function Footer() {
       }
 
       const t = workforce.value
-        ? await workforce.value.sendMessage(message, task.value!)
-        : await agent.value!.sendMessage(message, task.value!);
+        ? await workforce.value.sendMessage(messageText, task.value!)
+        : await agent.value!.sendMessage(
+            message?.trim() || "[Files attached]",
+            uploadedAttachments,
+            task.value!,
+          );
       if (task.value !== t) {
         task.value = t;
+        // Start tracking performance for this task
+        startPerformanceTracking(t.id);
       }
 
       if (input.current) {
@@ -77,7 +134,7 @@ export function Footer() {
       }
       setSelectedFiles([]);
     },
-    [input, selectedFiles],
+    [input, selectedFiles, isUploading],
   );
 
   return (
@@ -106,6 +163,12 @@ export function Footer() {
             ))}
           </div>
         )}
+        {isUploading && (
+          <div class="flex items-center gap-x-2 text-sm text-indigo-600 dark:text-indigo-400">
+            <div class="inline-block animate-spin rounded-full h-4 w-4 border-2 border-solid border-indigo-600 dark:border-indigo-400 border-r-transparent"></div>
+            <span>Uploading files...</span>
+          </div>
+        )}
         <div class="flex items-center gap-x-2">
           <input
             ref={fileInput}
@@ -118,7 +181,8 @@ export function Footer() {
           <button
             type="button"
             onClick={handleFileSelect}
-            class="p-3 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors cursor-pointer outline-indigo-500 outline-offset-3"
+            disabled={isUploading || isAgentTyping.value}
+            class="p-3 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors cursor-pointer outline-indigo-500 outline-offset-3 disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Attach file"
           >
             <Paperclip size={24} strokeWidth={1.5} />
@@ -127,12 +191,14 @@ export function Footer() {
             ref={input}
             type="text"
             placeholder="Analyse transaction data, detect fraud patterns or ask about risk scoring..."
-            class="flex-1 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-4 py-3 rounded-full outline-indigo-500 outline-offset-3 text-zinc-800 dark:text-white dark:placeholder-zinc-400 transition-colors"
+            disabled={isUploading}
+            class="flex-1 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-4 py-3 rounded-full outline-indigo-500 outline-offset-3 text-zinc-800 dark:text-white dark:placeholder-zinc-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             name="message"
           />
           <button
             type="submit"
-            class="bg-indigo-500 dark:bg-indigo-600 text-white rounded-full p-3 cursor-pointer hover:bg-indigo-600 dark:hover:bg-indigo-700 active:bg-indigo-700 dark:active:bg-indigo-800 outline-indigo-500 outline-offset-3 transition-colors"
+            disabled={isUploading || isAgentTyping.value}
+            class="bg-indigo-500 dark:bg-indigo-600 text-white rounded-full p-3 cursor-pointer hover:bg-indigo-600 dark:hover:bg-indigo-700 active:bg-indigo-700 dark:active:bg-indigo-800 outline-indigo-500 outline-offset-3 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Send message"
           >
             <SendHorizonal size={24} strokeWidth={1.5} />

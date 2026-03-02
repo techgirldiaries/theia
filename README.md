@@ -2,7 +2,7 @@
 
 ## MARAG Financial Fraud Detection System
 
-A real-time fraud intelligence platform powered by AI agents. Built with Preact, Vite and Relevance AI's workforce system.
+A real-time fraud intelligence platform using multi-agent collaboration and retrieval-augmented generation (MARAG). Built with Preact, Vite and Relevance AI's workforce system.
 
 ## Features
 

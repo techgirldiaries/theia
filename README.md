@@ -1,4 +1,4 @@
-# Theia Super-Squad Fraud Intelligence
+# Theia Fraud Intelligence
 
 ## MARAG Financial Fraud Detection System
 

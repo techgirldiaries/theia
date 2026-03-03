@@ -167,10 +167,9 @@ function saveChatSessionToHistory(msgs: Message[]): void {
       })),
     }));
 
-    localStorage.setItem(
-      "fraud-chat-sessions",
-      JSON.stringify(serialized.slice(-10)),
-    ); // Keep last 10 sessions
+    const jsonString = JSON.stringify(serialized.slice(-10));
+    const encrypted = simpleEncrypt(jsonString);
+    localStorage.setItem("fraud-chat-sessions", encrypted); // Keep last 10 sessions encrypted
   } catch (error) {
     console.error("Failed to save chat session:", error);
   }
@@ -181,7 +180,17 @@ function loadChatSessionsFromStorage(): ChatSession[] {
     const saved = localStorage.getItem("fraud-chat-sessions");
     if (!saved) return [];
 
-    const parsed = JSON.parse(saved);
+    // Try to decrypt first, fallback to plain JSON if it fails (for backward compatibility)
+    let jsonString: string;
+    try {
+      jsonString = simpleDecrypt(saved);
+      JSON.parse(jsonString); // Test if valid JSON
+    } catch {
+      // If decryption fails, assume it's plain JSON
+      jsonString = saved;
+    }
+
+    const parsed = JSON.parse(jsonString);
     return parsed.map((s: any) => ({
       id: s.id,
       startTime: new Date(s.startTime),
@@ -367,6 +376,32 @@ export const messageDraft = signal("");
 export const selectedSessionForComparison = signal<ChatSession | null>(null);
 export const sessionSearchQuery = signal("");
 export const sessionTagFilter = signal<string | null>(null);
+export const showKeyboardShortcuts = signal(false);
+export const isVoiceRecording = signal(false);
+export const showAutoComplete = signal(false);
+export const autoCompleteQuery = signal("");
+
+// Encryption key (in production, use a more secure method)
+const ENCRYPTION_KEY = "fraud-intelligence-key-2026";
+
+// Fraud analysis autocomplete suggestions
+export const fraudAnalysisTerms = [
+  "transaction analysis",
+  "anomaly detection",
+  "risk assessment",
+  "fraud pattern identification",
+  "suspicious activity report",
+  "chargeback analysis",
+  "identity verification",
+  "account takeover detection",
+  "payment fraud screening",
+  "behavioral analysis",
+  "velocity checks",
+  "device fingerprinting",
+  "geolocation analysis",
+  "network analysis",
+  "money laundering detection",
+];
 
 // Quick templates
 export const quickTemplates = signal<QuickTemplate[]>([
@@ -396,6 +431,48 @@ export const quickTemplates = signal<QuickTemplate[]>([
     title: "Deep Investigation",
     prompt:
       "Conduct a deep investigation into suspicious activities, trace transaction patterns, and identify potential fraud networks.",
+    category: "investigation",
+  },
+  {
+    id: "5",
+    title: "Evaluate Performance",
+    prompt:
+      "Evaluate the fraud detection performance metrics including accuracy, false positives, false negatives, and provide optimization recommendations.",
+    category: "analysis",
+  },
+  {
+    id: "6",
+    title: "Compare Datasets",
+    prompt:
+      "Compare the uploaded datasets and identify differences in fraud patterns, transaction volumes, and risk profiles between them.",
+    category: "analysis",
+  },
+  {
+    id: "7",
+    title: "Identify Trends",
+    prompt:
+      "Analyze temporal trends in the fraud data, identify seasonal patterns, emerging fraud types, and predict future risks.",
+    category: "analysis",
+  },
+  {
+    id: "8",
+    title: "Compliance Check",
+    prompt:
+      "Review the transactions for compliance with AML/KYC regulations, flag suspicious transactions, and generate compliance reports.",
+    category: "report",
+  },
+  {
+    id: "9",
+    title: "Customer Segmentation",
+    prompt:
+      "Segment customers based on transaction behavior, risk profiles, and fraud likelihood. Provide detailed profiles for each segment.",
+    category: "analysis",
+  },
+  {
+    id: "10",
+    title: "Network Analysis",
+    prompt:
+      "Perform network analysis to identify fraud rings, connected suspicious accounts, and money laundering schemes.",
     category: "investigation",
   },
 ]);
@@ -644,33 +721,127 @@ export function removeTagFromSession(sessionId: string, tag: string) {
   }
 }
 
-// Session export
-export function exportSessionAsJSON(session: ChatSession) {
+// Simple encryption/decryption utilities (for localStorage)
+function simpleEncrypt(text: string): string {
   try {
-    const dataStr = JSON.stringify(session, null, 2);
+    // Simple XOR cipher with base64 encoding (not cryptographically secure, but better than plain text)
+    const key = ENCRYPTION_KEY;
+    let encrypted = "";
+    for (let i = 0; i < text.length; i++) {
+      encrypted += String.fromCharCode(
+        text.charCodeAt(i) ^ key.charCodeAt(i % key.length),
+      );
+    }
+    return btoa(encrypted);
+  } catch (error) {
+    console.error("Encryption failed:", error);
+    return text;
+  }
+}
+
+function simpleDecrypt(encrypted: string): string {
+  try {
+    const key = ENCRYPTION_KEY;
+    const decoded = atob(encrypted);
+    let decrypted = "";
+    for (let i = 0; i < decoded.length; i++) {
+      decrypted += String.fromCharCode(
+        decoded.charCodeAt(i) ^ key.charCodeAt(i % key.length),
+      );
+    }
+    return decrypted;
+  } catch (error) {
+    console.error("Decryption failed:", error);
+    return encrypted;
+  }
+}
+
+// PII Redaction utilities
+function redactPII(text: string): string {
+  let redacted = text;
+
+  // Redact credit card numbers (most common patterns)
+  redacted = redacted.replace(
+    /\b\d{4}[\s-]?\d{4}[\s-]?\d{4}[\s-]?\d{4}\b/g,
+    "****-****-****-****",
+  );
+
+  // Redact SSN patterns
+  redacted = redacted.replace(/\b\d{3}-\d{2}-\d{4}\b/g, "***-**-****");
+
+  // Redact email addresses
+  redacted = redacted.replace(
+    /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g,
+    "[REDACTED_EMAIL]",
+  );
+
+  // Redact phone numbers (various formats)
+  redacted = redacted.replace(
+    /(\+\d{1,3}[\s-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/g,
+    "[REDACTED_PHONE]",
+  );
+
+  // Redact IP addresses
+  redacted = redacted.replace(/\b(?:\d{1,3}\.){3}\d{1,3}\b/g, "[REDACTED_IP]");
+
+  // Redact common ID patterns (like account numbers)
+  redacted = redacted.replace(/\b[A-Z]{2,}\d{6,}\b/g, "[REDACTED_ID]");
+
+  return redacted;
+}
+
+function redactSessionPII(session: ChatSession): ChatSession {
+  return {
+    ...session,
+    messages: session.messages.map((m) => ({
+      ...m,
+      text: redactPII(m.text),
+    })),
+  };
+}
+
+// Session export with PII redaction
+export function exportSessionAsJSON(
+  session: ChatSession,
+  redactSensitiveData = true,
+) {
+  try {
+    const exportSession = redactSensitiveData
+      ? redactSessionPII(session)
+      : session;
+    const dataStr = JSON.stringify(exportSession, null, 2);
     const dataBlob = new Blob([dataStr], { type: "application/json" });
     const url = URL.createObjectURL(dataBlob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `fraud-session-${session.id}.json`;
+    link.download = `fraud-session-${session.id}${redactSensitiveData ? "-redacted" : ""}.json`;
     link.click();
     URL.revokeObjectURL(url);
     logAuditEntry(
       "export",
-      `Exported session as JSON: ${session.id}`,
+      `Exported session as JSON${redactSensitiveData ? " (PII redacted)" : ""}: ${session.id}`,
       session.id,
     );
-    showToast("Session exported as JSON", "success");
+    showToast(
+      `Session exported as JSON${redactSensitiveData ? " (PII redacted)" : ""}`,
+      "success",
+    );
   } catch (error) {
     console.error("Failed to export session:", error);
     showToast("Export failed", "error");
   }
 }
 
-export function exportSessionAsCSV(session: ChatSession) {
+export function exportSessionAsCSV(
+  session: ChatSession,
+  redactSensitiveData = true,
+) {
   try {
+    const exportSession = redactSensitiveData
+      ? redactSessionPII(session)
+      : session;
     const headers = ["Timestamp", "Type", "Message", "Attachments"];
-    const rows = session.messages.map((m) => [
+    const rows = exportSession.messages.map((m) => [
       m.createdAt.toISOString(),
       m.type,
       `"${m.text.replace(/"/g, '""')}"`,
@@ -681,15 +852,18 @@ export function exportSessionAsCSV(session: ChatSession) {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `fraud-session-${session.id}.csv`;
+    link.download = `fraud-session-${session.id}${redactSensitiveData ? "-redacted" : ""}.csv`;
     link.click();
     URL.revokeObjectURL(url);
     logAuditEntry(
       "export",
-      `Exported session as CSV: ${session.id}`,
+      `Exported session as CSV${redactSensitiveData ? " (PII redacted)" : ""}: ${session.id}`,
       session.id,
     );
-    showToast("Session exported as CSV", "success");
+    showToast(
+      `Session exported as CSV${redactSensitiveData ? " (PII redacted)" : ""}`,
+      "success",
+    );
   } catch (error) {
     console.error("Failed to export session:", error);
     showToast("Export failed", "error");

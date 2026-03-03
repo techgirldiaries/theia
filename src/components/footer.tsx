@@ -1,4 +1,4 @@
-import { Paperclip, SendHorizonal, X } from "lucide-react";
+import { Paperclip, SendHorizonal, X, Mic, MicOff } from "lucide-react";
 import type { SubmitEventHandler } from "preact";
 import { useCallback, useRef, useState, useEffect } from "preact/hooks";
 import { QuickTemplates } from "@/components/quick-templates";
@@ -13,6 +13,10 @@ import {
   workforce,
   messageDraft,
   logAuditEntry,
+  isVoiceRecording,
+  fraudAnalysisTerms,
+  showAutoComplete,
+  autoCompleteQuery,
 } from "@/signals";
 import type { Attachment } from "@relevanceai/sdk";
 
@@ -35,6 +39,104 @@ export function Footer() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [recognition, setRecognition] = useState<any>(null);
+  const [autoCompleteSuggestions, setAutoCompleteSuggestions] = useState<
+    string[]
+  >([]);
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(0);
+
+  // Initialize Web Speech API
+  useEffect(() => {
+    if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
+      const SpeechRecognition =
+        (window as any).webkitSpeechRecognition ||
+        (window as any).SpeechRecognition;
+      const recognitionInstance = new SpeechRecognition();
+      recognitionInstance.continuous = true;
+      recognitionInstance.interimResults = true;
+      recognitionInstance.lang = "en-US";
+
+      recognitionInstance.onresult = (event: any) => {
+        const transcript = Array.from(event.results)
+          .map((result: any) => result[0].transcript)
+          .join("");
+
+        if (input.current) {
+          input.current.value = transcript;
+          messageDraft.value = transcript;
+          handleInput();
+        }
+      };
+
+      recognitionInstance.onerror = (event: any) => {
+        console.error("Speech recognition error:", event.error);
+        isVoiceRecording.value = false;
+      };
+
+      recognitionInstance.onend = () => {
+        isVoiceRecording.value = false;
+      };
+
+      setRecognition(recognitionInstance);
+    }
+  }, []);
+
+  // Voice input toggle
+  const toggleVoiceInput = useCallback(() => {
+    if (!recognition) {
+      alert(
+        "Voice input is not supported in your browser. Please use Chrome, Edge, or Safari.",
+      );
+      return;
+    }
+
+    if (isVoiceRecording.value) {
+      recognition.stop();
+      isVoiceRecording.value = false;
+    } else {
+      recognition.start();
+      isVoiceRecording.value = true;
+      logAuditEntry("view", "Started voice input");
+    }
+  }, [recognition]);
+
+  // Autocomplete logic
+  useEffect(() => {
+    if (input.current) {
+      const value = input.current.value.toLowerCase();
+      const lastWord = value.split(/\s+/).pop() || "";
+
+      if (lastWord.length >= 2) {
+        const matches = fraudAnalysisTerms
+          .filter((term) => term.toLowerCase().includes(lastWord))
+          .slice(0, 5);
+
+        if (matches.length > 0) {
+          setAutoCompleteSuggestions(matches);
+          showAutoComplete.value = true;
+          autoCompleteQuery.value = lastWord;
+        } else {
+          showAutoComplete.value = false;
+        }
+      } else {
+        showAutoComplete.value = false;
+      }
+    }
+  }, [messageDraft.value]);
+
+  // Handle autocomplete selection
+  const selectSuggestion = useCallback((suggestion: string) => {
+    if (input.current) {
+      const words = input.current.value.split(/\s+/);
+      words.pop(); // Remove last incomplete word
+      words.push(suggestion);
+      input.current.value = words.join(" ") + " ";
+      messageDraft.value = input.current.value;
+      handleInput();
+      showAutoComplete.value = false;
+      input.current.focus();
+    }
+  }, []);
 
   // Load saved draft on mount
   useEffect(() => {
@@ -136,6 +238,36 @@ export function Footer() {
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
+      // Handle autocomplete navigation
+      if (showAutoComplete.value && autoCompleteSuggestions.length > 0) {
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          setSelectedSuggestionIndex((prev) =>
+            Math.min(prev + 1, autoCompleteSuggestions.length - 1),
+          );
+          return;
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          setSelectedSuggestionIndex((prev) => Math.max(prev - 1, 0));
+          return;
+        } else if (e.key === "Tab") {
+          e.preventDefault();
+          selectSuggestion(autoCompleteSuggestions[selectedSuggestionIndex]);
+          return;
+        } else if (e.key === "Escape") {
+          e.preventDefault();
+          showAutoComplete.value = false;
+          return;
+        }
+      }
+
+      // Alt+V for voice input
+      if (e.altKey && e.key === "v") {
+        e.preventDefault();
+        toggleVoiceInput();
+        return;
+      }
+
       // Submit on Enter (without Shift), allow Shift+Enter for new lines
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
@@ -145,7 +277,13 @@ export function Footer() {
         }
       }
     },
-    [isUploading],
+    [
+      isUploading,
+      autoCompleteSuggestions,
+      selectedSuggestionIndex,
+      selectSuggestion,
+      toggleVoiceInput,
+    ],
   );
 
   const handleSubmit = useCallback<SubmitEventHandler<HTMLFormElement>>(
@@ -341,7 +479,7 @@ export function Footer() {
               <span>Uploading files...</span>
             </div>
           )}
-          <div class="flex items-end gap-x-2">
+          <div class="flex items-end gap-x-2 relative">
             <input
               ref={fileInput}
               type="file"
@@ -359,16 +497,74 @@ export function Footer() {
             >
               <Paperclip size={24} strokeWidth={1.5} />
             </button>
-            <textarea
-              ref={input}
-              placeholder="Analyse transaction data, detect fraud patterns or ask about risk scoring..."
-              disabled={isUploading}
-              onInput={handleInput}
-              onKeyDown={handleKeyDown}
-              rows={1}
-              class="flex-1 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-4 py-3 rounded-2xl outline-indigo-500 outline-offset-3 text-zinc-800 dark:text-white dark:placeholder-zinc-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed resize-none max-h-50 overflow-y-auto"
-              name="message"
-            />
+
+            <div class="flex-1 relative">
+              {/* Autocomplete Dropdown */}
+              {showAutoComplete.value && autoCompleteSuggestions.length > 0 && (
+                <div class="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg overflow-hidden z-10">
+                  {autoCompleteSuggestions.map((suggestion, index) => (
+                    <button
+                      key={suggestion}
+                      type="button"
+                      onClick={() => selectSuggestion(suggestion)}
+                      class={`w-full text-left px-4 py-2 text-sm transition-colors ${
+                        index === selectedSuggestionIndex
+                          ? "bg-indigo-500 text-white"
+                          : "text-zinc-900 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-700"
+                      }`}
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                  <div class="px-4 py-1.5 border-t border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900">
+                    <p class="text-xs text-zinc-500 dark:text-zinc-400">
+                      Press Tab to accept • ↑↓ to navigate • Esc to dismiss
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <textarea
+                ref={input}
+                placeholder="Analyse transaction data, detect fraud patterns or ask about risk scoring..."
+                disabled={isUploading || isVoiceRecording.value}
+                onInput={handleInput}
+                onKeyDown={handleKeyDown}
+                rows={1}
+                class="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-4 py-3 rounded-2xl outline-indigo-500 outline-offset-3 text-zinc-800 dark:text-white dark:placeholder-zinc-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed resize-none max-h-50 overflow-y-auto"
+                name="message"
+              />
+
+              {/* Voice Recording Indicator */}
+              {isVoiceRecording.value && (
+                <div class="absolute top-2 right-2 flex items-center gap-x-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs">
+                  <div class="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                  <span>Recording...</span>
+                </div>
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={toggleVoiceInput}
+              disabled={isUploading || isAgentTyping.value}
+              class={`p-3 rounded-full transition-all cursor-pointer outline-indigo-500 outline-offset-3 disabled:opacity-50 disabled:cursor-not-allowed shrink-0 ${
+                isVoiceRecording.value
+                  ? "bg-red-500 text-white hover:bg-red-600 animate-pulse"
+                  : "text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              }`}
+              aria-label={
+                isVoiceRecording.value ? "Stop recording" : "Start voice input"
+              }
+              title="Alt+V for voice input"
+            >
+              {isVoiceRecording.value ? (
+                <MicOff size={24} strokeWidth={1.5} />
+              ) : (
+                <Mic size={24} strokeWidth={1.5} />
+              )}
+            </button>
+
             <button
               type="submit"
               disabled={isUploading || isAgentTyping.value}

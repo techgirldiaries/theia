@@ -25,7 +25,7 @@ export function BarChart({
           {title}
         </h3>
       )}
-      <div class="relative" style={{ height: `${height}px` }}>
+      <div class="relative" style={`height: ${height}px`}>
         {/* Y-axis grid lines */}
         <div class="absolute inset-0 flex flex-col justify-between">
           {[...Array(5)].map((_, i) => (
@@ -46,7 +46,7 @@ export function BarChart({
               <div
                 key={index}
                 class="flex flex-col items-center justify-end flex-1"
-                style={{ maxWidth: `${barWidth}%` }}
+                style={`max-width: ${barWidth}%`}
               >
                 {showValues && item.value > 0 && (
                   <span class="text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
@@ -55,7 +55,7 @@ export function BarChart({
                 )}
                 <div
                   class={`w-full ${colorClass} rounded-t transition-all duration-300 hover:opacity-80`}
-                  style={{ height: `${barHeight}%` }}
+                  style={`height: ${barHeight}%`}
                   title={`${item.label}: ${item.value}`}
                 />
               </div>
@@ -70,7 +70,7 @@ export function BarChart({
           <div
             key={index}
             class="text-xs text-zinc-600 dark:text-zinc-400 text-center flex-1 truncate"
-            style={{ maxWidth: `${barWidth}%` }}
+            style={`max-width: ${barWidth}%`}
             title={item.label}
           >
             {item.label}

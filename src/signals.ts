@@ -258,9 +258,17 @@ function loadMetricsFromStorage(): PerformanceMetric[] {
   }
 }
 
-// Load saved messages on startup
+// Load saved messages on startup and archive them automatically
 const savedMessages = loadMessagesFromStorage();
-export const messages = signal<Message[]>(savedMessages);
+
+// Auto-archive any existing conversation from previous session
+if (savedMessages.length > 0) {
+  saveChatSessionToHistory(savedMessages);
+  localStorage.removeItem("fraud-chat-history"); // Clear current chat storage
+}
+
+// Always start with empty chat on page reload
+export const messages = signal<Message[]>([]);
 
 // Load saved datasets and metrics
 const savedDatasets = loadDatasetsFromStorage();

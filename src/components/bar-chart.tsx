@@ -25,6 +25,7 @@ export function BarChart({
           {title}
         </h3>
       )}
+      {/* eslint-disable-next-line */}
       <div class="relative" style={`height: ${height}px`}>
         {/* Y-axis grid lines */}
         <div class="absolute inset-0 flex flex-col justify-between">

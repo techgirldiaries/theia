@@ -51,6 +51,14 @@ type FraudStats = {
   successRate: number;
 };
 
+type ChatSession = {
+  id: string;
+  startTime: Date;
+  endTime: Date;
+  messages: Message[];
+  messageCount: number;
+};
+
 // Helper functions for message persistence
 function saveMessagesToStorage(msgs: Message[]) {
   try {
@@ -87,6 +95,69 @@ function loadMessagesFromStorage(): Message[] {
   }
 }
 
+// Helper functions for chat sessions history
+function saveChatSessionToHistory(msgs: Message[]): void {
+  try {
+    if (msgs.length === 0) return;
+
+    const sessions = loadChatSessionsFromStorage();
+    const newSession: ChatSession = {
+      id: `session-${Date.now()}`,
+      startTime: msgs[0].createdAt,
+      endTime: new Date(),
+      messages: msgs,
+      messageCount: msgs.length,
+    };
+
+    sessions.push(newSession);
+    const serialized = sessions.map((s) => ({
+      ...s,
+      startTime: s.startTime.toISOString(),
+      endTime: s.endTime.toISOString(),
+      messages: s.messages.map((m) => ({
+        id: m.id,
+        type: m.type,
+        text: m.text,
+        createdAt: m.createdAt.toISOString(),
+        attachments: m.attachments,
+      })),
+    }));
+
+    localStorage.setItem(
+      "fraud-chat-sessions",
+      JSON.stringify(serialized.slice(-10)),
+    ); // Keep last 10 sessions
+  } catch (error) {
+    console.error("Failed to save chat session:", error);
+  }
+}
+
+function loadChatSessionsFromStorage(): ChatSession[] {
+  try {
+    const saved = localStorage.getItem("fraud-chat-sessions");
+    if (!saved) return [];
+
+    const parsed = JSON.parse(saved);
+    return parsed.map((s: any) => ({
+      id: s.id,
+      startTime: new Date(s.startTime),
+      endTime: new Date(s.endTime),
+      messageCount: s.messageCount,
+      messages: s.messages.map((m: any) => ({
+        id: m.id,
+        type: m.type,
+        text: m.text,
+        createdAt: new Date(m.createdAt),
+        isAgent: () => m.type === "agent-message",
+        attachments: m.attachments,
+      })),
+    }));
+  } catch (error) {
+    console.error("Failed to load chat sessions:", error);
+    return [];
+  }
+}
+
 export function clearChatHistory() {
   messages.value = [];
   uploadedDatasets.value = [];
@@ -94,6 +165,39 @@ export function clearChatHistory() {
   localStorage.removeItem("fraud-chat-history");
   localStorage.removeItem("fraud-datasets");
   localStorage.removeItem("fraud-performance");
+  localStorage.removeItem("fraud-chat-sessions");
+}
+
+export function startNewChat() {
+  // Save current conversation to history before clearing
+  if (messages.value.length > 0) {
+    saveChatSessionToHistory(messages.value);
+    showToast(
+      `Chat saved to history (${messages.value.length} messages)`,
+      "success",
+    );
+  }
+
+  // Clear the UI completely
+  messages.value = [];
+
+  // Unsubscribe from current task to start fresh
+  if (task.value) {
+    task.value.unsubscribe();
+    task.value = undefined;
+  }
+
+  // Reset all task-related states
+  isAgentTyping.value = false;
+  taskStatus.value = null;
+
+  // Scroll to top for empty state
+  setTimeout(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }, 100);
 }
 
 // Helper functions for dataset persistence
@@ -163,6 +267,11 @@ const savedDatasets = loadDatasetsFromStorage();
 export const uploadedDatasets = signal<DatasetInfo[]>(savedDatasets);
 const savedMetrics = loadMetricsFromStorage();
 export const performanceMetrics = signal<PerformanceMetric[]>(savedMetrics);
+
+// Helper to get chat sessions (computed on demand)
+export function getChatSessions(): ChatSession[] {
+  return loadChatSessionsFromStorage();
+}
 
 export const client = signal<Client>();
 export const agent = signal<Agent>();
@@ -307,6 +416,14 @@ effect(() => {
 effect(() => {
   if (messages.value.length > 0) {
     saveMessagesToStorage(messages.value);
+
+    // Auto-scroll to bottom when new messages arrive
+    setTimeout(() => {
+      window.scrollTo({
+        top: document.documentElement.scrollHeight,
+        behavior: "smooth",
+      });
+    }, 100);
   }
 });
 

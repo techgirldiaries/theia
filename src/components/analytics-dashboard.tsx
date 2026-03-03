@@ -4,6 +4,7 @@ import {
   CheckCircle,
   Clock,
   Database,
+  MessageSquare,
   TrendingUp,
   X,
 } from "lucide-react";
@@ -13,6 +14,7 @@ import { LineChart } from "@/components/line-chart";
 import {
   clearChatHistory,
   fraudStats,
+  getChatSessions,
   performanceMetrics,
   showAnalytics,
   uploadedDatasets,
@@ -22,6 +24,7 @@ export function AnalyticsDashboard() {
   const stats = fraudStats.value;
   const metrics = performanceMetrics.value;
   const datasets = uploadedDatasets.value;
+  const chatSessions = getChatSessions();
 
   // Calculate response times over time for line chart
   const responseTimeData = metrics
@@ -183,6 +186,57 @@ export function AnalyticsDashboard() {
                     </a>
                   </div>
                 ))}
+              </div>
+            )}
+          </div>
+
+          {/* Chat Sessions History */}
+          <div class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg p-4 mb-4 transition-colors">
+            <div class="flex items-center gap-x-2 mb-3">
+              <MessageSquare
+                size={20}
+                strokeWidth={2}
+                class="text-indigo-500"
+              />
+              <h3 class="text-lg font-semibold text-zinc-900 dark:text-white">
+                Saved Chat Sessions
+              </h3>
+            </div>
+            {chatSessions.length === 0 ? (
+              <p class="text-sm text-zinc-500 dark:text-zinc-400">
+                No saved chat sessions yet. Use "New Chat" to save current
+                conversations.
+              </p>
+            ) : (
+              <div class="space-y-2">
+                {chatSessions
+                  .slice()
+                  .reverse()
+                  .map((session) => (
+                    <div
+                      key={session.id}
+                      class="flex items-center justify-between p-3 bg-zinc-50 dark:bg-zinc-700/50 rounded-lg"
+                    >
+                      <div class="flex-1">
+                        <p class="text-sm font-medium text-zinc-900 dark:text-white">
+                          Session from {session.startTime.toLocaleDateString()}{" "}
+                          at {session.startTime.toLocaleTimeString()}
+                        </p>
+                        <p class="text-xs text-zinc-500 dark:text-zinc-400">
+                          {session.messageCount} messages • Duration:{" "}
+                          {Math.round(
+                            (session.endTime.getTime() -
+                              session.startTime.getTime()) /
+                              60000,
+                          )}{" "}
+                          minutes
+                        </p>
+                      </div>
+                      <span class="text-xs bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 px-2 py-1 rounded-full">
+                        Saved
+                      </span>
+                    </div>
+                  ))}
               </div>
             )}
           </div>

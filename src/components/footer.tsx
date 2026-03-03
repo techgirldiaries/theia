@@ -23,10 +23,22 @@ type Message = {
 };
 
 export function Footer() {
-  const input = useRef<HTMLInputElement>(null);
+  const input = useRef<HTMLTextAreaElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+
+  // Helper to read CSV preview (first 5 rows)
+  const readCSVPreview = async (file: File): Promise<string> => {
+    try {
+      const text = await file.text();
+      const lines = text.split("\n").slice(0, 6); // Header + 5 rows
+      return lines.join("\n");
+    } catch (error) {
+      console.error("Failed to read CSV preview:", error);
+      return "";
+    }
+  };
 
   const handleFileSelect = useCallback(() => {
     fileInput.current?.click();
@@ -46,6 +58,28 @@ export function Footer() {
     setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
   }, []);
 
+  const handleInput = useCallback(() => {
+    if (input.current) {
+      // Auto-resize textarea
+      input.current.style.height = "auto";
+      input.current.style.height = `${Math.min(input.current.scrollHeight, 200)}px`;
+    }
+  }, []);
+
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      // Submit on Enter (without Shift), allow Shift+Enter for new lines
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        const form = input.current?.closest("form");
+        if (form && !isAgentTyping.value && !isUploading) {
+          form.requestSubmit();
+        }
+      }
+    },
+    [isUploading],
+  );
+
   const handleSubmit = useCallback<SubmitEventHandler<HTMLFormElement>>(
     async (e) => {
       e.preventDefault();
@@ -63,12 +97,23 @@ export function Footer() {
 
       // Upload files first if any are selected
       let uploadedAttachments: Attachment[] = [];
+      let fileDetailsWithPreviews: string[] = [];
+
       if (selectedFiles.length > 0 && client.value) {
         setIsUploading(true);
         try {
-          uploadedAttachments = await Promise.all(
-            selectedFiles.map((file) => client.value!.uploadTempFile(file)),
+          // Upload files and read previews in parallel
+          const uploadPromises = selectedFiles.map((file) =>
+            client.value!.uploadTempFile(file),
           );
+          const previewPromises = selectedFiles.map((file) =>
+            file.name.toLowerCase().endsWith(".csv")
+              ? readCSVPreview(file)
+              : Promise.resolve(""),
+          );
+
+          uploadedAttachments = await Promise.all(uploadPromises);
+          const previews = await Promise.all(previewPromises);
 
           // Store dataset info for multi-agent access
           uploadedAttachments.forEach((attachment, index) => {
@@ -80,6 +125,13 @@ export function Footer() {
               uploadedAt: new Date(),
               size: file.size,
             });
+
+            // Build detailed file info with preview
+            let fileDetail = `- File: ${attachment.fileName}\n  URL: ${attachment.fileUrl}\n  Size: ${(file.size / 1024).toFixed(2)} KB`;
+            if (previews[index]) {
+              fileDetail += `\n  Preview (first 5 rows):\n\`\`\`csv\n${previews[index]}\n\`\`\``;
+            }
+            fileDetailsWithPreviews.push(fileDetail);
           });
         } catch (error) {
           console.error("Failed to upload files:", error);
@@ -93,10 +145,8 @@ export function Footer() {
       // Build message with file information
       let messageText = message?.trim() || "";
       if (uploadedAttachments.length > 0) {
-        const fileList = uploadedAttachments
-          .map((att) => `- ${att.fileName}`)
-          .join("\n");
-        messageText = `${messageText}\n\nAttached files:\n${fileList}`;
+        const fileList = fileDetailsWithPreviews.join("\n\n");
+        messageText = `${messageText}\n\n📎 Dataset Files:\n${fileList}\n\n✅ Instructions: The file(s) are uploaded and accessible at the URL(s) above. Please fetch and analyze the complete dataset from the provided URL(s). The preview shows the structure (column names and sample rows).`;
       }
 
       messages.value = [
@@ -115,13 +165,26 @@ export function Footer() {
         return;
       }
 
-      const t = workforce.value
-        ? await workforce.value.sendMessage(messageText, task.value!)
-        : await agent.value!.sendMessage(
+      // Send message and get/create task
+      let t: any;
+      if (workforce.value) {
+        t = await workforce.value.sendMessage(messageText, task.value);
+      } else if (agent.value) {
+        if (task.value) {
+          t = await agent.value.sendMessage(
             message?.trim() || "[Files attached]",
             uploadedAttachments,
-            task.value!,
+            task.value,
           );
+        } else {
+          t = await agent.value.sendMessage(
+            message?.trim() || "[Files attached]",
+            uploadedAttachments,
+          );
+        }
+      }
+
+      // Update task reference and start tracking if it's a new task
       if (task.value !== t) {
         task.value = t;
         // Start tracking performance for this task
@@ -130,6 +193,7 @@ export function Footer() {
 
       if (input.current) {
         input.current.value = "";
+        input.current.style.height = "auto";
         input.current.focus();
       }
       setSelectedFiles([]);
@@ -169,7 +233,7 @@ export function Footer() {
             <span>Uploading files...</span>
           </div>
         )}
-        <div class="flex items-center gap-x-2">
+        <div class="flex items-end gap-x-2">
           <input
             ref={fileInput}
             type="file"
@@ -182,23 +246,25 @@ export function Footer() {
             type="button"
             onClick={handleFileSelect}
             disabled={isUploading || isAgentTyping.value}
-            class="p-3 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors cursor-pointer outline-indigo-500 outline-offset-3 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="p-3 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors cursor-pointer outline-indigo-500 outline-offset-3 disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
             aria-label="Attach file"
           >
             <Paperclip size={24} strokeWidth={1.5} />
           </button>
-          <input
+          <textarea
             ref={input}
-            type="text"
             placeholder="Analyse transaction data, detect fraud patterns or ask about risk scoring..."
             disabled={isUploading}
-            class="flex-1 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-4 py-3 rounded-full outline-indigo-500 outline-offset-3 text-zinc-800 dark:text-white dark:placeholder-zinc-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            onInput={handleInput}
+            onKeyDown={handleKeyDown}
+            rows={1}
+            class="flex-1 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-4 py-3 rounded-2xl outline-indigo-500 outline-offset-3 text-zinc-800 dark:text-white dark:placeholder-zinc-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed resize-none max-h-50 overflow-y-auto"
             name="message"
           />
           <button
             type="submit"
             disabled={isUploading || isAgentTyping.value}
-            class="bg-indigo-500 dark:bg-indigo-600 text-white rounded-full p-3 cursor-pointer hover:bg-indigo-600 dark:hover:bg-indigo-700 active:bg-indigo-700 dark:active:bg-indigo-800 outline-indigo-500 outline-offset-3 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            class="bg-indigo-500 dark:bg-indigo-600 text-white rounded-full p-3 cursor-pointer hover:bg-indigo-600 dark:hover:bg-indigo-700 active:bg-indigo-700 dark:active:bg-indigo-800 outline-indigo-500 outline-offset-3 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
             aria-label="Send message"
           >
             <SendHorizonal size={24} strokeWidth={1.5} />

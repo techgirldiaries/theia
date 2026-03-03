@@ -1,5 +1,5 @@
 import * as Avatar from "@radix-ui/react-avatar";
-import { BarChart3, Moon, Sun, Trash2 } from "lucide-react";
+import { BarChart3, MessageSquarePlus, Moon, Sun, Trash2 } from "lucide-react";
 import {
   agentAvatar,
   agentInitials,
@@ -8,6 +8,7 @@ import {
   isDarkMode,
   messages,
   showAnalytics,
+  startNewChat,
 } from "@/signals";
 import { ConnectionStatus } from "@/components/connection-status";
 
@@ -26,6 +27,10 @@ export function Header() {
 
   const toggleAnalytics = () => {
     showAnalytics.value = !showAnalytics.value;
+  };
+
+  const handleNewChat = () => {
+    startNewChat();
   };
 
   return (
@@ -52,6 +57,15 @@ export function Header() {
               <ConnectionStatus />
             </div>
           </hgroup>
+          <button
+            type="button"
+            onClick={handleNewChat}
+            class="p-2 rounded-lg text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+            aria-label="Start new chat"
+            title="New Chat"
+          >
+            <MessageSquarePlus size={20} strokeWidth={1.5} />
+          </button>
           <button
             type="button"
             onClick={toggleAnalytics}

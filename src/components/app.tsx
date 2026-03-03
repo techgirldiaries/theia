@@ -11,6 +11,7 @@ import { StopButton } from "@/components/stop-button";
 import { ScrollToBottomButton } from "@/components/scroll-to-bottom";
 import { LoadingSkeleton } from "@/components/loading-skeleton";
 import { FileManagerPanel } from "@/components/file-manager";
+import { KeyboardShortcutsPanel } from "@/components/keyboard-shortcuts";
 import {
   dismissToast,
   isAgentTyping,
@@ -111,6 +112,7 @@ export function App() {
       <StopButton />
       <ScrollToBottomButton />
       <FileManagerPanel />
+      <KeyboardShortcutsPanel />
       {/* Toast notifications */}
       <For each={toasts}>
         {(toast) => (

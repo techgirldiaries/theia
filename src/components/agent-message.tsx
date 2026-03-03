@@ -53,7 +53,7 @@ export function AgentMessage({ message }: AgentMessageProps) {
 
   return (
     <div
-      class={`flex items-start gap-x-2 pr-12 md:pr-0 md:max-w-4/6 self-start group ${compactView.value ? "mb-2" : ""}`}
+      class={`flex items-start gap-x-2 pr-12 md:pr-0 md:max-w-3xl self-start group ${compactView.value ? "mb-2" : ""}`}
     >
       <div class="shrink-0">
         <Avatar.Root>

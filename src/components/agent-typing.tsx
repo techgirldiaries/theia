@@ -4,7 +4,7 @@ import { TaskStatusIndicator } from "@/components/task-status-indicator";
 
 export function AgentTyping() {
   return (
-    <div class="flex items-start gap-x-2 max-w-4/6 self-start">
+    <div class="flex items-start gap-x-2 max-w-3xl self-start">
       <div class="shrink-0">
         <Avatar.Root>
           <Avatar.Image

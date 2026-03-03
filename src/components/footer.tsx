@@ -208,6 +208,62 @@ export function Footer() {
     }
   };
 
+  const readJSONPreview = async (file: File): Promise<string> => {
+    try {
+      const text = await file.text();
+      const json = JSON.parse(text);
+      // Pretty print JSON with max 20 lines preview
+      const formatted = JSON.stringify(json, null, 2);
+      const lines = formatted.split("\n").slice(0, 20);
+      return (
+        lines.join("\n") + (formatted.split("\n").length > 20 ? "\n..." : "")
+      );
+    } catch (error) {
+      console.error("Failed to read JSON preview:", error);
+      return "";
+    }
+  };
+
+  const readTXTPreview = async (file: File): Promise<string> => {
+    try {
+      const text = await file.text();
+      const lines = text.split("\n").slice(0, 15); // First 15 lines
+      return lines.join("\n") + (text.split("\n").length > 15 ? "\n..." : "");
+    } catch (error) {
+      console.error("Failed to read TXT preview:", error);
+      return "";
+    }
+  };
+
+  const readTSVPreview = async (file: File): Promise<string> => {
+    try {
+      const text = await file.text();
+      const lines = text.split("\n").slice(0, 6); // Header + 5 rows
+      return lines.join("\n");
+    } catch (error) {
+      console.error("Failed to read TSV preview:", error);
+      return "";
+    }
+  };
+
+  const getFilePreview = async (
+    file: File,
+  ): Promise<{ preview: string; format: string }> => {
+    const fileName = file.name.toLowerCase();
+
+    if (fileName.endsWith(".csv")) {
+      return { preview: await readCSVPreview(file), format: "csv" };
+    } else if (fileName.endsWith(".json")) {
+      return { preview: await readJSONPreview(file), format: "json" };
+    } else if (fileName.endsWith(".txt") || fileName.endsWith(".log")) {
+      return { preview: await readTXTPreview(file), format: "text" };
+    } else if (fileName.endsWith(".tsv")) {
+      return { preview: await readTSVPreview(file), format: "tsv" };
+    } else {
+      return { preview: "", format: "unknown" };
+    }
+  };
+
   const handleFileSelect = useCallback(() => {
     fileInput.current?.click();
   }, []);
@@ -313,9 +369,7 @@ export function Footer() {
             client.value!.uploadTempFile(file),
           );
           const previewPromises = selectedFiles.map((file) =>
-            file.name.toLowerCase().endsWith(".csv")
-              ? readCSVPreview(file)
-              : Promise.resolve(""),
+            getFilePreview(file),
           );
 
           uploadedAttachments = await Promise.all(uploadPromises);
@@ -340,8 +394,9 @@ export function Footer() {
 
             // Build detailed file info with preview
             let fileDetail = `- File: ${attachment.fileName}\n  URL: ${attachment.fileUrl}\n  Size: ${(file.size / 1024).toFixed(2)} KB`;
-            if (previews[index]) {
-              fileDetail += `\n  Preview (first 5 rows):\n\`\`\`csv\n${previews[index]}\n\`\`\``;
+            if (previews[index].preview) {
+              const previewFormat = previews[index].format;
+              fileDetail += `\n  Preview (first rows):\n\`\`\`${previewFormat}\n${previews[index].preview}\n\`\`\``;
             }
             fileDetailsWithPreviews.push(fileDetail);
           });

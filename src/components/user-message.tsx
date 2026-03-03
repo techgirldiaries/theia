@@ -41,7 +41,7 @@ export function UserMessage({ message }: UserMessageProps) {
 
   return (
     <div
-      class={`flex items-start gap-x-2 pl-12 md:pl-0 md:max-w-4/6 self-end flex-row-reverse group ${compactView.value ? "mb-2" : ""}`}
+      class={`flex items-start gap-x-2 pl-12 md:pl-0 md:max-w-3xl self-end flex-row-reverse group ${compactView.value ? "mb-2" : ""}`}
     >
       <div class="shrink-0">
         <Avatar.Root>

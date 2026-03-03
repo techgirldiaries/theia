@@ -2,7 +2,13 @@ import * as Avatar from "@radix-ui/react-avatar";
 import { FileText, Copy, Check } from "lucide-react";
 import TimeAgo from "react-timeago";
 import { useState } from "preact/hooks";
-import { agentAvatar, agentInitials, agentName, showToast, compactView } from "@/signals";
+import {
+  agentAvatar,
+  agentInitials,
+  agentName,
+  showToast,
+  compactView,
+} from "@/signals";
 import { RiskBadge } from "@/components/risk-badge";
 import { FraudReport } from "@/components/fraud-report";
 import { isFraudReport, parseFraudReport } from "@/utils/parse-fraud-report";
@@ -25,7 +31,7 @@ interface AgentMessageProps {
 
 export function AgentMessage({ message }: AgentMessageProps) {
   const [copied, setCopied] = useState(false);
-  
+
   // Check if message is a fraud report
   const isFraud = isFraudReport(message.text);
   const parsedReport = isFraud ? parseFraudReport(message.text) : null;
@@ -46,7 +52,9 @@ export function AgentMessage({ message }: AgentMessageProps) {
   };
 
   return (
-    <div class={`flex items-start gap-x-2 pr-12 md:pr-0 md:max-w-4/6 self-start group ${compactView.value ? 'mb-2' : ''}`}>
+    <div
+      class={`flex items-start gap-x-2 pr-12 md:pr-0 md:max-w-4/6 self-start group ${compactView.value ? "mb-2" : ""}`}
+    >
       <div class="shrink-0">
         <Avatar.Root>
           <Avatar.Image
@@ -60,7 +68,10 @@ export function AgentMessage({ message }: AgentMessageProps) {
         <div class="flex items-center justify-between w-full">
           <small class="flex gap-x-1.5">
             <span class="text-zinc-700 dark:text-zinc-300">{agentName}</span>{" "}
-            <span class="text-zinc-500 dark:text-zinc-400" title={message.createdAt.toLocaleString()}>
+            <span
+              class="text-zinc-500 dark:text-zinc-400"
+              title={message.createdAt.toLocaleString()}
+            >
               <TimeAgo date={message.createdAt} />
             </span>
           </small>
@@ -88,8 +99,12 @@ export function AgentMessage({ message }: AgentMessageProps) {
               </div>
             )}
             <div class="flex flex-col gap-y-2">
-              <div class={`py-2 px-4 rounded-3xl rounded-tl-xs bg-zinc-200 dark:bg-zinc-800 transition-colors ${compactView.value ? 'py-1.5 px-3' : ''}`}>
-                <div class={`text-zinc-800 dark:text-white prose prose-sm dark:prose-invert max-w-none ${compactView.value ? 'text-sm' : ''}`}>
+              <div
+                class={`py-2 px-4 rounded-3xl rounded-tl-xs bg-zinc-200 dark:bg-zinc-800 transition-colors ${compactView.value ? "py-1.5 px-3" : ""}`}
+              >
+                <div
+                  class={`text-zinc-800 dark:text-white prose prose-sm dark:prose-invert max-w-none ${compactView.value ? "text-sm" : ""}`}
+                >
                   <p class="whitespace-pre-wrap">{message.text}</p>
                 </div>
               </div>

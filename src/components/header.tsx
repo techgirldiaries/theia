@@ -1,5 +1,15 @@
 import * as Avatar from "@radix-ui/react-avatar";
-import { BarChart3, MessageSquarePlus, Moon, Sun, Trash2 } from "lucide-react";
+import {
+  BarChart3,
+  MessageSquarePlus,
+  Moon,
+  Sun,
+  Trash2,
+  FolderOpen,
+  Maximize2,
+  Minimize2,
+  Layout,
+} from "lucide-react";
 import {
   agentAvatar,
   agentInitials,
@@ -9,6 +19,9 @@ import {
   messages,
   showAnalytics,
   startNewChat,
+  showFileManager,
+  compactView,
+  splitScreenMode,
 } from "@/signals";
 import { ConnectionStatus } from "@/components/connection-status";
 
@@ -27,10 +40,30 @@ export function Header() {
 
   const toggleAnalytics = () => {
     showAnalytics.value = !showAnalytics.value;
+    // Disable split screen when toggling to full analytics
+    if (showAnalytics.value) {
+      splitScreenMode.value = false;
+    }
   };
 
   const handleNewChat = () => {
     startNewChat();
+  };
+
+  const toggleFileManager = () => {
+    showFileManager.value = !showFileManager.value;
+  };
+
+  const toggleCompactView = () => {
+    compactView.value = !compactView.value;
+  };
+
+  const toggleSplitScreen = () => {
+    splitScreenMode.value = !splitScreenMode.value;
+    // Close full analytics when enabling split screen
+    if (splitScreenMode.value) {
+      showAnalytics.value = false;
+    }
   };
 
   return (
@@ -65,6 +98,45 @@ export function Header() {
             title="New Chat"
           >
             <MessageSquarePlus size={20} strokeWidth={1.5} />
+          </button>
+          <button
+            type="button"
+            onClick={toggleFileManager}
+            class="p-2 rounded-lg text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+            aria-label="Open file manager"
+            title="File Manager"
+          >
+            <FolderOpen size={20} strokeWidth={1.5} />
+          </button>
+          <button
+            type="button"
+            onClick={toggleSplitScreen}
+            class={`p-2 rounded-lg transition-colors cursor-pointer ${
+              splitScreenMode.value
+                ? "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400"
+                : "text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+            }`}
+            aria-label="Toggle split screen"
+            title="Split Screen"
+          >
+            <Layout size={20} strokeWidth={1.5} />
+          </button>
+          <button
+            type="button"
+            onClick={toggleCompactView}
+            class={`p-2 rounded-lg transition-colors cursor-pointer ${
+              compactView.value
+                ? "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400"
+                : "text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+            }`}
+            aria-label="Toggle compact view"
+            title={compactView.value ? "Expanded View" : "Compact View"}
+          >
+            {compactView.value ? (
+              <Maximize2 size={20} strokeWidth={1.5} />
+            ) : (
+              <Minimize2 size={20} strokeWidth={1.5} />
+            )}
           </button>
           <button
             type="button"

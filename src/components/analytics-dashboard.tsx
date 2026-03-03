@@ -11,6 +11,7 @@ import {
 import { StatsCard } from "@/components/stats-card";
 import { BarChart } from "@/components/bar-chart";
 import { LineChart } from "@/components/line-chart";
+import { AuditLogViewer } from "@/components/audit-log-viewer";
 import {
   clearChatHistory,
   fraudStats,
@@ -192,16 +193,19 @@ export function AnalyticsDashboard() {
 
           {/* Chat Sessions History */}
           <div class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg p-4 mb-4 transition-colors">
-            <div class="flex items-center gap-x-2 mb-3">
-              <MessageSquare
-                size={20}
-                strokeWidth={2}
-                class="text-indigo-500"
-              />
-              <h3 class="text-lg font-semibold text-zinc-900 dark:text-white">
-                Saved Chat Sessions
-              </h3>
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-x-2">
+                <MessageSquare
+                  size={20}
+                  strokeWidth={2}
+                  class="text-indigo-500"
+                />
+                <h3 class="text-lg font-semibold text-zinc-900 dark:text-white">
+                  Saved Chat Sessions
+                </h3>
+              </div>
             </div>
+
             {chatSessions.length === 0 ? (
               <p class="text-sm text-zinc-500 dark:text-zinc-400">
                 No saved chat sessions yet. Use "New Chat" to save current
@@ -212,31 +216,120 @@ export function AnalyticsDashboard() {
                 {chatSessions
                   .slice()
                   .reverse()
-                  .map((session) => (
-                    <div
-                      key={session.id}
-                      class="flex items-center justify-between p-3 bg-zinc-50 dark:bg-zinc-700/50 rounded-lg"
-                    >
-                      <div class="flex-1">
-                        <p class="text-sm font-medium text-zinc-900 dark:text-white">
-                          Session from {session.startTime.toLocaleDateString()}{" "}
-                          at {session.startTime.toLocaleTimeString()}
-                        </p>
-                        <p class="text-xs text-zinc-500 dark:text-zinc-400">
-                          {session.messageCount} messages • Duration:{" "}
-                          {Math.round(
-                            (session.endTime.getTime() -
-                              session.startTime.getTime()) /
-                              60000,
-                          )}{" "}
-                          minutes
-                        </p>
+                  .map((session) => {
+                    const riskColors = {
+                      high: "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800",
+                      medium:
+                        "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800",
+                      low: "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800",
+                    };
+
+                    return (
+                      <div
+                        key={session.id}
+                        class={`p-3 bg-zinc-50 dark:bg-zinc-700/50 rounded-lg border transition-all hover:shadow-md ${
+                          session.riskLevel
+                            ? `border-l-4 ${riskColors[session.riskLevel].split(" ")[3]}`
+                            : "border-zinc-200 dark:border-zinc-600"
+                        }`}
+                      >
+                        <div class="flex items-start justify-between mb-2">
+                          <div class="flex-1">
+                            <p class="text-sm font-medium text-zinc-900 dark:text-white">
+                              Session from{" "}
+                              {session.startTime.toLocaleDateString()} at{" "}
+                              {session.startTime.toLocaleTimeString()}
+                            </p>
+                            <p class="text-xs text-zinc-500 dark:text-zinc-400">
+                              {session.messageCount} messages • Duration:{" "}
+                              {Math.round(
+                                (session.endTime.getTime() -
+                                  session.startTime.getTime()) /
+                                  60000,
+                              )}{" "}
+                              minutes
+                            </p>
+                          </div>
+                          {session.riskLevel && (
+                            <span
+                              class={`text-xs px-2 py-1 rounded-full border ${riskColors[session.riskLevel]}`}
+                            >
+                              {session.riskLevel.toUpperCase()} RISK
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Tags */}
+                        {session.tags && session.tags.length > 0 && (
+                          <div class="flex flex-wrap gap-1 mb-2">
+                            {session.tags.map((tag) => (
+                              <span
+                                key={tag}
+                                class="text-xs bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 px-2 py-0.5 rounded-full"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Action buttons */}
+                        <div class="flex items-center gap-x-1 mt-2">
+                          <button
+                            onClick={() => {
+                              const { restoreSession } = require("@/signals");
+                              restoreSession(session);
+                            }}
+                            class="px-3 py-1 text-xs bg-indigo-500 hover:bg-indigo-600 text-white rounded transition-colors"
+                            title="Restore this session"
+                          >
+                            Restore
+                          </button>
+                          <button
+                            onClick={() => {
+                              const {
+                                exportSessionAsJSON,
+                              } = require("@/signals");
+                              exportSessionAsJSON(session);
+                            }}
+                            class="px-3 py-1 text-xs bg-zinc-200 dark:bg-zinc-600 hover:bg-zinc-300 dark:hover:bg-zinc-500 text-zinc-700 dark:text-zinc-200 rounded transition-colors"
+                            title="Export as JSON"
+                          >
+                            JSON
+                          </button>
+                          <button
+                            onClick={() => {
+                              const {
+                                exportSessionAsCSV,
+                              } = require("@/signals");
+                              exportSessionAsCSV(session);
+                            }}
+                            class="px-3 py-1 text-xs bg-zinc-200 dark:bg-zinc-600 hover:bg-zinc-300 dark:hover:bg-zinc-500 text-zinc-700 dark:text-zinc-200 rounded transition-colors"
+                            title="Export as CSV"
+                          >
+                            CSV
+                          </button>
+                          <button
+                            onClick={() => {
+                              const tag = prompt(
+                                "Enter tag name (e.g., 'Credit Card Fraud', 'Identity Theft'):",
+                              );
+                              if (tag) {
+                                const {
+                                  addTagToSession,
+                                } = require("@/signals");
+                                addTagToSession(session.id, tag);
+                              }
+                            }}
+                            class="px-3 py-1 text-xs bg-purple-100 dark:bg-purple-900/30 hover:bg-purple-200 dark:hover:bg-purple-900/50 text-purple-700 dark:text-purple-300 rounded transition-colors"
+                            title="Add tag"
+                          >
+                            +Tag
+                          </button>
+                        </div>
                       </div>
-                      <span class="text-xs bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 px-2 py-1 rounded-full">
-                        Saved
-                      </span>
-                    </div>
-                  ))}
+                    );
+                  })}
               </div>
             )}
           </div>
@@ -333,6 +426,9 @@ export function AnalyticsDashboard() {
               </div>
             )}
           </div>
+
+          {/* Audit Log */}
+          <AuditLogViewer />
 
           {/* Actions */}
           <div class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg p-4 transition-colors">

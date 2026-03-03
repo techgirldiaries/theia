@@ -8,6 +8,9 @@ import { Header } from "@/components/header";
 import { UserMessage } from "@/components/user-message";
 import { Toast } from "@/components/toast";
 import { StopButton } from "@/components/stop-button";
+import { ScrollToBottomButton } from "@/components/scroll-to-bottom";
+import { LoadingSkeleton } from "@/components/loading-skeleton";
+import { FileManagerPanel } from "@/components/file-manager";
 import {
   dismissToast,
   isAgentTyping,
@@ -16,6 +19,7 @@ import {
   messages,
   showAnalytics,
   toasts,
+  splitScreenMode,
 } from "@/signals";
 import type { Attachment } from "@relevanceai/sdk";
 
@@ -26,6 +30,8 @@ type Message = {
   createdAt: Date;
   isAgent: () => boolean;
   attachments?: Attachment[];
+  status?: "sending" | "sent" | "failed";
+  read?: boolean;
 };
 
 export function App() {
@@ -74,24 +80,37 @@ export function App() {
   return (
     <div class="flex flex-col min-h-dvh dark:bg-zinc-950">
       <Header />
-      <main class="flex-1 p-4 bg-zinc-50 dark:bg-zinc-950 transition-colors">
-        <div class="max-w-3xl mx-auto flex flex-col gap-y-4">
-          <For each={messages} fallback={<EmptyState />}>
-            {(m) =>
-              m.isAgent() ? (
-                <AgentMessage message={m as Message} />
-              ) : (
-                <UserMessage message={m as Message} />
-              )
-            }
-          </For>
-          <Show when={isAgentTyping}>
-            <AgentTyping />
-          </Show>
-        </div>
-      </main>
+      <div
+        class={`flex flex-1 ${splitScreenMode.value ? "flex-row" : "flex-col"}`}
+      >
+        <main
+          class={`${splitScreenMode.value ? "w-1/2" : "w-full"} p-4 bg-zinc-50 dark:bg-zinc-950 transition-colors overflow-auto`}
+        >
+          <div class="max-w-3xl mx-auto flex flex-col gap-y-4">
+            <For each={messages} fallback={<EmptyState />}>
+              {(m) =>
+                m.isAgent() ? (
+                  <AgentMessage message={m as Message} />
+                ) : (
+                  <UserMessage message={m as Message} />
+                )
+              }
+            </For>
+            <Show when={isAgentTyping}>
+              <LoadingSkeleton />
+            </Show>
+          </div>
+        </main>
+        {splitScreenMode.value && (
+          <div class="w-1/2 border-l border-zinc-200 dark:border-zinc-800 overflow-auto">
+            <AnalyticsDashboard />
+          </div>
+        )}
+      </div>
       <Footer />
       <StopButton />
+      <ScrollToBottomButton />
+      <FileManagerPanel />
       {/* Toast notifications */}
       <For each={toasts}>
         {(toast) => (
@@ -103,8 +122,8 @@ export function App() {
           />
         )}
       </For>
-      {/* Analytics Dashboard */}
-      <Show when={showAnalytics}>
+      {/* Analytics Dashboard (full screen mode) */}
+      <Show when={showAnalytics && !splitScreenMode.value}>
         <AnalyticsDashboard />
       </Show>
     </div>

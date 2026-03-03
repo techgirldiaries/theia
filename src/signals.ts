@@ -219,7 +219,13 @@ export function clearChatHistory() {
 export function startNewChat() {
   // Save current conversation to history before clearing
   if (messages.value.length > 0) {
+    const sessionId = `session-${Date.now()}`;
     saveChatSessionToHistory(messages.value);
+    logAuditEntry(
+      "session_end",
+      `Ended session with ${messages.value.length} messages`,
+      sessionId,
+    );
     showToast(
       `Chat saved to history (${messages.value.length} messages)`,
       "success",
@@ -238,6 +244,9 @@ export function startNewChat() {
   // Reset all task-related states
   isAgentTyping.value = false;
   taskStatus.value = null;
+
+  // Log new session start
+  logAuditEntry("session_start", "Started new chat session");
 
   // Scroll to top for empty state
   setTimeout(() => {

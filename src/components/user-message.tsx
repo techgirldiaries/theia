@@ -94,15 +94,17 @@ export function UserMessage({ message }: UserMessageProps) {
             </button>
           </div>
         </div>
-        <div class="flex flex-col gap-y-2 items-end">
+        <div class="flex flex-col gap-y-2 items-end w-full">
           <div
-            class={`relative py-2 px-4 rounded-3xl rounded-tr-xs ${
+            class={`relative py-2 px-4 rounded-3xl rounded-tr-xs max-w-full ${
               message.status === "failed"
                 ? "bg-red-500/20 dark:bg-red-900/30 border border-red-500/50"
                 : "bg-indigo-500 dark:bg-indigo-600"
             } text-white transition-colors ${compactView.value ? "py-1.5 px-3" : ""}`}
           >
-            <p class={`text-end ${compactView.value ? "text-sm" : ""}`}>
+            <p
+              class={`text-end whitespace-pre-wrap break-words ${compactView.value ? "text-sm" : ""}`}
+            >
               {message.text}
             </p>
             {message.status === "failed" && (

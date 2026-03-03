@@ -98,9 +98,9 @@ export function AgentMessage({ message }: AgentMessageProps) {
                 <RiskBadge score={riskScore} />
               </div>
             )}
-            <div class="flex flex-col gap-y-2">
+            <div class="flex flex-col gap-y-2 w-full">
               <div
-                class={`py-2 px-4 rounded-3xl rounded-tl-xs bg-zinc-200 dark:bg-zinc-800 transition-colors ${compactView.value ? "py-1.5 px-3" : ""}`}
+                class={`py-2 px-4 rounded-3xl rounded-tl-xs bg-zinc-200 dark:bg-zinc-800 transition-colors max-w-full ${compactView.value ? "py-1.5 px-3" : ""}`}
               >
                 <div
                   class={`text-zinc-800 dark:text-white prose prose-sm dark:prose-invert max-w-none ${compactView.value ? "text-sm" : ""}`}

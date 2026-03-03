@@ -1,7 +1,8 @@
 import * as Avatar from "@radix-ui/react-avatar";
-import { FileText } from "lucide-react";
+import { FileText, Copy, Check } from "lucide-react";
 import TimeAgo from "react-timeago";
-import { agentAvatar, agentInitials, agentName } from "@/signals";
+import { useState } from "preact/hooks";
+import { agentAvatar, agentInitials, agentName, showToast, compactView } from "@/signals";
 import { RiskBadge } from "@/components/risk-badge";
 import { FraudReport } from "@/components/fraud-report";
 import { isFraudReport, parseFraudReport } from "@/utils/parse-fraud-report";
@@ -14,6 +15,8 @@ type Message = {
   createdAt: Date;
   isAgent: () => boolean;
   attachments?: Attachment[];
+  status?: "sending" | "sent" | "failed";
+  read?: boolean;
 };
 
 interface AgentMessageProps {
@@ -21,6 +24,8 @@ interface AgentMessageProps {
 }
 
 export function AgentMessage({ message }: AgentMessageProps) {
+  const [copied, setCopied] = useState(false);
+  
   // Check if message is a fraud report
   const isFraud = isFraudReport(message.text);
   const parsedReport = isFraud ? parseFraudReport(message.text) : null;
@@ -29,8 +34,19 @@ export function AgentMessage({ message }: AgentMessageProps) {
   const riskScoreMatch = message.text.match(/Risk Score[:\s]+(\d+)/i);
   const riskScore = riskScoreMatch ? parseInt(riskScoreMatch[1]) : null;
 
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(message.text);
+      setCopied(true);
+      showToast("Message copied to clipboard", "success");
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      showToast("Failed to copy message", "error");
+    }
+  };
+
   return (
-    <div class="flex items-start gap-x-2 pr-12 md:pr-0 md:max-w-4/6 self-start">
+    <div class={`flex items-start gap-x-2 pr-12 md:pr-0 md:max-w-4/6 self-start group ${compactView.value ? 'mb-2' : ''}`}>
       <div class="shrink-0">
         <Avatar.Root>
           <Avatar.Image
@@ -40,13 +56,26 @@ export function AgentMessage({ message }: AgentMessageProps) {
           <Avatar.Fallback>{agentInitials}</Avatar.Fallback>
         </Avatar.Root>
       </div>
-      <div class="flex flex-col gap-y-1 items-start">
-        <small class="flex gap-x-1.5">
-          <span class="text-zinc-700 dark:text-zinc-300">{agentName}</span>{" "}
-          <span class="text-zinc-500 dark:text-zinc-400">
-            <TimeAgo date={message.createdAt} />
-          </span>
-        </small>
+      <div class="flex flex-col gap-y-1 items-start flex-1">
+        <div class="flex items-center justify-between w-full">
+          <small class="flex gap-x-1.5">
+            <span class="text-zinc-700 dark:text-zinc-300">{agentName}</span>{" "}
+            <span class="text-zinc-500 dark:text-zinc-400" title={message.createdAt.toLocaleString()}>
+              <TimeAgo date={message.createdAt} />
+            </span>
+          </small>
+          <button
+            onClick={handleCopy}
+            class="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all"
+            title="Copy message"
+          >
+            {copied ? (
+              <Check size={14} class="text-green-600 dark:text-green-400" />
+            ) : (
+              <Copy size={14} class="text-zinc-500 dark:text-zinc-400" />
+            )}
+          </button>
+        </div>
 
         {/* Render FraudReport component if this is a parsed fraud report */}
         {parsedReport ? (
@@ -59,8 +88,8 @@ export function AgentMessage({ message }: AgentMessageProps) {
               </div>
             )}
             <div class="flex flex-col gap-y-2">
-              <div class="py-2 px-4 rounded-3xl rounded-tl-xs bg-zinc-200 dark:bg-zinc-800 transition-colors">
-                <div class="text-zinc-800 dark:text-white prose prose-sm dark:prose-invert max-w-none">
+              <div class={`py-2 px-4 rounded-3xl rounded-tl-xs bg-zinc-200 dark:bg-zinc-800 transition-colors ${compactView.value ? 'py-1.5 px-3' : ''}`}>
+                <div class={`text-zinc-800 dark:text-white prose prose-sm dark:prose-invert max-w-none ${compactView.value ? 'text-sm' : ''}`}>
                   <p class="whitespace-pre-wrap">{message.text}</p>
                 </div>
               </div>

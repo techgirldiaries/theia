@@ -22,6 +22,9 @@ type Message = {
   createdAt: Date;
   isAgent: () => boolean;
   attachments?: Attachment[];
+  status?: "sending" | "sent" | "failed";
+  read?: boolean;
+  errorMessage?: string;
 };
 
 type DatasetInfo = {
@@ -57,6 +60,30 @@ type ChatSession = {
   endTime: Date;
   messages: Message[];
   messageCount: number;
+  tags?: string[];
+  riskLevel?: "low" | "medium" | "high";
+};
+
+type AuditLogEntry = {
+  id: string;
+  timestamp: Date;
+  action:
+    | "view"
+    | "export"
+    | "delete"
+    | "upload"
+    | "session_start"
+    | "session_end";
+  userId: string;
+  details: string;
+  sessionId?: string;
+};
+
+type QuickTemplate = {
+  id: string;
+  title: string;
+  prompt: string;
+  category: "analysis" | "report" | "risk" | "investigation";
 };
 
 // Helper functions for message persistence
@@ -100,6 +127,19 @@ function saveChatSessionToHistory(msgs: Message[]): void {
   try {
     if (msgs.length === 0) return;
 
+    // Detect risk level from messages
+    let riskLevel: "low" | "medium" | "high" | undefined;
+    for (const msg of msgs) {
+      const riskMatch = msg.text.match(/Risk\s+Score[:\s]+(\d+)/i);
+      if (riskMatch) {
+        const score = parseInt(riskMatch[1]);
+        if (score >= 70) riskLevel = "high";
+        else if (score >= 45) riskLevel = "medium";
+        else riskLevel = "low";
+        break;
+      }
+    }
+
     const sessions = loadChatSessionsFromStorage();
     const newSession: ChatSession = {
       id: `session-${Date.now()}`,
@@ -107,6 +147,8 @@ function saveChatSessionToHistory(msgs: Message[]): void {
       endTime: new Date(),
       messages: msgs,
       messageCount: msgs.length,
+      tags: [],
+      riskLevel,
     };
 
     sessions.push(newSession);
@@ -120,6 +162,8 @@ function saveChatSessionToHistory(msgs: Message[]): void {
         text: m.text,
         createdAt: m.createdAt.toISOString(),
         attachments: m.attachments,
+        status: m.status,
+        read: m.read,
       })),
     }));
 
@@ -143,6 +187,8 @@ function loadChatSessionsFromStorage(): ChatSession[] {
       startTime: new Date(s.startTime),
       endTime: new Date(s.endTime),
       messageCount: s.messageCount,
+      tags: s.tags || [],
+      riskLevel: s.riskLevel,
       messages: s.messages.map((m: any) => ({
         id: m.id,
         type: m.type,
@@ -150,6 +196,8 @@ function loadChatSessionsFromStorage(): ChatSession[] {
         createdAt: new Date(m.createdAt),
         isAgent: () => m.type === "agent-message",
         attachments: m.attachments,
+        status: m.status,
+        read: m.read,
       })),
     }));
   } catch (error) {
@@ -299,6 +347,50 @@ export const isDarkMode = signal(
       : window.matchMedia("(prefers-color-scheme: dark)").matches),
 );
 
+// New UI state signals
+export const showScrollToBottom = signal(false);
+export const showFileManager = signal(false);
+export const compactView = signal(
+  localStorage.getItem("compactView") === "true",
+);
+export const splitScreenMode = signal(false);
+export const messageDraft = signal("");
+export const selectedSessionForComparison = signal<ChatSession | null>(null);
+export const sessionSearchQuery = signal("");
+export const sessionTagFilter = signal<string | null>(null);
+
+// Quick templates
+export const quickTemplates = signal<QuickTemplate[]>([
+  {
+    id: "1",
+    title: "Analyze for Anomalies",
+    prompt:
+      "Please analyze the uploaded dataset for anomalies, unusual patterns, and potential fraud indicators. Provide a detailed risk assessment.",
+    category: "analysis",
+  },
+  {
+    id: "2",
+    title: "Generate Fraud Report",
+    prompt:
+      "Generate a comprehensive fraud report based on the data, including risk scores, fraud patterns, and recommendations.",
+    category: "report",
+  },
+  {
+    id: "3",
+    title: "Risk Assessment",
+    prompt:
+      "Perform a risk assessment on the transactions and categorize them by risk level (low, medium, high).",
+    category: "risk",
+  },
+  {
+    id: "4",
+    title: "Deep Investigation",
+    prompt:
+      "Conduct a deep investigation into suspicious activities, trace transaction patterns, and identify potential fraud networks.",
+    category: "investigation",
+  },
+]);
+
 export const agentName = computed(
   () => agent.value?.name ?? workforce.value?.name,
 );
@@ -410,6 +502,226 @@ export const fraudStats = computed<FraudStats>(() => {
   };
 });
 
+// Audit log helpers
+function saveAuditLog(entry: AuditLogEntry) {
+  try {
+    const saved = localStorage.getItem("fraud-audit-log");
+    const logs: AuditLogEntry[] = saved ? JSON.parse(saved) : [];
+    const serialized = {
+      ...entry,
+      timestamp: entry.timestamp.toISOString(),
+    };
+    logs.push(serialized);
+    // Keep last 100 audit entries
+    localStorage.setItem("fraud-audit-log", JSON.stringify(logs.slice(-100)));
+  } catch (error) {
+    console.error("Failed to save audit log:", error);
+  }
+}
+
+export function logAuditEntry(
+  action: AuditLogEntry["action"],
+  details: string,
+  sessionId?: string,
+) {
+  const entry: AuditLogEntry = {
+    id: `audit-${Date.now()}`,
+    timestamp: new Date(),
+    action,
+    userId: "current-user", // In production, use actual user ID
+    details,
+    sessionId,
+  };
+  saveAuditLog(entry);
+}
+
+export function getAuditLogs(): AuditLogEntry[] {
+  try {
+    const saved = localStorage.getItem("fraud-audit-log");
+    if (!saved) return [];
+    const parsed = JSON.parse(saved);
+    return parsed.map((entry: any) => ({
+      ...entry,
+      timestamp: new Date(entry.timestamp),
+    }));
+  } catch (error) {
+    console.error("Failed to load audit logs:", error);
+    return [];
+  }
+}
+
+// Session restoration
+export function restoreSession(session: ChatSession) {
+  // Save current session if it has messages
+  if (messages.value.length > 0) {
+    saveChatSessionToHistory(messages.value);
+  }
+
+  // Restore the selected session
+  messages.value = session.messages;
+
+  // Reset task for fresh context
+  if (task.value) {
+    task.value.unsubscribe();
+    task.value = undefined;
+  }
+
+  logAuditEntry("view", `Restored session: ${session.id}`, session.id);
+  showToast(`Session restored (${session.messageCount} messages)`, "success");
+
+  // Scroll to top
+  setTimeout(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, 100);
+}
+
+// Session tagging
+export function addTagToSession(sessionId: string, tag: string) {
+  try {
+    const sessions = loadChatSessionsFromStorage();
+    const session = sessions.find((s) => s.id === sessionId);
+    if (session) {
+      if (!session.tags) session.tags = [];
+      if (!session.tags.includes(tag)) {
+        session.tags.push(tag);
+        const serialized = sessions.map((s) => ({
+          ...s,
+          startTime: s.startTime.toISOString(),
+          endTime: s.endTime.toISOString(),
+          messages: s.messages.map((m) => ({
+            id: m.id,
+            type: m.type,
+            text: m.text,
+            createdAt: m.createdAt.toISOString(),
+            attachments: m.attachments,
+            status: m.status,
+            read: m.read,
+          })),
+        }));
+        localStorage.setItem("fraud-chat-sessions", JSON.stringify(serialized));
+        showToast(`Tag "${tag}" added`, "success");
+      }
+    }
+  } catch (error) {
+    console.error("Failed to add tag:", error);
+  }
+}
+
+export function removeTagFromSession(sessionId: string, tag: string) {
+  try {
+    const sessions = loadChatSessionsFromStorage();
+    const session = sessions.find((s) => s.id === sessionId);
+    if (session && session.tags) {
+      session.tags = session.tags.filter((t) => t !== tag);
+      const serialized = sessions.map((s) => ({
+        ...s,
+        startTime: s.startTime.toISOString(),
+        endTime: s.endTime.toISOString(),
+        messages: s.messages.map((m) => ({
+          id: m.id,
+          type: m.type,
+          text: m.text,
+          createdAt: m.createdAt.toISOString(),
+          attachments: m.attachments,
+          status: m.status,
+          read: m.read,
+        })),
+      }));
+      localStorage.setItem("fraud-chat-sessions", JSON.stringify(serialized));
+      showToast(`Tag "${tag}" removed`, "success");
+    }
+  } catch (error) {
+    console.error("Failed to remove tag:", error);
+  }
+}
+
+// Session export
+export function exportSessionAsJSON(session: ChatSession) {
+  try {
+    const dataStr = JSON.stringify(session, null, 2);
+    const dataBlob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `fraud-session-${session.id}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+    logAuditEntry(
+      "export",
+      `Exported session as JSON: ${session.id}`,
+      session.id,
+    );
+    showToast("Session exported as JSON", "success");
+  } catch (error) {
+    console.error("Failed to export session:", error);
+    showToast("Export failed", "error");
+  }
+}
+
+export function exportSessionAsCSV(session: ChatSession) {
+  try {
+    const headers = ["Timestamp", "Type", "Message", "Attachments"];
+    const rows = session.messages.map((m) => [
+      m.createdAt.toISOString(),
+      m.type,
+      `"${m.text.replace(/"/g, '""')}"`,
+      m.attachments?.map((a) => a.fileName).join("; ") || "",
+    ]);
+    const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `fraud-session-${session.id}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    logAuditEntry(
+      "export",
+      `Exported session as CSV: ${session.id}`,
+      session.id,
+    );
+    showToast("Session exported as CSV", "success");
+  } catch (error) {
+    console.error("Failed to export session:", error);
+    showToast("Export failed", "error");
+  }
+}
+
+// Message retry
+export function retryFailedMessage(messageId: string) {
+  const messageIndex = messages.value.findIndex((m) => m.id === messageId);
+  if (messageIndex === -1) return;
+
+  const failedMessage = messages.value[messageIndex];
+  if (failedMessage.status !== "failed") return;
+
+  // Remove failed message and retry
+  messages.value = messages.value.filter((m) => m.id !== messageId);
+
+  // Re-send the message
+  showToast("Retrying message...", "info");
+
+  // The actual retry logic would be in the Footer component
+  // This just updates the state
+}
+
+// Mark messages as read
+export function markMessagesAsRead() {
+  messages.value = messages.value.map((m) => ({
+    ...m,
+    read: true,
+  }));
+}
+
+// Delete dataset
+export function deleteDataset(datasetId: string) {
+  uploadedDatasets.value = uploadedDatasets.value.filter(
+    (d) => d.id !== datasetId,
+  );
+  showToast("Dataset deleted", "success");
+  logAuditEntry("delete", `Deleted dataset: ${datasetId}`);
+}
+
 // Persist dark mode preference
 effect(() => {
   localStorage.setItem("darkMode", isDarkMode.value.toString());
@@ -427,13 +739,50 @@ effect(() => {
 
     // Auto-scroll to bottom when new messages arrive
     setTimeout(() => {
-      window.scrollTo({
-        top: document.documentElement.scrollHeight,
-        behavior: "smooth",
-      });
+      const isNearBottom =
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 100;
+      if (isNearBottom) {
+        window.scrollTo({
+          top: document.documentElement.scrollHeight,
+          behavior: "smooth",
+        });
+      }
     }, 100);
   }
 });
+
+// Detect if user should see scroll to bottom button
+if (typeof window !== "undefined") {
+  window.addEventListener("scroll", () => {
+    const isNearBottom =
+      window.innerHeight + window.scrollY >=
+      document.documentElement.scrollHeight - 300;
+    showScrollToBottom.value = !isNearBottom && messages.value.length > 0;
+  });
+}
+
+// Persist compact view preference
+effect(() => {
+  localStorage.setItem("compactView", compactView.value.toString());
+});
+
+// Persist draft message
+effect(() => {
+  if (messageDraft.value) {
+    localStorage.setItem("fraud-message-draft", messageDraft.value);
+  } else {
+    localStorage.removeItem("fraud-message-draft");
+  }
+});
+
+// Load draft on startup
+if (typeof window !== "undefined") {
+  const savedDraft = localStorage.getItem("fraud-message-draft");
+  if (savedDraft) {
+    messageDraft.value = savedDraft;
+  }
+}
 
 // Persist datasets to localStorage
 effect(() => {

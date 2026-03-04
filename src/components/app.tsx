@@ -12,6 +12,7 @@ import { ScrollToBottomButton } from "@/components/scroll-to-bottom";
 import { LoadingSkeleton } from "@/components/loading-skeleton";
 import { FileManagerPanel } from "@/components/file-manager";
 import { KeyboardShortcutsPanel } from "@/components/keyboard-shortcuts";
+import { HistorySidebar } from "@/components/history-sidebar";
 import {
   dismissToast,
   isAgentTyping,
@@ -111,6 +112,7 @@ export function App() {
       <Footer />
       <StopButton />
       <ScrollToBottomButton />
+      <HistorySidebar />
       <FileManagerPanel />
       <KeyboardShortcutsPanel />
       {/* Toast notifications */}

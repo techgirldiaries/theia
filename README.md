@@ -10,7 +10,7 @@ A real-time fraud intelligence platform using multi-agent collaboration and retr
 - **Real-time Processing** - Instant risk assessment and intelligence gathering
 - **Risk Badging** - Visual risk indicators for quick decision-making
 - **Interactive Interface** - Chat-based interaction with AI agents
-- **Workflow Visualization** - Track agent operations in real-time
+- **Workflow Visualisation** - Track agent operations in real-time
 
 ## Getting Started
 
@@ -38,7 +38,7 @@ A real-time fraud intelligence platform using multi-agent collaboration and retr
 - **Frontend:** Preact with TypeScript
 - **Styling:** Tailwind CSS 4.x with Radix UI components
 - **Build Tool:** Vite
-- **AI/ML:** Relevance AI SDK for multi-agent workforce
+- **AI or ML:** Relevance AI SDK for multi-agent workforce
 - **State Management:** Preact Signals
 
 ## Project Structure

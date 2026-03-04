@@ -368,6 +368,7 @@ export const isDarkMode = signal(
 // New UI state signals
 export const showScrollToBottom = signal(false);
 export const showFileManager = signal(false);
+export const showHistorySidebar = signal(false);
 export const compactView = signal(
   localStorage.getItem("compactView") === "true",
 );
@@ -380,6 +381,9 @@ export const showKeyboardShortcuts = signal(false);
 export const isVoiceRecording = signal(false);
 export const showAutoComplete = signal(false);
 export const autoCompleteQuery = signal("");
+export const agentMode = signal<"auto" | "fast" | "expert" | "heavy">(
+  (localStorage.getItem("agentMode") as any) || "expert",
+);
 
 // Encryption key (in production, use a more secure method)
 const ENCRYPTION_KEY = "fraud-intelligence-key-2026";
@@ -721,6 +725,36 @@ export function removeTagFromSession(sessionId: string, tag: string) {
   }
 }
 
+// Delete a chat session
+export function deleteSession(sessionId: string) {
+  try {
+    const sessions = loadChatSessionsFromStorage();
+    const filteredSessions = sessions.filter((s) => s.id !== sessionId);
+
+    const serialized = filteredSessions.map((s) => ({
+      ...s,
+      startTime: s.startTime.toISOString(),
+      endTime: s.endTime.toISOString(),
+      messages: s.messages.map((m) => ({
+        id: m.id,
+        type: m.type,
+        text: m.text,
+        createdAt: m.createdAt.toISOString(),
+        attachments: m.attachments,
+        status: m.status,
+        read: m.read,
+      })),
+    }));
+
+    localStorage.setItem("fraud-chat-sessions", JSON.stringify(serialized));
+    showToast("Session deleted", "success");
+    logAuditEntry("delete", `Deleted session: ${sessionId}`);
+  } catch (error) {
+    console.error("Failed to delete session:", error);
+    showToast("Failed to delete session", "error");
+  }
+}
+
 // Simple encryption/decryption utilities (for localStorage)
 function simpleEncrypt(text: string): string {
   try {
@@ -957,6 +991,11 @@ effect(() => {
   } else {
     localStorage.removeItem("fraud-message-draft");
   }
+});
+
+// Persist agent mode preference
+effect(() => {
+  localStorage.setItem("agentMode", agentMode.value);
 });
 
 // Load draft on startup

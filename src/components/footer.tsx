@@ -2,6 +2,8 @@ import { Paperclip, SendHorizonal, X, Mic, MicOff } from "lucide-react";
 import type { SubmitEventHandler } from "preact";
 import { useCallback, useRef, useState, useEffect } from "preact/hooks";
 import { QuickTemplates } from "@/components/quick-templates";
+import { AttachmentMenu } from "@/components/attachment-menu";
+import { ModeSelector } from "@/components/mode-selector";
 import {
   addDataset,
   agent,
@@ -17,6 +19,7 @@ import {
   fraudAnalysisTerms,
   showAutoComplete,
   autoCompleteQuery,
+  agentMode,
 } from "@/signals";
 import type { Attachment } from "@relevanceai/sdk";
 
@@ -534,7 +537,8 @@ export function Footer() {
               <span>Uploading files...</span>
             </div>
           )}
-          <div class="flex items-end gap-x-2 relative">
+          {/* Unified Input Bar */}
+          <div class="flex items-center gap-x-1 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-full px-2 py-1.5 shadow-sm hover:shadow-md transition-shadow relative">
             <input
               ref={fileInput}
               type="file"
@@ -543,17 +547,14 @@ export function Footer() {
               onChange={handleFileChange}
               aria-label="File input"
             />
-            <button
-              type="button"
-              onClick={handleFileSelect}
-              disabled={isUploading || isAgentTyping.value}
-              class="p-3 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors cursor-pointer outline-indigo-500 outline-offset-3 disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
-              aria-label="Attach file"
-            >
-              <Paperclip size={24} strokeWidth={1.5} />
-            </button>
 
-            <div class="flex-1 relative">
+            {/* Attachment Menu */}
+            <AttachmentMenu
+              onFileSelect={handleFileSelect}
+              disabled={isUploading || isAgentTyping.value}
+            />
+
+            <div class="flex-1 relative px-2">
               {/* Autocomplete Dropdown */}
               {showAutoComplete.value && autoCompleteSuggestions.length > 0 && (
                 <div class="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg overflow-hidden z-10">
@@ -581,12 +582,12 @@ export function Footer() {
 
               <textarea
                 ref={input}
-                placeholder="Analyse transaction data, detect fraud patterns or ask about risk scoring..."
+                placeholder="Ask anything"
                 disabled={isUploading || isVoiceRecording.value}
                 onInput={handleInput}
                 onKeyDown={handleKeyDown}
                 rows={1}
-                class="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-4 py-3 rounded-2xl outline-indigo-500 outline-offset-3 text-zinc-800 dark:text-white dark:placeholder-zinc-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed resize-none max-h-50 overflow-y-auto"
+                class="w-full bg-transparent border-none px-0 py-2 outline-none text-zinc-800 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed resize-none max-h-40 overflow-y-auto"
                 name="message"
               />
 
@@ -599,14 +600,24 @@ export function Footer() {
               )}
             </div>
 
+            {/* Mode Selector */}
+            <ModeSelector
+              selectedMode={agentMode.value}
+              onModeChange={(mode) => {
+                agentMode.value = mode;
+                logAuditEntry("view", `Changed agent mode to ${mode}`);
+              }}
+              disabled={isUploading || isAgentTyping.value}
+            />
+
             <button
               type="button"
               onClick={toggleVoiceInput}
               disabled={isUploading || isAgentTyping.value}
-              class={`p-3 rounded-full transition-all cursor-pointer outline-indigo-500 outline-offset-3 disabled:opacity-50 disabled:cursor-not-allowed shrink-0 ${
+              class={`p-2.5 rounded-full transition-all cursor-pointer outline-indigo-500 outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed shrink-0 ${
                 isVoiceRecording.value
-                  ? "bg-red-500 text-white hover:bg-red-600 animate-pulse"
-                  : "text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                  ? "bg-red-500 text-white hover:bg-red-600"
+                  : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700"
               }`}
               aria-label={
                 isVoiceRecording.value ? "Stop recording" : "Start voice input"
@@ -614,19 +625,19 @@ export function Footer() {
               title="Alt+V for voice input"
             >
               {isVoiceRecording.value ? (
-                <MicOff size={24} strokeWidth={1.5} />
+                <MicOff size={20} strokeWidth={1.5} />
               ) : (
-                <Mic size={24} strokeWidth={1.5} />
+                <Mic size={20} strokeWidth={1.5} />
               )}
             </button>
 
             <button
               type="submit"
               disabled={isUploading || isAgentTyping.value}
-              class="bg-indigo-500 dark:bg-indigo-600 text-white rounded-full p-3 cursor-pointer hover:bg-indigo-600 dark:hover:bg-indigo-700 active:bg-indigo-700 dark:active:bg-indigo-800 outline-indigo-500 outline-offset-3 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+              class="bg-indigo-500 dark:bg-indigo-600 text-white rounded-full p-2.5 cursor-pointer hover:bg-indigo-600 dark:hover:bg-indigo-700 active:bg-indigo-700 dark:active:bg-indigo-800 outline-indigo-500 outline-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
               aria-label="Send message"
             >
-              <SendHorizonal size={24} strokeWidth={1.5} />
+              <SendHorizonal size={20} strokeWidth={1.5} />
             </button>
           </div>
         </form>

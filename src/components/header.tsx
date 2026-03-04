@@ -9,6 +9,7 @@ import {
   Maximize2,
   Minimize2,
   Layout,
+  History,
 } from "lucide-react";
 import {
   agentAvatar,
@@ -22,6 +23,7 @@ import {
   showFileManager,
   compactView,
   splitScreenMode,
+  showHistorySidebar,
 } from "@/signals";
 import { ConnectionStatus } from "@/components/connection-status";
 
@@ -66,6 +68,10 @@ export function Header() {
     }
   };
 
+  const toggleHistorySidebar = () => {
+    showHistorySidebar.value = !showHistorySidebar.value;
+  };
+
   return (
     <header class="p-4 border-b border-zinc-500/25 sticky top-0 bg-white dark:bg-zinc-900 transition-colors">
       <div class="max-w-3xl mx-auto">
@@ -98,6 +104,19 @@ export function Header() {
             title="New Chat"
           >
             <MessageSquarePlus size={20} strokeWidth={1.5} />
+          </button>
+          <button
+            type="button"
+            onClick={toggleHistorySidebar}
+            class={`p-2 rounded-lg transition-colors cursor-pointer ${
+              showHistorySidebar.value
+                ? "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400"
+                : "text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+            }`}
+            aria-label="Open chat history"
+            title="Chat History"
+          >
+            <History size={20} strokeWidth={1.5} />
           </button>
           <button
             type="button"

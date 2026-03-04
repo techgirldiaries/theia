@@ -1,7 +1,6 @@
 import { Paperclip, SendHorizonal, X, Mic, MicOff } from "lucide-react";
 import type { SubmitEventHandler } from "preact";
 import { useCallback, useRef, useState, useEffect } from "preact/hooks";
-import { QuickTemplates } from "@/components/quick-templates";
 import { AttachmentMenu } from "@/components/attachment-menu";
 import { ModeSelector } from "@/components/mode-selector";
 import {
@@ -186,16 +185,6 @@ export function Footer() {
         "upload",
         `Dropped ${files.length} file(s) via drag-and-drop`,
       );
-    }
-  }, []);
-
-  // Template selection handler
-  const handleSelectTemplate = useCallback((prompt: string) => {
-    if (input.current) {
-      input.current.value = prompt;
-      messageDraft.value = prompt;
-      handleInput();
-      input.current.focus();
     }
   }, []);
 
@@ -496,11 +485,6 @@ export function Footer() {
               </p>
             </div>
           </div>
-        )}
-
-        {/* Quick Templates */}
-        {messages.value.length === 0 && (
-          <QuickTemplates onSelectTemplate={handleSelectTemplate} />
         )}
 
         <form

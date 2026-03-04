@@ -80,7 +80,6 @@ export function AgentWorkflow({ currentPhase = 0 }: AgentWorkflowProps) {
         return "bg-green-500 dark:bg-green-600";
       case "active":
         return "bg-blue-500 dark:bg-blue-600 animate-pulse";
-      case "pending":
       default:
         return "bg-zinc-300 dark:bg-zinc-700";
     }

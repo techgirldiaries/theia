@@ -1,26 +1,28 @@
-import { Paperclip, SendHorizonal, X, Mic, MicOff } from "lucide-react";
+import type { Attachment } from "@relevanceai/sdk";
+import { Mic, MicOff, Paperclip, SendHorizonal, X } from "lucide-react";
 import type { SubmitEventHandler } from "preact";
-import { useCallback, useRef, useState, useEffect } from "preact/hooks";
+import { useCallback, useEffect, useRef, useState } from "preact/hooks";
 import { AttachmentMenu } from "@/components/attachment-menu";
 import { ModeSelector } from "@/components/mode-selector";
 import {
   addDataset,
   agent,
+  agentMode,
+  autoCompleteQuery,
   client,
+  fraudAnalysisTerms,
   isAgentTyping,
+  isVoiceRecording,
+  logAuditEntry,
+  messageDraft,
   messages,
+  showAutoComplete,
+  showToast,
   startPerformanceTracking,
   task,
+  uploadedDatasets,
   workforce,
-  messageDraft,
-  logAuditEntry,
-  isVoiceRecording,
-  fraudAnalysisTerms,
-  showAutoComplete,
-  autoCompleteQuery,
-  agentMode,
 } from "@/signals";
-import type { Attachment } from "@relevanceai/sdk";
 
 type Message = {
   id: string;
@@ -132,7 +134,7 @@ export function Footer() {
       const words = input.current.value.split(/\s+/);
       words.pop(); // Remove last incomplete word
       words.push(suggestion);
-      input.current.value = words.join(" ") + " ";
+      input.current.value = `${words.join(" ")} `;
       messageDraft.value = input.current.value;
       handleInput();
       showAutoComplete.value = false;
@@ -148,8 +150,18 @@ export function Footer() {
     }
   }, []);
 
+  // Update textarea when messageDraft changes (e.g., from template selection)
+  useEffect(() => {
+    if (input.current && input.current.value !== messageDraft.value) {
+      input.current.value = messageDraft.value || "";
+      // Only handle the auto-resize, don't call full handleInput to avoid loops
+      input.current.style.height = "auto";
+      input.current.style.height = `${Math.min(input.current.scrollHeight, 200)}px`;
+    }
+  }, [messageDraft.value]);
+
   // Save draft when input changes
-  const handleDraftChange = useCallback(() => {
+  const _handleDraftChange = useCallback(() => {
     if (input.current) {
       messageDraft.value = input.current.value;
     }
@@ -264,9 +276,17 @@ export function Footer() {
     const files = fileInput.current?.files;
     if (files && files.length > 0) {
       setSelectedFiles((prev) => [...prev, ...Array.from(files)]);
+      // Reset file input to allow reselecting the same file
       if (fileInput.current) {
         fileInput.current.value = "";
       }
+      // Log audit entry for file selection
+      logAuditEntry(
+        "upload",
+        `Selected ${files.length} file(s): ${Array.from(files)
+          .map((f) => f.name)
+          .join(", ")}`,
+      );
     }
   }, []);
 
@@ -351,14 +371,14 @@ export function Footer() {
 
       // Upload files first if any are selected
       let uploadedAttachments: Attachment[] = [];
-      let fileDetailsWithPreviews: string[] = [];
+      const fileDetailsWithPreviews: string[] = [];
 
       if (selectedFiles.length > 0 && client.value) {
         setIsUploading(true);
         try {
           // Upload files and read previews in parallel
           const uploadPromises = selectedFiles.map((file) =>
-            client.value!.uploadTempFile(file),
+            client.value?.uploadTempFile(file),
           );
           const previewPromises = selectedFiles.map((file) =>
             getFilePreview(file),
@@ -455,17 +475,47 @@ export function Footer() {
         input.current.value = "";
         input.current.style.height = "auto";
         input.current.focus();
+        messageDraft.value = "";
       }
       setSelectedFiles([]);
-      // Clear draft
-      messageDraft.value = "";
     },
     [input, selectedFiles, isUploading],
   );
 
+  // Cloud storage handlers
+  const handleConnectGoogleDrive = useCallback(() => {
+    // Google Drive API integration would go here
+    showToast("Google Drive integration is not yet implemented", "info");
+    logAuditEntry("action", "Attempted Google Drive connection");
+  }, []);
+
+  const handleConnectOneDrive = useCallback(() => {
+    // Microsoft OneDrive API integration would go here
+    showToast("OneDrive integration is not yet implemented", "info");
+    logAuditEntry("action", "Attempted OneDrive connection");
+  }, []);
+
+  const handleOpenRecentFiles = useCallback(() => {
+    if (uploadedDatasets.value.length === 0) {
+      showToast("No recent files found", "info");
+      return;
+    }
+
+    // Show recent files (could be integrated with file manager or a modal)
+    const recentCount = Math.min(uploadedDatasets.value.length, 5);
+    const recentFiles = uploadedDatasets.value
+      .sort((a, b) => b.uploadedAt.getTime() - a.uploadedAt.getTime())
+      .slice(0, recentCount)
+      .map((f) => f.fileName)
+      .join(", ");
+
+    showToast(`Recent files: ${recentFiles}`, "info");
+    logAuditEntry("view", `Viewed recent files (${recentCount} files)`);
+  }, []);
+
   return (
-    <footer class="p-4 border-t border-zinc-500/25 sticky bottom-0 bg-white dark:bg-zinc-900 transition-colors">
-      <div ref={dropZone} class="max-w-3xl mx-auto">
+    <footer class="fixed bottom-0 left-0 right-0 h-auto min-h-16 pl-0 md:pl-16 lg:pl-16 pr-4 py-2 border-t border-zinc-500/25 bg-white dark:bg-zinc-900 transition-all duration-300 z-10 flex items-center">
+      <div ref={dropZone} class="max-w-3xl mx-auto w-full">
         {/* Drag-and-drop overlay */}
         {isDragging && (
           <div
@@ -535,6 +585,9 @@ export function Footer() {
             {/* Attachment Menu */}
             <AttachmentMenu
               onFileSelect={handleFileSelect}
+              onConnectGoogleDrive={handleConnectGoogleDrive}
+              onConnectOneDrive={handleConnectOneDrive}
+              onOpenRecentFiles={handleOpenRecentFiles}
               disabled={isUploading || isAgentTyping.value}
             />
 

@@ -1,5 +1,5 @@
-import { Signal, Wifi, WifiOff, RefreshCw } from "lucide-react";
-import { isInitialized, loadingError, agentName } from "@/signals";
+import { RefreshCw, Wifi, WifiOff } from "lucide-react";
+import { agentName, isInitialized, loadingError } from "@/signals";
 
 export function ConnectionStatus() {
   if (!isInitialized.value) {

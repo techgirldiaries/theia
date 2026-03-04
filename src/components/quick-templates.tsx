@@ -1,5 +1,5 @@
-import { Sparkles } from "lucide-react";
 import { For } from "@preact/signals/utils";
+import { Sparkles } from "lucide-react";
 import { quickTemplates } from "@/signals";
 
 interface QuickTemplatesProps {

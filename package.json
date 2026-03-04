@@ -9,6 +9,7 @@
   "dependencies": {
     "@preact/signals": "^2.3.1",
     "@radix-ui/react-avatar": "^1.1.10",
+    "@radix-ui/react-collapsible": "^1.1.2",
     "@radix-ui/react-scroll-area": "^1.2.10",
     "@relevanceai/sdk": "latest",
     "@tailwindcss/vite": "^4.1.13",
@@ -21,8 +22,10 @@
   "devDependencies": {
     "@biomejs/biome": "2.2.4",
     "@preact/preset-vite": "^2.10.2",
+    "@testing-library/preact": "^3.2.4",
     "@types/node": "^24.5.1",
     "typescript": "^5.9.2",
-    "vite": "^7.0.4"
+    "vite": "^7.0.4",
+    "vitest": "^2.1.8"
   }
 }

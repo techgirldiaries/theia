@@ -1,6 +1,6 @@
-import { X, FileText, Download, Trash2 } from "lucide-react";
-import { Show, For } from "@preact/signals/utils";
-import { showFileManager, uploadedDatasets, deleteDataset } from "@/signals";
+import { For, Show } from "@preact/signals/utils";
+import { Download, FileText, Trash2, X } from "lucide-react";
+import { deleteDataset, showFileManager, uploadedDatasets } from "@/signals";
 
 export function FileManagerPanel() {
   const handleClose = () => {

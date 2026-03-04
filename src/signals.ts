@@ -28,6 +28,10 @@ type Message = {
 };
 
 type DatasetInfo = {
+  type: string;
+  rows?: number;
+  columns?: number;
+  description: any;
   id: string;
   fileName: string;
   fileUrl: string;
@@ -132,7 +136,7 @@ function saveChatSessionToHistory(msgs: Message[]): void {
     for (const msg of msgs) {
       const riskMatch = msg.text.match(/Risk\s+Score[:\s]+(\d+)/i);
       if (riskMatch) {
-        const score = parseInt(riskMatch[1]);
+        const score = parseInt(riskMatch[1], 10);
         if (score >= 70) riskLevel = "high";
         else if (score >= 45) riskLevel = "medium";
         else riskLevel = "low";
@@ -184,10 +188,16 @@ function loadChatSessionsFromStorage(): ChatSession[] {
     let jsonString: string;
     try {
       jsonString = simpleDecrypt(saved);
-      JSON.parse(jsonString); // Test if valid JSON
-    } catch {
-      // If decryption fails, assume it's plain JSON
-      jsonString = saved;
+      // Test if valid JSON after decryption
+      JSON.parse(jsonString);
+    } catch (decryptError) {
+      console.warn(
+        "Chat sessions decryption failed, clearing corrupted data:",
+        decryptError,
+      );
+      // Clear corrupted data and start fresh
+      localStorage.removeItem("fraud-chat-sessions");
+      return [];
     }
 
     const parsed = JSON.parse(jsonString);
@@ -359,21 +369,36 @@ export const toasts = signal<ToastMessage[]>([]);
 export const connectionRetryCount = signal(0);
 export const showAnalytics = signal(false);
 export const isDarkMode = signal(
-  localStorage.getItem("darkMode") === "true" ||
-    (localStorage.getItem("darkMode") === "false"
-      ? false
-      : window.matchMedia("(prefers-color-scheme: dark)").matches),
+  (() => {
+    try {
+      const saved = localStorage.getItem("darkMode");
+      if (saved !== null) {
+        return saved === "true";
+      }
+      // Default to user's system preference
+      return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    } catch {
+      // Fallback for SSR or localStorage errors
+      return false;
+    }
+  })(),
 );
 
 // New UI state signals
 export const showScrollToBottom = signal(false);
 export const showFileManager = signal(false);
 export const showHistorySidebar = signal(false);
+export const showReports = signal(false);
+export const showDataManagement = signal(false);
+export const showAuditLog = signal(false);
+export const showSettings = signal(false);
+export const showQuickActions = signal(false);
 export const compactView = signal(
   localStorage.getItem("compactView") === "true",
 );
 export const splitScreenMode = signal(false);
 export const messageDraft = signal("");
+export const isSidebarExpanded = signal(false); // Sidebar state for mobile/tablet
 export const selectedSessionForComparison = signal<ChatSession | null>(null);
 export const sessionSearchQuery = signal("");
 export const sessionTagFilter = signal<string | null>(null);
@@ -701,7 +726,7 @@ export function removeTagFromSession(sessionId: string, tag: string) {
   try {
     const sessions = loadChatSessionsFromStorage();
     const session = sessions.find((s) => s.id === sessionId);
-    if (session && session.tags) {
+    if (session?.tags) {
       session.tags = session.tags.filter((t) => t !== tag);
       const serialized = sessions.map((s) => ({
         ...s,
@@ -786,7 +811,8 @@ function simpleDecrypt(encrypted: string): string {
     return decrypted;
   } catch (error) {
     console.error("Decryption failed:", error);
-    return encrypted;
+    // Throw the error to be caught by the caller
+    throw new Error(`Decryption failed: ${error}`);
   }
 }
 
@@ -939,13 +965,23 @@ export function deleteDataset(datasetId: string) {
   logAuditEntry("delete", `Deleted dataset: ${datasetId}`);
 }
 
-// Persist dark mode preference
+// Persist dark mode preference and update DOM
 effect(() => {
-  localStorage.setItem("darkMode", isDarkMode.value.toString());
-  if (isDarkMode.value) {
-    document.documentElement.classList.add("dark");
-  } else {
-    document.documentElement.classList.remove("dark");
+  try {
+    localStorage.setItem("darkMode", isDarkMode.value.toString());
+    if (isDarkMode.value) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  } catch (error) {
+    console.warn("Failed to persist dark mode preference:", error);
+    // Still update DOM classes even if localStorage fails
+    if (isDarkMode.value) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
   }
 });
 
@@ -1023,10 +1059,28 @@ effect(() => {
 // Connection with retry logic
 effect(() => {
   if (client.value) {
+    console.log(
+      "Client initialized, attempting to connect to workforce/agent...",
+    );
+
     const attemptConnection = (retryCount = 0) => {
       if (WORKFORCE_ID) {
-        Workforce.get(WORKFORCE_ID, client.value!)
-          .then((w) => {
+        console.log(
+          `Attempting to load workforce: ${WORKFORCE_ID} (attempt ${retryCount + 1})`,
+        );
+
+        // Add timeout to workforce loading
+        const workforcePromise = Workforce.get(WORKFORCE_ID, client.value!);
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(
+            () => reject(new Error("Workforce connection timeout")),
+            30000,
+          ),
+        );
+
+        Promise.race([workforcePromise, timeoutPromise])
+          .then((w: any) => {
+            console.log("Workforce loaded successfully");
             workforce.value = w;
             isInitialized.value = true;
             loadingError.value = null;
@@ -1043,7 +1097,7 @@ effect(() => {
 
             // Auto-retry up to 3 times
             if (retryCount < 3) {
-              const delay = Math.min(1000 * Math.pow(2, retryCount), 5000);
+              const delay = Math.min(1000 * 2 ** retryCount, 5000);
               connectionRetryCount.value = retryCount + 1;
               showToast(
                 `Connection failed. Retrying in ${delay / 1000}s...`,
@@ -1058,8 +1112,22 @@ effect(() => {
             }
           });
       } else if (AGENT_ID) {
-        Agent.get(AGENT_ID, client.value!)
-          .then((a) => {
+        console.log(
+          `Attempting to load agent: ${AGENT_ID} (attempt ${retryCount + 1})`,
+        );
+
+        // Add timeout to agent loading
+        const agentPromise = Agent.get(AGENT_ID, client.value!);
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(
+            () => reject(new Error("Agent connection timeout")),
+            30000,
+          ),
+        );
+
+        Promise.race([agentPromise, timeoutPromise])
+          .then((a: any) => {
+            console.log("Agent loaded successfully");
             agent.value = a;
             isInitialized.value = true;
             loadingError.value = null;
@@ -1076,7 +1144,7 @@ effect(() => {
 
             // Auto-retry up to 3 times
             if (retryCount < 3) {
-              const delay = Math.min(1000 * Math.pow(2, retryCount), 5000);
+              const delay = Math.min(1000 * 2 ** retryCount, 5000);
               connectionRetryCount.value = retryCount + 1;
               showToast(
                 `Connection failed. Retrying in ${delay / 1000}s...`,
@@ -1091,6 +1159,7 @@ effect(() => {
             }
           });
       } else {
+        console.error("No AGENT_ID or WORKFORCE_ID configured");
         loadingError.value = "No AGENT_ID or WORKFORCE_ID configured.";
         isInitialized.value = true;
       }
@@ -1128,7 +1197,7 @@ effect(() => {
         if (lastMessage && lastMessage.type === "agent-message") {
           const riskMatch = lastMessage.text.match(/Risk\s+Score[:\s]+(\d+)/i);
           if (riskMatch) {
-            riskScore = parseInt(riskMatch[1]);
+            riskScore = parseInt(riskMatch[1], 10);
           }
           // Count agent mentions
           const agentMatches = lastMessage.text.match(

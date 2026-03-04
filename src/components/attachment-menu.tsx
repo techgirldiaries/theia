@@ -1,18 +1,22 @@
 import {
-  Paperclip,
-  Upload,
+  Cloud,
   FileText,
-  Pen,
   Folder,
   History,
+  Paperclip,
+  Pen,
+  Upload,
 } from "lucide-react";
-import { useState, useRef, useEffect } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 interface AttachmentMenuProps {
   onFileSelect: () => void;
   onAddText?: () => void;
   onDrawSketch?: () => void;
   onOpenRecent?: () => void;
+  onConnectGoogleDrive?: () => void;
+  onConnectOneDrive?: () => void;
+  onOpenRecentFiles?: () => void;
   disabled?: boolean;
 }
 
@@ -21,6 +25,9 @@ export function AttachmentMenu({
   onAddText,
   onDrawSketch,
   onOpenRecent,
+  onConnectGoogleDrive,
+  onConnectOneDrive,
+  onOpenRecentFiles,
   disabled,
 }: AttachmentMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -62,6 +69,21 @@ export function AttachmentMenu({
     onOpenRecent?.();
   };
 
+  const handleConnectGoogleDrive = () => {
+    setIsOpen(false);
+    onConnectGoogleDrive?.();
+  };
+
+  const handleConnectOneDrive = () => {
+    setIsOpen(false);
+    onConnectOneDrive?.();
+  };
+
+  const handleOpenRecentFiles = () => {
+    setIsOpen(false);
+    onOpenRecentFiles?.();
+  };
+
   const menuItems = [
     {
       icon: Upload,
@@ -69,6 +91,27 @@ export function AttachmentMenu({
       description: "CSV, JSON, or other data files",
       onClick: handleFileSelect,
       enabled: true,
+    },
+    {
+      icon: Cloud,
+      label: "Connect Google Drive",
+      description: "Import files from Google Drive",
+      onClick: handleConnectGoogleDrive,
+      enabled: !!onConnectGoogleDrive,
+    },
+    {
+      icon: Cloud,
+      label: "Connect Microsoft OneDrive",
+      description: "Import files from OneDrive",
+      onClick: handleConnectOneDrive,
+      enabled: !!onConnectOneDrive,
+    },
+    {
+      icon: Folder,
+      label: "Recent Files",
+      description: "Access recently used files",
+      onClick: handleOpenRecentFiles,
+      enabled: !!onOpenRecentFiles,
     },
     {
       icon: FileText,

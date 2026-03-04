@@ -1,18 +1,18 @@
 import * as Avatar from "@radix-ui/react-avatar";
-import { FileText, Copy, Check } from "lucide-react";
-import TimeAgo from "react-timeago";
+import type { Attachment } from "@relevanceai/sdk";
+import { Check, Copy, FileText } from "lucide-react";
 import { useState } from "preact/hooks";
+import TimeAgo from "react-timeago";
+import { FraudReport } from "@/components/fraud-report";
+import { RiskBadge } from "@/components/risk-badge";
 import {
   agentAvatar,
   agentInitials,
   agentName,
-  showToast,
   compactView,
+  showToast,
 } from "@/signals";
-import { RiskBadge } from "@/components/risk-badge";
-import { FraudReport } from "@/components/fraud-report";
 import { isFraudReport, parseFraudReport } from "@/utils/parse-fraud-report";
-import type { Attachment } from "@relevanceai/sdk";
 
 type Message = {
   id: string;
@@ -38,7 +38,7 @@ export function AgentMessage({ message }: AgentMessageProps) {
 
   // Extract risk score if present in message text (for non-fraud-report messages)
   const riskScoreMatch = message.text.match(/Risk Score[:\s]+(\d+)/i);
-  const riskScore = riskScoreMatch ? parseInt(riskScoreMatch[1]) : null;
+  const riskScore = riskScoreMatch ? parseInt(riskScoreMatch[1], 10) : null;
 
   const handleCopy = async () => {
     try {
@@ -46,7 +46,7 @@ export function AgentMessage({ message }: AgentMessageProps) {
       setCopied(true);
       showToast("Message copied to clipboard", "success");
       setTimeout(() => setCopied(false), 2000);
-    } catch (error) {
+    } catch (_error) {
       showToast("Failed to copy message", "error");
     }
   };

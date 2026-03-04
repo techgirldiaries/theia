@@ -1,6 +1,6 @@
 import * as Avatar from "@radix-ui/react-avatar";
-import { agentAvatar, agentInitials, agentName, taskStatus } from "@/signals";
 import { TaskStatusIndicator } from "@/components/task-status-indicator";
+import { agentAvatar, agentInitials, agentName, taskStatus } from "@/signals";
 
 export function AgentTyping() {
   return (

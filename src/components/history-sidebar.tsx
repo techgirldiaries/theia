@@ -1,20 +1,20 @@
-import {
-  X,
-  Clock,
-  MessageSquare,
-  Trash2,
-  Search,
-  AlertCircle,
-} from "lucide-react";
-import { useState } from "preact/hooks";
 import { Show } from "@preact/signals/utils";
 import {
-  showHistorySidebar,
-  getChatSessions,
-  restoreSession,
+  AlertCircle,
+  Clock,
+  MessageSquare,
+  Search,
+  Trash2,
+  X,
+} from "lucide-react";
+import { useEffect, useState } from "preact/hooks";
+import {
   deleteSession,
-  sessionSearchQuery,
+  getChatSessions,
   logAuditEntry,
+  restoreSession,
+  sessionSearchQuery,
+  showHistorySidebar,
 } from "@/signals";
 
 type ChatSession = {
@@ -32,15 +32,12 @@ export function HistorySidebar() {
   const [searchQuery, setSearchQuery] = useState("");
 
   // Load sessions when sidebar opens
-  const handleOpen = () => {
-    const loadedSessions = getChatSessions();
-    setSessions(loadedSessions);
-  };
-
-  // Call handleOpen when sidebar becomes visible
-  if (showHistorySidebar.value && sessions.length === 0) {
-    handleOpen();
-  }
+  useEffect(() => {
+    if (showHistorySidebar.value) {
+      const loadedSessions = getChatSessions();
+      setSessions(loadedSessions);
+    }
+  }, [showHistorySidebar.value]);
 
   const handleClose = () => {
     showHistorySidebar.value = false;

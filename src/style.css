@@ -3,7 +3,6 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @keyframes bounce {
-
   0%,
   50%,
   100% {

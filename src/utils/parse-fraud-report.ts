@@ -140,7 +140,7 @@ export function extractRecommendedActions(text: string): string[] {
     const lines = actionsList.split("\n");
 
     for (const line of lines) {
-      const cleaned = line.trim().replace(/^[•\-\*\d\.]+\s*/, "");
+      const cleaned = line.trim().replace(/^[•\-*\d.]+\s*/, "");
       if (cleaned && cleaned.length > 5) {
         actions.push(cleaned);
       }
@@ -201,9 +201,9 @@ export function parseFraudReport(
   messageText: string,
 ): ParsedFraudReport | null {
   // Extract dataset/transaction IDs
-  const datasetIdMatch = messageText.match(/Dataset\s+ID:\s*([A-Z0-9\-]+)/i);
+  const datasetIdMatch = messageText.match(/Dataset\s+ID:\s*([A-Z0-9-]+)/i);
   const transactionIdMatch = messageText.match(
-    /Transaction\s+ID:\s*([A-Z0-9\-]+)/i,
+    /Transaction\s+ID:\s*([A-Z0-9-]+)/i,
   );
 
   // Extract risk score and category

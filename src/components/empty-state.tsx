@@ -1,6 +1,11 @@
-import { Search, Sparkles, Users, ChevronDown } from "lucide-react";
-import { useState, useRef, useEffect } from "preact/hooks";
-import { quickTemplates, messageDraft } from "@/signals";
+import { ChevronDown, Search, Sparkles, Users } from "lucide-react";
+import { useEffect, useRef, useState } from "preact/hooks";
+import {
+  messageDraft,
+  quickTemplates,
+  showFileManager,
+  showToast,
+} from "@/signals";
 
 export function EmptyState() {
   const [showQuickTemplates, setShowQuickTemplates] = useState(false);
@@ -30,27 +35,57 @@ export function EmptyState() {
   }, []);
 
   const handleDeepSearch = () => {
-    console.log("Deep Search activated");
-    // Add your deep search logic here
+    // Open file manager to upload datasets for deep search
+    showFileManager.value = true;
+    showToast("Open File Manager to upload datasets for deep analysis", "info");
   };
 
   const handleSelectTemplate = (prompt: string) => {
     messageDraft.value = prompt;
     setShowQuickTemplates(false);
+    showToast("Template added to message", "success");
     // Focus on the input field
-    const inputElement = document.querySelector(
-      'textarea[name="message"]',
-    ) as HTMLTextAreaElement;
-    if (inputElement) {
-      inputElement.focus();
-      inputElement.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
+    setTimeout(() => {
+      const inputElement = document.querySelector(
+        'textarea[name="message"]',
+      ) as HTMLTextAreaElement;
+      if (inputElement) {
+        inputElement.focus();
+        inputElement.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }, 100);
   };
 
-  const handleSelectAgent = (agent: string) => {
-    console.log("Agent selected:", agent);
+  const handleSelectAgent = (agentId: string, agentName: string) => {
     setShowAgentSelector(false);
-    // Add logic to switch agent
+    showToast(
+      `Agent "${agentName}" selected for specialized analysis`,
+      "success",
+    );
+    // Pre-fill message with agent-specific prompt
+    const agentPrompts: Record<string, string> = {
+      "fraud-analyst":
+        "Please perform a comprehensive fraud analysis on my data with focus on transaction anomalies and suspicious patterns.",
+      "risk-assessor":
+        "Please evaluate the risk levels across my datasets and provide detailed risk scoring recommendations.",
+      "compliance-checker":
+        "Please review my data for regulatory compliance issues, AML/KYC violations, and generate compliance reports.",
+      "pattern-detector":
+        "Please detect unusual patterns, anomalies, and potential fraud networks in my transaction data.",
+    };
+
+    if (agentPrompts[agentId]) {
+      messageDraft.value = agentPrompts[agentId];
+      setTimeout(() => {
+        const inputElement = document.querySelector(
+          'textarea[name="message"]',
+        ) as HTMLTextAreaElement;
+        if (inputElement) {
+          inputElement.focus();
+          inputElement.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 100);
+    }
   };
 
   const categoryColors = {
@@ -90,7 +125,7 @@ export function EmptyState() {
     <div class="flex flex-col items-center justify-center min-h-[60vh] px-4">
       {/* Logo/Title Section */}
       <div class="flex items-center gap-x-3 mb-12">
-        <div class="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+        <div class="w-16 h-16 rounded-full bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
           <svg
             class="w-10 h-10 text-white"
             fill="none"
@@ -113,7 +148,7 @@ export function EmptyState() {
         {/* DeepSearch Button */}
         <button
           onClick={handleDeepSearch}
-          class="flex items-center gap-x-2 px-4 py-2.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-full text-sm font-medium transition-all border border-zinc-200 dark:border-zinc-700"
+          class="flex items-center gap-x-2 px-4 py-2.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-full text-sm font-medium transition-all border border-zinc-200 dark:border-zinc-700 hover:scale-105 active:scale-95"
         >
           <Search size={16} strokeWidth={2} />
           <span>DeepSearch</span>
@@ -123,7 +158,7 @@ export function EmptyState() {
         <div class="relative" ref={templatesRef}>
           <button
             onClick={() => setShowQuickTemplates(!showQuickTemplates)}
-            class="flex items-center gap-x-2 px-4 py-2.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-full text-sm font-medium transition-all border border-zinc-200 dark:border-zinc-700"
+            class="flex items-center gap-x-2 px-4 py-2.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-full text-sm font-medium transition-all border border-zinc-200 dark:border-zinc-700 hover:scale-105 active:scale-95"
           >
             <Sparkles size={16} strokeWidth={2} />
             <span>Quick Templates</span>
@@ -153,7 +188,7 @@ export function EmptyState() {
         <div class="relative" ref={agentsRef}>
           <button
             onClick={() => setShowAgentSelector(!showAgentSelector)}
-            class="flex items-center gap-x-2 px-4 py-2.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-full text-sm font-medium transition-all border border-zinc-200 dark:border-zinc-700"
+            class="flex items-center gap-x-2 px-4 py-2.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-full text-sm font-medium transition-all border border-zinc-200 dark:border-zinc-700 hover:scale-105 active:scale-95"
           >
             <Users size={16} strokeWidth={2} />
             <span>Select Agents</span>
@@ -170,7 +205,7 @@ export function EmptyState() {
                 {agents.map((agent) => (
                   <button
                     key={agent.id}
-                    onClick={() => handleSelectAgent(agent.id)}
+                    onClick={() => handleSelectAgent(agent.id, agent.name)}
                     class="w-full text-left px-3 py-2.5 rounded-lg text-zinc-900 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
                   >
                     <div class="font-medium text-sm">{agent.name}</div>

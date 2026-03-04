@@ -1,7 +1,7 @@
-import { ArrowDown, ArrowUp } from "lucide-react";
 import { Show } from "@preact/signals/utils";
+import { ArrowDown, ArrowUp } from "lucide-react";
+import { useEffect, useState } from "preact/hooks";
 import { showScrollToBottom } from "@/signals";
-import { useState, useEffect } from "preact/hooks";
 
 export function ScrollToBottomButton() {
   const [showScrollToTop, setShowScrollToTop] = useState(false);

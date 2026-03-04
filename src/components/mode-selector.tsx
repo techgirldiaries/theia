@@ -1,5 +1,5 @@
-import { ChevronDown, Zap, Lightbulb, Rocket, Users } from "lucide-react";
-import { useState, useRef, useEffect } from "preact/hooks";
+import { ChevronDown, Lightbulb, Users, Zap } from "lucide-react";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 export type AgentMode = "auto" | "fast" | "expert" | "heavy";
 

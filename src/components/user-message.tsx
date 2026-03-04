@@ -1,9 +1,9 @@
 import * as Avatar from "@radix-ui/react-avatar";
-import { FileText, Copy, Check, RefreshCw, AlertCircle } from "lucide-react";
-import TimeAgo from "react-timeago";
-import { useState } from "preact/hooks";
-import { showToast, compactView, retryFailedMessage } from "@/signals";
 import type { Attachment } from "@relevanceai/sdk";
+import { AlertCircle, Check, Copy, FileText, RefreshCw } from "lucide-react";
+import { useState } from "preact/hooks";
+import TimeAgo from "react-timeago";
+import { compactView, retryFailedMessage, showToast } from "@/signals";
 
 type Message = {
   id: string;
@@ -30,7 +30,7 @@ export function UserMessage({ message }: UserMessageProps) {
       setCopied(true);
       showToast("Message copied to clipboard", "success");
       setTimeout(() => setCopied(false), 2000);
-    } catch (error) {
+    } catch (_error) {
       showToast("Failed to copy message", "error");
     }
   };

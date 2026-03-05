@@ -41,7 +41,7 @@ export function UserMessage({ message }: UserMessageProps) {
 
   return (
     <div
-      class={`flex items-start gap-x-2 pl-12 md:pl-0 md:max-w-3xl self-end flex-row-reverse group ${compactView.value ? "mb-2" : ""}`}
+      class={`flex items-start gap-x-2 w-full max-w-full self-end flex-row-reverse group ${compactView.value ? "mb-2" : ""}`}
     >
       <div class="shrink-0">
         <Avatar.Root>
@@ -103,7 +103,7 @@ export function UserMessage({ message }: UserMessageProps) {
             } text-white transition-colors ${compactView.value ? "py-1.5 px-3" : ""}`}
           >
             <p
-              class={`text-end whitespace-pre-wrap break-words ${compactView.value ? "text-sm" : ""}`}
+              class={`text-end whitespace-pre-wrap wrap-break-word ${compactView.value ? "text-sm" : ""}`}
             >
               {message.text}
             </p>

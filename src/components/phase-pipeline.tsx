@@ -486,7 +486,7 @@ export function PhasePipeline({
         {/* Overall Progress Bar */}
         <div className="w-full bg-zinc-200 dark:bg-zinc-700 rounded-full h-3 mt-4">
           <div
-            className="h-3 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-500"
+            className="h-3 rounded-full bg-linear-to-r from-indigo-500 to-purple-500 transition-all duration-500"
             style={{ width: `${caseProgress.overallProgress}%` }}
           />
         </div>

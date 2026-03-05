@@ -514,8 +514,8 @@ export function Footer() {
   }, []);
 
   return (
-    <footer class="fixed bottom-0 left-0 right-0 h-auto min-h-16 pl-0 md:pl-16 lg:pl-16 pr-4 py-2 border-t border-zinc-500/25 bg-white dark:bg-zinc-900 transition-all duration-300 z-10 flex items-center">
-      <div ref={dropZone} class="max-w-3xl mx-auto w-full">
+    <footer class="fixed bottom-0 left-0 right-0 h-auto min-h-16 pl-0 md:pl-16 lg:pl-16 pr-0 py-2 border-t border-zinc-500/25 bg-white dark:bg-zinc-900 transition-all duration-300 z-10 flex items-center">
+      <div ref={dropZone} class="w-full max-w-4xl mx-auto px-4">
         {/* Drag-and-drop overlay */}
         {isDragging && (
           <div

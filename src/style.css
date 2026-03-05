@@ -3,6 +3,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @keyframes bounce {
+
   0%,
   50%,
   100% {
@@ -35,4 +36,45 @@
 
 .typing-dot-delay-2 {
   animation-delay: 0.3s;
+}
+
+/* Chat Container Styles */
+.chat-container {
+  overflow-x: hidden;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+.chat-messages {
+  scroll-behavior: smooth;
+}
+
+/* Ensure proper word wrapping in chat messages */
+.chat-container * {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+/* Responsive chat layout */
+@media (max-width: 768px) {
+  .chat-container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    max-width: calc(100vw - 2rem);
+  }
+}
+
+/* Markdown content styling */
+.chat-container .prose code {
+  @apply bg-zinc-100 dark:bg-zinc-700 px-1 py-0.5 rounded text-sm font-mono;
+}
+
+.chat-container .prose strong {
+  @apply font-semibold text-zinc-900 dark:text-white;
+}
+
+.chat-container .prose em {
+  @apply italic text-zinc-800 dark:text-zinc-200;
 }

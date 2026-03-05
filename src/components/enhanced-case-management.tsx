@@ -665,6 +665,7 @@ export function EnhancedCaseManagement({
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.currentTarget.value as any)}
+              aria-label="Filter cases by status"
               className={`border border-zinc-300 dark:border-zinc-600 rounded px-3 py-1 bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white ${compact ? "text-sm" : ""}`}
             >
               <option value="all">All</option>
@@ -686,6 +687,7 @@ export function EnhancedCaseManagement({
             <select
               value={filterPriority}
               onChange={(e) => setFilterPriority(e.currentTarget.value as any)}
+              aria-label="Filter cases by priority"
               className={`border border-zinc-300 dark:border-zinc-600 rounded px-3 py-1 bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white ${compact ? "text-sm" : ""}`}
             >
               <option value="all">All</option>

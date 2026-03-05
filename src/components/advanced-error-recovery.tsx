@@ -18,7 +18,7 @@ import {
   Play,
   Pause,
   Activity,
-  Tool,
+  Wrench,
   MessageCircle,
   FileText,
 } from "lucide-react";
@@ -150,7 +150,7 @@ export const recoveryStrategies = signal<RecoveryStrategy[]>([
 const getErrorTypeIcon = (type: PhaseError["errorType"]) => {
   switch (type) {
     case "tool_failure":
-      return Tool;
+      return Wrench;
     case "data_quality":
       return FileText;
     case "timeout":
@@ -786,6 +786,7 @@ export function AdvancedErrorRecovery({
             value={filter}
             onChange={(e) => setFilter(e.currentTarget.value as any)}
             className={`border border-zinc-300 dark:border-zinc-600 rounded px-3 py-1 bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white ${compact ? "text-sm" : ""}`}
+            title="Filter errors by status"
           >
             <option value="all">All Errors</option>
             <option value="active">Active</option>

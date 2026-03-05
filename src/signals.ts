@@ -90,6 +90,69 @@ type QuickTemplate = {
   category: "analysis" | "report" | "risk" | "investigation";
 };
 
+type MARAGAgent = {
+  id: string;
+  name: string;
+  acronym: string;
+  domain: string;
+  status: "idle" | "processing" | "completed" | "error";
+  confidence: number;
+  findings: string[];
+  icon: string;
+  color: string;
+};
+
+type MARAGConsensus = {
+  consensusScore: number;
+  agentScores: Record<string, number>;
+  correlations: Array<{ agents: string[]; finding: string; strength: number }>;
+  conflicts: Array<{ agents: string[]; issue: string }>;
+  finalScore: number;
+  uncertaintySources: string[];
+};
+
+type Visualization = {
+  id: string;
+  chartType: string;
+  downloadUrl: string;
+  filename: string;
+  phase: string;
+  explanation: {
+    title: string;
+    keyInsights: string[];
+    riskIndicators: string[];
+    recommendations: string[];
+    technicalDetails: {
+      method: string;
+      parameters: string[];
+      confidence: number;
+    };
+  };
+};
+
+type BenchmarkResults = {
+  datasetsAnalyzed: string[];
+  performanceMetrics: Record<
+    string,
+    {
+      precision: number;
+      recall: number;
+      f1Score: number;
+      aucRoc: number;
+    }
+  >;
+  processingTimes: Record<string, string>;
+  qualityScores: Record<string, number>;
+  statisticalSignificance: Array<{
+    comparison: string;
+    pValue: number;
+    significant: boolean;
+    effectSize: number;
+  }>;
+  bestPerformingDataset: string;
+  recommendations: string[];
+};
+
 // Helper functions for message persistence
 function saveMessagesToStorage(msgs: Message[]) {
   try {
@@ -409,6 +472,20 @@ export const autoCompleteQuery = signal("");
 export const agentMode = signal<"auto" | "fast" | "expert" | "heavy">(
   (localStorage.getItem("agentMode") as any) || "expert",
 );
+
+// MARAG (Multi-Agent RAG) signals
+export const maragAgents = signal<MARAGAgent[]>([]);
+export const maragConsensus = signal<MARAGConsensus | null>(null);
+export const showMARAGPanel = signal(false);
+
+// Visualization signals
+export const visualizations = signal<Visualization[]>([]);
+export const showVisualizationGallery = signal(false);
+export const selectedVisualization = signal<Visualization | null>(null);
+
+// Benchmarking signals
+export const benchmarkResults = signal<BenchmarkResults | null>(null);
+export const showBenchmarkPanel = signal(false);
 
 // Encryption key (in production, use a more secure method)
 const ENCRYPTION_KEY = "fraud-intelligence-key-2026";

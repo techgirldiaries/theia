@@ -14,6 +14,44 @@ import {
 } from "@/signals";
 import { isFraudReport, parseFraudReport } from "@/utils/parse-fraud-report";
 
+// Simple markdown parser for basic formatting
+function parseMarkdown(text: string): string {
+  // Escape HTML first
+  let html = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+  // Parse markdown patterns
+  html = html
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") // Bold
+    .replace(/\*(.*?)\*/g, "<em>$1</em>") // Italic
+    .replace(
+      /`(.*?)`/g,
+      '<code class="bg-zinc-100 dark:bg-zinc-700 px-1 py-0.5 rounded text-sm font-mono">$1</code>',
+    ) // Inline code
+    .replace(
+      /^### (.*?)$/gm,
+      '<h3 class="text-lg font-semibold mt-4 mb-2">$1</h3>',
+    ) // H3
+    .replace(
+      /^## (.*?)$/gm,
+      '<h2 class="text-xl font-semibold mt-4 mb-2">$1</h2>',
+    ) // H2
+    .replace(/^# (.*?)$/gm, '<h1 class="text-2xl font-bold mt-4 mb-2">$1</h1>') // H1
+    .replace(/^[-*+] (.*?)$/gm, '<li class="ml-4 list-disc">$1</li>') // Bullet points
+    .replace(/^(\d+)\. (.*?)$/gm, '<li class="ml-4 list-decimal">$2</li>') // Numbered lists
+    .replace(/\n\n/g, '</p><p class="mt-3">') // Paragraph breaks
+    .replace(/\n/g, "<br>"); // Line breaks
+
+  // Wrap in paragraph if needed
+  if (!html.includes("<p>") && !html.includes("<h") && !html.includes("<li>")) {
+    html = `<p>${html}</p>`;
+  }
+
+  return html;
+}
+
 type Message = {
   id: string;
   type: "agent-message" | "user-message";
@@ -53,7 +91,7 @@ export function AgentMessage({ message }: AgentMessageProps) {
 
   return (
     <div
-      class={`flex items-start gap-x-2 pr-12 md:pr-0 md:max-w-3xl self-start group ${compactView.value ? "mb-2" : ""}`}
+      class={`flex items-start gap-x-2 w-full max-w-full self-start group ${compactView.value ? "mb-2" : ""}`}
     >
       <div class="shrink-0">
         <Avatar.Root>
@@ -104,9 +142,10 @@ export function AgentMessage({ message }: AgentMessageProps) {
               >
                 <div
                   class={`text-zinc-800 dark:text-white prose prose-sm dark:prose-invert max-w-none ${compactView.value ? "text-sm" : ""}`}
-                >
-                  <p class="whitespace-pre-wrap">{message.text}</p>
-                </div>
+                  dangerouslySetInnerHTML={{
+                    __html: parseMarkdown(message.text),
+                  }}
+                ></div>
               </div>
               {message.attachments && message.attachments.length > 0 && (
                 <div class="flex flex-col gap-y-1">

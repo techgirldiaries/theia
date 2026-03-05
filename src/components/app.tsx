@@ -106,7 +106,7 @@ export function App() {
         class={`flex flex-1 pt-16 pb-20 ${splitScreenMode.value ? "flex-col lg:flex-row" : "flex-col"}`}
       >
         <main
-          class={`${splitScreenMode.value ? "w-full lg:w-1/2" : "w-full"} pl-0 md:pl-16 lg:pl-16 pr-4 py-4 bg-zinc-50 dark:bg-zinc-950 transition-all duration-300 overflow-y-auto overflow-x-hidden scroll-pb-20`}
+          class={`${splitScreenMode.value ? "w-full lg:w-1/2" : "w-full"} pl-0 md:pl-16 lg:pl-16 pr-0 py-4 bg-zinc-50 dark:bg-zinc-950 transition-all duration-300 overflow-auto`}
         >
           {/* Show dataset manager inline when Datasets is selected */}
           {showFileManager.value && !splitScreenMode.value && (
@@ -157,19 +157,22 @@ export function App() {
             !showAuditLog.value &&
             !showQuickActions.value &&
             !showSettings.value && (
-              <div class="max-w-3xl mx-auto flex flex-col gap-y-4">
+              <div class="chat-container w-full max-w-4xl mx-auto px-4 flex flex-col gap-y-4 min-h-[calc(100vh-12rem)] pb-4">
                 {messages.value.length === 0 ? (
                   <EmptyState />
                 ) : (
-                  messages.value.map((m) =>
-                    m.isAgent() ? (
-                      <AgentMessage key={m.id} message={m as Message} />
-                    ) : (
-                      <UserMessage key={m.id} message={m as Message} />
-                    ),
-                  )
+                  <div class="chat-messages flex flex-col gap-y-4 flex-1">
+                    {messages.value.map((m) =>
+                      m.isAgent() ? (
+                        <AgentMessage key={m.id} message={m as Message} />
+                      ) : (
+                        <UserMessage key={m.id} message={m as Message} />
+                      ),
+                    )}
+                  </div>
                 )}
                 {isAgentTyping.value && <LoadingSkeleton />}
+                <div class="h-20 shrink-0"></div>
               </div>
             )}
         </main>

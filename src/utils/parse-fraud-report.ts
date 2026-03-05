@@ -254,3 +254,94 @@ export function isFraudReport(messageText: string): boolean {
       (messageText.includes("AGENT") || messageText.includes("Agent")))
   );
 }
+
+// ============================================================================
+// ENHANCED FRAUD REPORT PARSING (MARAG & BENCHMARKING SUPPORT)
+// ============================================================================
+
+import type { EnhancedFraudReport } from "@/types/fraud-report";
+import type { MaragResults } from "@/types/marag";
+import type { BenchmarkingResults } from "@/types/benchmarking";
+
+/**
+ * Detect if message contains enhanced fraud report with MARAG/benchmarking data
+ */
+export function isEnhancedFraudReport(messageText: string): boolean {
+  return (
+    messageText.includes('"marag_results"') ||
+    messageText.includes('"benchmarking_results"') ||
+    messageText.includes('"agent_consensus"') ||
+    messageText.includes('"case_id": "FRAUD-') ||
+    (messageText.includes("{") &&
+      messageText.includes("case_id") &&
+      messageText.includes("overall_risk_score"))
+  );
+}
+
+/**
+ * Parse enhanced fraud report from JSON structure
+ */
+export function parseEnhancedFraudReport(
+  messageText: string,
+): EnhancedFraudReport | null {
+  try {
+    // Try to extract JSON from markdown code blocks
+    const jsonMatch = messageText.match(/```json\n([\s\S]*?)\n```/);
+    if (jsonMatch) {
+      return JSON.parse(jsonMatch[1]) as EnhancedFraudReport;
+    }
+
+    // Try direct JSON parse
+    const jsonStart = messageText.indexOf('{"case_id"');
+    if (jsonStart !== -1) {
+      const jsonEnd = messageText.lastIndexOf("}") + 1;
+      const jsonStr = messageText.substring(jsonStart, jsonEnd);
+      return JSON.parse(jsonStr) as EnhancedFraudReport;
+    }
+
+    // Try alternative JSON start patterns
+    const altJsonStart = messageText.indexOf('{\n  "case_id"');
+    if (altJsonStart !== -1) {
+      const jsonEnd = messageText.lastIndexOf("}") + 1;
+      const jsonStr = messageText.substring(altJsonStart, jsonEnd);
+      return JSON.parse(jsonStr) as EnhancedFraudReport;
+    }
+
+    return null;
+  } catch (error) {
+    console.error("Failed to parse enhanced fraud report:", error);
+    return null;
+  }
+}
+
+/**
+ * Extract MARAG results from enhanced report
+ */
+export function extractMaragResults(
+  report: EnhancedFraudReport,
+): MaragResults | null {
+  return report.marag_results || null;
+}
+
+/**
+ * Extract benchmarking results from enhanced report
+ */
+export function extractBenchmarkingResults(
+  report: EnhancedFraudReport,
+): BenchmarkingResults | null {
+  return report.benchmarking_results || null;
+}
+
+/**
+ * Check if report has MARAG data
+ */
+export function hasMaragData(report: EnhancedFraudReport): boolean {
+  return !!report.marag_results?.agent_consensus;
+}
+
+/**
+ * Check if report has benchmarking data
+ */
+export function hasBenchmarkingData(report: EnhancedFraudReport): boolean {
+  return !!report.benchmarking_results?.dataset_comparison;
+}

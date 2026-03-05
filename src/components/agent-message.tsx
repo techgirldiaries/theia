@@ -4,6 +4,7 @@ import { Check, Copy, FileText } from "lucide-react";
 import { useState } from "preact/hooks";
 import TimeAgo from "react-timeago";
 import { FraudReport } from "@/components/fraud-report";
+import { EnhancedFraudReportDisplay } from "@/components/enhanced-fraud-report-display";
 import { RiskBadge } from "@/components/risk-badge";
 import {
   agentAvatar,
@@ -12,7 +13,12 @@ import {
   compactView,
   showToast,
 } from "@/signals";
-import { isFraudReport, parseFraudReport } from "@/utils/parse-fraud-report";
+import {
+  isFraudReport,
+  parseFraudReport,
+  isEnhancedFraudReport,
+  parseEnhancedFraudReport,
+} from "@/utils/parse-fraud-report";
 
 // Simple markdown parser for basic formatting
 function parseMarkdown(text: string): string {
@@ -70,8 +76,14 @@ interface AgentMessageProps {
 export function AgentMessage({ message }: AgentMessageProps) {
   const [copied, setCopied] = useState(false);
 
-  // Check if message is a fraud report
-  const isFraud = isFraudReport(message.text);
+  // Check for enhanced fraud report first (with MARAG/benchmarking data)
+  const isEnhanced = isEnhancedFraudReport(message.text);
+  const enhancedReport = isEnhanced
+    ? parseEnhancedFraudReport(message.text)
+    : null;
+
+  // Fallback to basic fraud report (backward compatibility)
+  const isFraud = !isEnhanced && isFraudReport(message.text);
   const parsedReport = isFraud ? parseFraudReport(message.text) : null;
 
   // Extract risk score if present in message text (for non-fraud-report messages)
@@ -126,8 +138,11 @@ export function AgentMessage({ message }: AgentMessageProps) {
           </button>
         </div>
 
-        {/* Render FraudReport component if this is a parsed fraud report */}
-        {parsedReport ? (
+        {/* Render Enhanced Fraud Report (with MARAG/benchmarking) */}
+        {enhancedReport ? (
+          <EnhancedFraudReportDisplay report={enhancedReport} />
+        ) : parsedReport ? (
+          /* Render Basic Fraud Report (backward compatibility) */
           <FraudReport {...parsedReport} />
         ) : (
           <>

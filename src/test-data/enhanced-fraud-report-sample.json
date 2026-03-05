@@ -1,0 +1,375 @@
+{
+  "case_id": "FRAUD-20260305-Transaction-HIGH",
+  "overall_risk_score": 79,
+  "risk_category": "HIGH",
+  "confidence_level": "High",
+  "fraud_types_detected": ["ATO", "Payment Fraud", "Identity Fraud"],
+  "marag_results": {
+    "agent_consensus": {
+      "participating_agents": ["TIRA", "RCRA", "HPRA", "ERRA", "BARA"],
+      "consensus_score": 0.87,
+      "agent_confidence_scores": {
+        "TIRA": 0.92,
+        "RCRA": 0.85,
+        "HPRA": 0.89,
+        "ERRA": 0.78,
+        "BARA": 0.91
+      },
+      "evidence_triangulation": {
+        "cross_agent_correlations": {
+          "TIRA_HPRA": 0.84,
+          "RCRA_ERRA": 0.76,
+          "BARA_HPRA": 0.88
+        },
+        "conflict_resolution": {
+          "conflicts_detected": 2,
+          "conflicts_resolved": 2,
+          "resolution_method": "weighted_consensus"
+        }
+      },
+      "collaborative_risk_assessment": {
+        "individual_agent_scores": {
+          "TIRA": 78,
+          "RCRA": 65,
+          "HPRA": 82,
+          "ERRA": 71,
+          "BARA": 85
+        },
+        "weighted_final_score": 79,
+        "uncertainty_quantification": {
+          "confidence_interval": [74, 84],
+          "uncertainty_sources": [
+            "Limited ERRA evidence",
+            "RCRA jurisdiction ambiguity"
+          ]
+        }
+      }
+    },
+    "specialized_findings": {
+      "TIRA_findings": {
+        "threat_patterns_identified": [
+          "APT-style lateral movement",
+          "Credential stuffing indicators"
+        ],
+        "ioc_matches": 3,
+        "threat_actor_attribution": "Possible FIN7 tactics"
+      },
+      "RCRA_findings": {
+        "sanctions_hits": 0,
+        "pep_matches": 1,
+        "compliance_violations": ["Incomplete KYC documentation"]
+      },
+      "HPRA_findings": {
+        "pattern_matches": [
+          "Account takeover sequence",
+          "Velocity manipulation"
+        ],
+        "historical_similarity": 0.89,
+        "fraud_typology": "Synthetic identity fraud"
+      },
+      "ERRA_findings": {
+        "network_anomalies": [
+          "Unusual entity clustering",
+          "Shell company indicators"
+        ],
+        "centrality_scores": {
+          "betweenness": 0.23,
+          "degree": 0.45
+        },
+        "fraud_ring_probability": 0.67
+      },
+      "BARA_findings": {
+        "behavioral_anomalies": [
+          "Device switching pattern",
+          "Timing inconsistencies"
+        ],
+        "bot_probability": 0.34,
+        "account_takeover_indicators": 4
+      }
+    }
+  },
+  "benchmarking_results": {
+    "dataset_comparison": {
+      "datasets_analyzed": ["Dataset_A", "Dataset_B", "Dataset_C"],
+      "performance_metrics": {
+        "Dataset_A": {
+          "precision": 0.92,
+          "recall": 0.88,
+          "f1_score": 0.9,
+          "auc_roc": 0.94
+        },
+        "Dataset_B": {
+          "precision": 0.89,
+          "recall": 0.91,
+          "f1_score": 0.9,
+          "auc_roc": 0.93
+        },
+        "Dataset_C": {
+          "precision": 0.94,
+          "recall": 0.85,
+          "f1_score": 0.89,
+          "auc_roc": 0.95
+        }
+      },
+      "processing_time_comparison": {
+        "Dataset_A": "2.3 minutes",
+        "Dataset_B": "3.1 minutes",
+        "Dataset_C": "1.8 minutes"
+      },
+      "data_quality_scores": {
+        "Dataset_A": 87,
+        "Dataset_B": 92,
+        "Dataset_C": 89
+      }
+    },
+    "statistical_significance": {
+      "accuracy_differences": {
+        "A_vs_B": {
+          "p_value": 0.032,
+          "significant": true,
+          "effect_size": 0.23
+        },
+        "A_vs_C": {
+          "p_value": 0.156,
+          "significant": false,
+          "effect_size": 0.12
+        },
+        "B_vs_C": {
+          "p_value": 0.041,
+          "significant": true,
+          "effect_size": 0.19
+        }
+      }
+    },
+    "best_performing_dataset": "Dataset_C",
+    "recommendations": [
+      "Dataset_C shows highest precision and AUC-ROC scores",
+      "Dataset_B has fastest processing time but lower precision",
+      "Consider ensemble approach combining Dataset_A and Dataset_C"
+    ]
+  },
+  "visualizations": {
+    "generated_charts": [
+      {
+        "chart_type": "time_series",
+        "download_url": "https://placehold.co/800x600/png",
+        "filename": "transaction_timeline.png",
+        "phase": "phase-2",
+        "explanation": {
+          "title": "Transaction Timeline Analysis",
+          "key_insights": [
+            "Sharp increase in transaction frequency at 2:00 AM",
+            "Unusual pattern of micro-transactions followed by large withdrawal",
+            "Geographic location changes correlate with suspicious activity"
+          ],
+          "risk_indicators": [
+            "Velocity spike exceeds 3x normal baseline",
+            "Off-hours activity pattern typical of automated attacks"
+          ],
+          "recommendations": [
+            "Implement stricter velocity controls",
+            "Enable multi-factor authentication for high-risk transactions"
+          ],
+          "technical_details": "Time series analysis using 30-day rolling window, outlier detection threshold set at 3 standard deviations"
+        }
+      },
+      {
+        "chart_type": "risk_heatmap",
+        "download_url": "https://placehold.co/800x600/png",
+        "filename": "risk_distribution.png",
+        "phase": "phase-10",
+        "explanation": {
+          "title": "Risk Distribution Heatmap",
+          "key_insights": [
+            "Highest risk concentration in payment processing phase",
+            "Entity verification shows moderate risk levels",
+            "Behavioral analysis confirms abnormal patterns"
+          ],
+          "risk_indicators": [
+            "Multiple high-risk zones identified",
+            "Cross-phase risk correlation detected"
+          ],
+          "recommendations": [
+            "Focus investigation on payment processing anomalies",
+            "Cross-reference with entity relationship data"
+          ],
+          "technical_details": "Heatmap generated using risk scores from all 15 phases, normalized to 0-100 scale"
+        }
+      }
+    ],
+    "marag_charts": [
+      {
+        "chart_type": "consensus_radar",
+        "download_url": "https://placehold.co/600x600/png",
+        "filename": "marag_agent_consensus.png",
+        "explanation": {
+          "title": "MARAG Agent Consensus Visualization",
+          "key_insights": [
+            "Strong agreement between TIRA and BARA (behavioral + threat intelligence)",
+            "RCRA shows lower confidence due to jurisdiction ambiguity",
+            "ERRA provides unique entity relationship insights"
+          ],
+          "risk_indicators": [
+            "87% overall consensus achieved",
+            "No major conflicts between agents"
+          ],
+          "recommendations": [
+            "Trust high-confidence MARAG assessment",
+            "Investigate ERRA's entity network findings further"
+          ],
+          "technical_details": "Pentagon radar chart with normalized confidence scores (0-1 range) for 5 specialized RAG agents"
+        }
+      },
+      {
+        "chart_type": "evidence_network",
+        "download_url": "https://placehold.co/800x800/png",
+        "filename": "evidence_triangulation.png",
+        "explanation": {
+          "title": "Evidence Triangulation Network",
+          "key_insights": [
+            "Strong correlation between TIRA and HPRA threat patterns",
+            "BARA behavioral analysis supports TIRA findings",
+            "ERRA entity links provide additional context"
+          ],
+          "risk_indicators": [
+            "Multiple independent evidence sources confirm fraud",
+            "Cross-agent correlation strength: 0.84-0.88"
+          ],
+          "recommendations": [
+            "Use triangulated evidence for SAR filing",
+            "Investigate connected entities identified by ERRA"
+          ],
+          "technical_details": "Network graph showing cross-agent correlations with edge weights representing correlation strength"
+        }
+      }
+    ],
+    "benchmarking_charts": [
+      {
+        "chart_type": "performance_comparison",
+        "download_url": "https://placehold.co/1000x600/png",
+        "filename": "dataset_performance.png",
+        "explanation": {
+          "title": "Multi-Dataset Performance Comparison",
+          "key_insights": [
+            "Dataset_C shows highest precision (0.94) and AUC-ROC (0.95)",
+            "Dataset_B has best recall but lower precision",
+            "Dataset_A provides balanced performance across metrics"
+          ],
+          "risk_indicators": [
+            "Statistically significant differences between datasets (p<0.05)",
+            "Dataset quality scores range from 87-92"
+          ],
+          "recommendations": [
+            "Use Dataset_C for high-precision fraud detection",
+            "Consider ensemble approach combining Dataset_A and Dataset_C"
+          ],
+          "technical_details": "Bar chart comparison of precision, recall, F1-score, and AUC-ROC across 3 datasets with statistical significance indicators"
+        }
+      },
+      {
+        "chart_type": "statistical_matrix",
+        "download_url": "https://placehold.co/700x700/png",
+        "filename": "statistical_significance.png",
+        "explanation": {
+          "title": "Statistical Significance Matrix",
+          "key_insights": [
+            "Dataset_A vs Dataset_B shows significant difference (p=0.032)",
+            "Dataset_B vs Dataset_C also statistically significant (p=0.041)",
+            "Dataset_A vs Dataset_C difference not significant (p=0.156)"
+          ],
+          "risk_indicators": [
+            "Effect sizes range from 0.12 to 0.23",
+            "Moderate practical significance detected"
+          ],
+          "recommendations": [
+            "Dataset selection impacts fraud detection accuracy",
+            "Monitor performance across different data sources"
+          ],
+          "technical_details": "P-value heatmap with effect size indicators, using two-tailed t-tests for accuracy comparisons"
+        }
+      }
+    ]
+  },
+  "key_risk_factors": [
+    "Multiple failed login attempts detected",
+    "Unusual transaction velocity (3x normal baseline)",
+    "High-risk geographic location (flagged jurisdiction)",
+    "Device fingerprint inconsistencies",
+    "Behavioral pattern anomalies detected"
+  ],
+  "recommendations": [
+    "Freeze account immediately pending investigation",
+    "Contact customer for identity verification",
+    "Review transaction history for past 30 days",
+    "File SAR with regulatory authorities",
+    "Implement enhanced monitoring for similar patterns"
+  ],
+  "compliance_status": {
+    "sar_ready": true,
+    "gdpr_compliant": true,
+    "dora_compliant": true,
+    "jurisdiction": "US"
+  },
+  "phase_results": {
+    "phase-0": {
+      "phase_id": "phase-0",
+      "phase_name": "Data Acquisition",
+      "status": "completed",
+      "duration": 120,
+      "confidence": 95
+    },
+    "phase-1": {
+      "phase_id": "phase-1",
+      "phase_name": "Data Ingestion & Validation",
+      "status": "completed",
+      "duration": 180,
+      "confidence": 92
+    },
+    "phase-2": {
+      "phase_id": "phase-2",
+      "phase_name": "Transaction Monitoring",
+      "status": "completed",
+      "duration": 250,
+      "confidence": 88
+    }
+  },
+  "audit_trail": [
+    {
+      "timestamp": "2026-03-05T10:00:00Z",
+      "phase": "Data Acquisition",
+      "action": "Dataset uploaded and classified",
+      "actor": "System",
+      "evidence_source": "CSV file upload"
+    },
+    {
+      "timestamp": "2026-03-05T10:02:00Z",
+      "phase": "MARAG Intelligence",
+      "action": "Multi-agent consensus achieved",
+      "actor": "MARAG System",
+      "evidence_source": "5 specialized RAG agents"
+    },
+    {
+      "timestamp": "2026-03-05T10:05:00Z",
+      "phase": "Risk Classification",
+      "action": "HIGH risk classification confirmed",
+      "actor": "Risk Engine",
+      "evidence_source": "Phase 10 aggregation"
+    }
+  ],
+  "processing_metadata": {
+    "total_processing_time": "3.2 minutes",
+    "phases_completed": 15,
+    "phases_failed": 0,
+    "data_quality_score": 92,
+    "error_log": [],
+    "visualizations_generated": 12,
+    "images_exported": 12,
+    "benchmarking_charts_generated": 8,
+    "marag_charts_generated": 6,
+    "marag_agents_deployed": 5,
+    "agent_consensus_score": 0.87,
+    "datasets_compared": 3,
+    "statistical_tests_performed": 6,
+    "total_download_size": "32.4MB"
+  }
+}

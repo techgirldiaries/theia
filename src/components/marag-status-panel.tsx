@@ -89,9 +89,9 @@ export const maragAgents = signal<MARAGAgent[]>([
   },
   {
     id: "BARA",
-    name: "Behavioral Analysis RAG Agent",
+    name: "Behavioural Analysis RAG Agent",
     acronym: "BARA",
-    domain: "User behavior patterns, biometric analysis, device intelligence",
+    domain: "User behaviour patterns, biometric analysis, device intelligence",
     status: "idle",
     confidence: null,
     findings: [],

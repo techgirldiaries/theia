@@ -22,7 +22,7 @@ import { AdvancedErrorRecovery } from "./advanced-error-recovery";
 import { MultiAgentProgressVisualization } from "./multi-agent-progress-visualization";
 import { FraudDatasetManager } from "./fraud-dataset-manager";
 import { MARAGStatusPanel } from "./marag-status-panel";
-import { VisualizationGallery } from "./visualization-gallery";
+import { VisualizationGallery } from "./visualisation-gallery";
 import { BenchmarkComparison } from "./benchmark-comparison";
 
 // Signal for managing active workflows

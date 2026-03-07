@@ -10,7 +10,7 @@ import { MaragConsensusRadar } from "@/components/marag-consensus-radar";
 import {
   VisualizationGallery,
   type Visualization as VizGalleryVisualization,
-} from "@/components/visualization-gallery";
+} from "@/components/visualisation-gallery";
 import {
   BenchmarkComparison,
   type BenchmarkResults,

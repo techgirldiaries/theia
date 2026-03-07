@@ -28,7 +28,6 @@ interface ParsedFraudReport {
 
 /**
  * Extract risk score from message text
- * Looks for patterns like "Risk Score: 85/100" or "Overall Risk Score: 85"
  */
 export function extractRiskScore(text: string): number | null {
   const patterns = [
@@ -100,6 +99,7 @@ export function extractModality(text: string): {
  * Extract agent contributions from structured report
  */
 export function extractAgentContributions(text: string) {
+  // Extracts RAG-enhanced agent findings from response text
   const contributions: Array<{
     agent: string;
     score?: number;
@@ -255,9 +255,9 @@ export function isFraudReport(messageText: string): boolean {
   );
 }
 
-// ============================================================================
+// ---------------------------------------------------------------------
 // ENHANCED FRAUD REPORT PARSING (MARAG & BENCHMARKING SUPPORT)
-// ============================================================================
+// ---------------------------------------------------------------------
 
 import type { EnhancedFraudReport } from "@/types/fraud-report";
 import type { MaragResults } from "@/types/marag";

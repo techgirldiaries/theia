@@ -5,7 +5,6 @@ import { AnalyticsDashboard } from "@/components/analytics-dashboard";
 import { AuditLogViewer } from "@/components/audit-log-viewer";
 import { DatasetsManager } from "@/components/datasets-manager";
 import { EmptyState } from "@/components/empty-state";
-import { FileManagerPanel } from "@/components/file-manager";
 import { Footer } from "@/components/footer";
 import { FraudReportsViewer } from "@/components/fraud-reports-viewer";
 import { Header } from "@/components/header";
@@ -21,6 +20,7 @@ import { Settings } from "@/components/settings";
 import { StopButton } from "@/components/stop-button";
 import { Toast } from "@/components/toast";
 import { UserMessage } from "@/components/user-message";
+import { FileManagerPanel } from "@/components/file-manager";
 import {
   dismissToast,
   isAgentTyping,

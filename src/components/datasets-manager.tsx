@@ -63,7 +63,7 @@ export function DatasetsManager() {
               No datasets uploaded yet
             </p>
             <p class="text-sm text-zinc-600 dark:text-zinc-400">
-              Upload CSV, JSON, or Excel files through the chat interface
+              Upload CSV, JSON or Excel files through the chat interface
             </p>
           </div>
         ) : (
@@ -161,7 +161,7 @@ export function DatasetsManager() {
             • Upload datasets via drag & drop or the attachment menu in the chat
           </li>
           <li>• Supported formats: CSV, JSON, Excel (XLSX, XLS)</li>
-          <li>• Datasets are automatically analyzed for fraud patterns</li>
+          <li>• Datasets are automatically analysed for fraud patterns</li>
           <li>• Large files may take longer to process</li>
         </ul>
       </div>

@@ -1,3 +1,6 @@
+# Large dataset files (exceed GitHub 100MB limit)
+datasets/
+
 # Environment variables
 .env
 

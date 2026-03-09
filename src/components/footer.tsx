@@ -540,6 +540,9 @@ export function Footer() {
 
     input.current.value = snippet;
     messageDraft.value = snippet;
+    // Trigger resize so the textarea expands to fit the injected text
+    input.current.style.height = "auto";
+    input.current.style.height = `${Math.min(input.current.scrollHeight, 400)}px`;
     input.current.focus();
     logAuditEntry("action", `Re-used recent dataset: ${file.fileName}`);
   }, []);

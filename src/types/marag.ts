@@ -3,6 +3,8 @@
  * Theia Fraud Intelligence
  */
 
+import { types } from "node:util";
+
 export type MaragAgentId = "TIRA" | "RCRA" | "HPRA" | "ERRA" | "BARA";
 
 export interface MaragAgent {
@@ -26,8 +28,8 @@ export interface EvidenceTriangulation {
   };
 }
 
-export interface CollaborativeRiskAssessment {
-  individual_agent_scores: Record<MaragAgentId, number>;
+export interface CollaborativeRiskAssessment { 
+  individual_agent_scores: Record<MaragAgentId, number>; 
   weighted_final_score: number;
   uncertainty_quantification: {
     confidence_interval: [number, number];

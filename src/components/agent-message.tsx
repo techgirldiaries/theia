@@ -33,6 +33,10 @@ function parseMarkdown(text: string): string {
     .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") // Bold
     .replace(/\*(.*?)\*/g, "<em>$1</em>") // Italic
     .replace(
+      /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,
+      '<a href="$2" target="_blank" rel="noopener noreferrer" class="underline text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">$1</a>',
+    ) // Links
+    .replace(
       /`(.*?)`/g,
       '<code class="bg-zinc-100 dark:bg-zinc-700 px-1 py-0.5 rounded text-sm font-mono">$1</code>',
     ) // Inline code

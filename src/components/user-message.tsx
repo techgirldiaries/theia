@@ -5,6 +5,23 @@ import { useState } from "preact/hooks";
 import TimeAgo from "react-timeago";
 import { compactView, retryFailedMessage, showToast } from "@/signals";
 
+function parseUserMarkdown(text: string): string {
+  if (!text) return "";
+  let html = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+  html = html
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.*?)\*/g, "<em>$1</em>")
+    .replace(
+      /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,
+      '<a href="$2" target="_blank" rel="noopener noreferrer" class="underline opacity-90 hover:opacity-100 break-all">$1</a>',
+    )
+    .replace(/\n/g, "<br>");
+  return html;
+}
+
 type Message = {
   id: string;
   type: "agent-message" | "user-message";
@@ -102,11 +119,13 @@ export function UserMessage({ message }: UserMessageProps) {
                 : "bg-indigo-500 dark:bg-indigo-600"
             } text-white transition-colors ${compactView.value ? "py-1.5 px-3" : ""}`}
           >
-            <p
-              class={`text-end whitespace-pre-wrap wrap-break-word ${compactView.value ? "text-sm" : ""}`}
-            >
-              {message.text}
-            </p>
+            <div
+              class={`text-end wrap-break-word ${compactView.value ? "text-sm" : ""}`}
+              // biome-ignore lint/security/noDangerouslySetInnerHtml: content is user-supplied text with HTML-escaped, link-only markdown
+              dangerouslySetInnerHTML={{
+                __html: parseUserMarkdown(message.text),
+              }}
+            />
             {message.status === "failed" && (
               <div class="flex items-center gap-x-1 mt-1 text-xs text-red-200">
                 <AlertCircle size={12} />

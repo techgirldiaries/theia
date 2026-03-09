@@ -355,10 +355,10 @@ export function LeftSidebar() {
                 : "left-0 top-16 bottom-16 w-64 -translate-x-full"
               : isLargeScreen
                 ? // Large Screen: Static expanded sidebar, full-width
-                  "left-0 top-16 h-[calc(100vh-4rem)] w-80"
+                  "left-0 top-16 h-[calc(100vh-4rem)] w-56"
                 : // Desktop: Fixed sidebar with hover expansion
                   isExpanded
-                  ? "left-0 top-16 h-[calc(100vh-4rem)] w-48"
+                  ? "left-0 top-16 h-[calc(100vh-4rem)] w-44"
                   : "left-0 top-16 h-[calc(100vh-4rem)] w-16"
           }`}
           onMouseEnter={() =>

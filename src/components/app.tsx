@@ -35,6 +35,7 @@ import {
   showSettings,
   splitScreenMode,
   toasts,
+  workforce,
 } from "@/signals";
 
 type Message = {
@@ -106,7 +107,7 @@ export function App() {
         class={`flex flex-1 pt-16 pb-20 ${splitScreenMode.value ? "flex-col lg:flex-row" : "flex-col"}`}
       >
         <main
-          class={`${splitScreenMode.value ? "w-full lg:w-1/2" : "w-full"} pl-0 md:pl-16 lg:pl-16 pr-0 py-4 bg-zinc-50 dark:bg-zinc-950 transition-all duration-300 overflow-auto`}
+          class={`${splitScreenMode.value ? "w-full lg:w-1/2" : "w-full"} pl-0 md:pl-16 lg:pl-16 1440:pl-56 pr-0 py-4 bg-zinc-50 dark:bg-zinc-950 transition-all duration-300 overflow-auto`}
         >
           {/* Show dataset manager inline when Datasets is selected */}
           {showFileManager.value && !splitScreenMode.value && (
@@ -163,7 +164,7 @@ export function App() {
                 ) : (
                   <div class="chat-messages flex flex-col gap-y-4 flex-1">
                     {messages.value.map((m) =>
-                      m.isAgent() ? (
+                      m.isAgent?.() || m.type === "agent-message" ? (
                         <AgentMessage key={m.id} message={m as Message} />
                       ) : (
                         <UserMessage key={m.id} message={m as Message} />
@@ -171,7 +172,9 @@ export function App() {
                     )}
                   </div>
                 )}
-                {isAgentTyping.value && <LoadingSkeleton />}
+                {isAgentTyping.value && (
+                  <LoadingSkeleton isWorkforce={!!workforce.value} />
+                )}
                 <div class="h-20 shrink-0"></div>
               </div>
             )}

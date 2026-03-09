@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* Custom breakpoint matching the large-screen sidebar threshold */
+@theme {
+  --breakpoint-1440: 1440px;
+}
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 @keyframes bounce {
@@ -19,6 +24,37 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+@keyframes thinking-dot {
+
+  0%,
+  60%,
+  100% {
+    opacity: 0.2;
+    transform: scale(0.85);
+  }
+
+  30% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+.thinking-dot {
+  animation: thinking-dot 1.2s ease-in-out infinite;
+}
+
+.thinking-dot-1 {
+  animation-delay: 0ms;
+}
+
+.thinking-dot-2 {
+  animation-delay: 200ms;
+}
+
+.thinking-dot-3 {
+  animation-delay: 400ms;
 }
 
 .animate-spin {

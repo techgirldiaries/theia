@@ -2,7 +2,7 @@ import type { Attachment } from "@relevanceai/sdk";
 import { Mic, MicOff, Paperclip, SendHorizonal, X } from "lucide-react";
 import type { SubmitEventHandler } from "preact";
 import { useCallback, useEffect, useRef, useState } from "preact/hooks";
-import { AttachmentMenu } from "@/components/attachment-menu";
+import { AttachmentMenu, type RecentFile } from "@/components/attachment-menu";
 import { ModeSelector } from "@/components/mode-selector";
 import {
   addDataset,
@@ -156,7 +156,7 @@ export function Footer() {
       input.current.value = messageDraft.value || "";
       // Only handle the auto-resize, don't call full handleInput to avoid loops
       input.current.style.height = "auto";
-      input.current.style.height = `${Math.min(input.current.scrollHeight, 200)}px`;
+      input.current.style.height = `${Math.min(input.current.scrollHeight, 400)}px`;
     }
   }, [messageDraft.value]);
 
@@ -298,7 +298,7 @@ export function Footer() {
     if (input.current) {
       // Auto-resize textarea
       input.current.style.height = "auto";
-      input.current.style.height = `${Math.min(input.current.scrollHeight, 200)}px`;
+      input.current.style.height = `${Math.min(input.current.scrollHeight, 400)}px`;
       // Save draft
       messageDraft.value = input.current.value;
     }
@@ -402,6 +402,8 @@ export function Footer() {
               fileUrl: attachment.fileUrl,
               uploadedAt: new Date(),
               size: file.size,
+              preview: previews[index].preview || undefined,
+              previewFormat: previews[index].format,
             });
 
             // Build detailed file info with preview
@@ -495,26 +497,55 @@ export function Footer() {
     logAuditEntry("action", "Attempted OneDrive connection");
   }, []);
 
-  const handleOpenRecentFiles = useCallback(() => {
-    if (uploadedDatasets.value.length === 0) {
-      showToast("No recent files found", "info");
-      return;
+  const recentFilesForMenu: RecentFile[] = uploadedDatasets.value
+    .slice()
+    .sort((a, b) => b.uploadedAt.getTime() - a.uploadedAt.getTime())
+    .slice(0, 10)
+    .map((d) => ({
+      id: d.id,
+      fileName: d.fileName,
+      fileUrl: d.fileUrl,
+      uploadedAt: d.uploadedAt,
+      size: d.size,
+      preview: d.preview,
+      previewFormat: d.previewFormat,
+    }));
+
+  const handleRecentFileSelect = useCallback((file: RecentFile) => {
+    if (!input.current) return;
+    const current = input.current.value.trimEnd();
+
+    let snippet: string;
+
+    if (file.preview) {
+      // We have inline preview data — give the agent the actual data rows so it
+      // never needs to fetch the (now-expired) temp URL.
+      const sizeNote = file.size
+        ? ` (${(file.size / 1024).toFixed(1)} KB)`
+        : "";
+      snippet =
+        (current ? `${current}\n\n` : "") +
+        `Please analyse the following dataset — **${file.fileName}**${sizeNote}.\n\n` +
+        `Here is the full available data:\n` +
+        `\`\`\`${file.previewFormat ?? "csv"}\n${file.preview}\n\`\`\`\n\n` +
+        `✅ Instructions: Use the data above for your analysis. ` +
+        `Do not attempt to fetch an external URL — the data is provided inline above.`;
+    } else {
+      // No preview stored — the temp URL is likely expired, warn the agent.
+      snippet =
+        (current ? `${current}\n\n` : "") +
+        `I would like to re-analyse **${file.fileName}** but the original upload URL may have expired.\n` +
+        `Please let me know if I should re-upload the file.`;
     }
 
-    // Show recent files (could be integrated with file manager or a modal)
-    const recentCount = Math.min(uploadedDatasets.value.length, 5);
-    const recentFiles = uploadedDatasets.value
-      .sort((a, b) => b.uploadedAt.getTime() - a.uploadedAt.getTime())
-      .slice(0, recentCount)
-      .map((f) => f.fileName)
-      .join(", ");
-
-    showToast(`Recent files: ${recentFiles}`, "info");
-    logAuditEntry("view", `Viewed recent files (${recentCount} files)`);
+    input.current.value = snippet;
+    messageDraft.value = snippet;
+    input.current.focus();
+    logAuditEntry("action", `Re-used recent dataset: ${file.fileName}`);
   }, []);
 
   return (
-    <footer class="fixed bottom-0 left-0 right-0 h-auto min-h-16 pl-0 md:pl-16 lg:pl-16 pr-0 py-2 border-t border-zinc-500/25 bg-white dark:bg-zinc-900 transition-all duration-300 z-10 flex items-center">
+    <footer class="fixed bottom-0 left-0 right-0 h-auto min-h-16 pl-0 md:pl-16 lg:pl-16 1440:pl-56 pr-0 py-2 border-t border-zinc-500/25 bg-white dark:bg-zinc-900 transition-all duration-300 z-10 flex items-center">
       <div ref={dropZone} class="w-full max-w-4xl mx-auto px-4">
         {/* Drag-and-drop overlay */}
         {isDragging && (
@@ -587,7 +618,8 @@ export function Footer() {
               onFileSelect={handleFileSelect}
               onConnectGoogleDrive={handleConnectGoogleDrive}
               onConnectOneDrive={handleConnectOneDrive}
-              onOpenRecentFiles={handleOpenRecentFiles}
+              recentFiles={recentFilesForMenu}
+              onRecentFileSelect={handleRecentFileSelect}
               disabled={isUploading || isAgentTyping.value}
             />
 
@@ -624,7 +656,7 @@ export function Footer() {
                 onInput={handleInput}
                 onKeyDown={handleKeyDown}
                 rows={1}
-                class="w-full bg-transparent border-none px-0 py-2 outline-none text-zinc-800 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed resize-none max-h-40 overflow-y-auto"
+                class="w-full bg-transparent border-none px-0 py-2 outline-none text-zinc-800 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed resize-none max-h-52 overflow-y-auto"
                 name="message"
               />
 

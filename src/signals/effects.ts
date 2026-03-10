@@ -2,6 +2,7 @@ import { effect } from "@preact/signals";
 import { Agent, Workforce } from "@relevanceai/sdk";
 import { AGENT_ID, WORKFORCE_ID } from "@/constant";
 import {
+  saveChatSessionToHistory,
   saveDatasetsToStorage,
   saveMessagesToStorage,
   saveMetricsToStorage,
@@ -54,6 +55,15 @@ effect(() => {
     }, 100);
   }
 });
+
+// ── Auto-save session on tab/window close ───────────────────────────────────
+if (typeof window !== "undefined") {
+  window.addEventListener("beforeunload", () => {
+    if (messages.value.length > 0) {
+      saveChatSessionToHistory(messages.value);
+    }
+  });
+}
 
 // ── Scroll-to-bottom button visibility ───────────────────────────────────────
 if (typeof window !== "undefined") {

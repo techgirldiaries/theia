@@ -36,10 +36,25 @@ type Message = {
   errorMessage?: string;
 };
 
+const MAX_MESSAGE_LENGTH = 20_000;
+const MAX_FILES = 5;
+const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
+const ALLOWED_MIME_TYPES = new Set([
+  "text/csv",
+  "application/json",
+  "text/plain",
+  "text/tab-separated-values",
+  "application/vnd.ms-excel",
+  "application/octet-stream", // some browsers report this for .csv
+]);
+const ALLOWED_EXTENSIONS = /\.(csv|json|txt|log|tsv)$/i;
+const SUBMIT_COOLDOWN_MS = 2_000;
+
 export function Footer() {
   const input = useRef<HTMLTextAreaElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const dropZone = useRef<HTMLDivElement>(null);
+  const lastSubmitTime = useRef(0);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -185,20 +200,46 @@ export function Footer() {
     e.stopPropagation();
   }, []);
 
-  const handleDrop = useCallback((e: DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-
-    const files = e.dataTransfer?.files;
-    if (files && files.length > 0) {
-      setSelectedFiles((prev) => [...prev, ...Array.from(files)]);
-      logAuditEntry(
-        "upload",
-        `Dropped ${files.length} file(s) via drag-and-drop`,
-      );
-    }
+  const validateFile = useCallback((file: File): string | null => {
+    if (file.size > MAX_FILE_SIZE_BYTES)
+      return `"${file.name}" exceeds the 10 MB limit.`;
+    const mimeOk = ALLOWED_MIME_TYPES.has(file.type);
+    const extOk = ALLOWED_EXTENSIONS.test(file.name);
+    if (!mimeOk && !extOk)
+      return `"${file.name}" is not an accepted file type (CSV, JSON, TXT, TSV).`;
+    return null;
   }, []);
+
+  const handleDrop = useCallback(
+    (e: DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsDragging(false);
+
+      const files = e.dataTransfer?.files;
+      if (files && files.length > 0) {
+        const incoming = Array.from(files);
+        const errors = incoming.map(validateFile).filter(Boolean);
+        if (errors.length > 0) {
+          showToast(errors[0]!, "error");
+          return;
+        }
+        setSelectedFiles((prev) => {
+          const merged = [...prev, ...incoming];
+          if (merged.length > MAX_FILES) {
+            showToast(`Maximum ${MAX_FILES} files per submission.`, "error");
+            return prev;
+          }
+          return merged;
+        });
+        logAuditEntry(
+          "upload",
+          `Dropped ${files.length} file(s) via drag-and-drop`,
+        );
+      }
+    },
+    [validateFile],
+  );
 
   // Helper to read CSV preview (first 5 rows)
   const readCSVPreview = async (file: File): Promise<string> => {
@@ -275,12 +316,26 @@ export function Footer() {
   const handleFileChange = useCallback(() => {
     const files = fileInput.current?.files;
     if (files && files.length > 0) {
-      setSelectedFiles((prev) => [...prev, ...Array.from(files)]);
-      // Reset file input to allow reselecting the same file
-      if (fileInput.current) {
-        fileInput.current.value = "";
+      const incoming = Array.from(files);
+      // Validate each file
+      for (const file of incoming) {
+        const err = validateFile(file);
+        if (err) {
+          showToast(err, "error");
+          if (fileInput.current) fileInput.current.value = "";
+          return;
+        }
       }
-      // Log audit entry for file selection
+      setSelectedFiles((prev) => {
+        const merged = [...prev, ...incoming];
+        if (merged.length > MAX_FILES) {
+          showToast(`Maximum ${MAX_FILES} files per submission.`, "error");
+          if (fileInput.current) fileInput.current.value = "";
+          return prev;
+        }
+        return merged;
+      });
+      if (fileInput.current) fileInput.current.value = "";
       logAuditEntry(
         "upload",
         `Selected ${files.length} file(s): ${Array.from(files)
@@ -288,7 +343,7 @@ export function Footer() {
           .join(", ")}`,
       );
     }
-  }, []);
+  }, [validateFile]);
 
   const removeFile = useCallback((index: number) => {
     setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
@@ -362,10 +417,27 @@ export function Footer() {
         return;
       }
 
+      // Rate limit: enforce minimum gap between submissions
+      const now = Date.now();
+      if (now - lastSubmitTime.current < SUBMIT_COOLDOWN_MS) {
+        showToast("Please wait a moment before sending again.", "info");
+        return;
+      }
+      lastSubmitTime.current = now;
+
       const form = e.currentTarget;
       const data = new FormData(form);
       const message = data.get("message") as string | null;
       if (!message?.trim() && selectedFiles.length === 0) {
+        return;
+      }
+
+      // Enforce message length cap
+      if ((message?.length ?? 0) > MAX_MESSAGE_LENGTH) {
+        showToast(
+          `Message exceeds the ${MAX_MESSAGE_LENGTH.toLocaleString()} character limit.`,
+          "error",
+        );
         return;
       }
 
@@ -661,6 +733,7 @@ export function Footer() {
                 rows={1}
                 class="w-full bg-transparent border-none px-0 py-2 outline-none text-zinc-800 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed resize-none max-h-52 overflow-y-auto"
                 name="message"
+                maxLength={MAX_MESSAGE_LENGTH}
               />
 
               {/* Voice Recording Indicator */}

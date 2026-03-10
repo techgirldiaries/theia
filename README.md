@@ -65,7 +65,7 @@ Agents reach agreement through weighted voting, where each agent's contribution 
 ### Frontend
 
 - **Framework:** Preact (React-compatible, lightweight)
-- **Language:** TypeScript (100% type coverage)
+- **Language:** TypeScript
 - **Styling:** Tailwind CSS 4.x
 - **UI Components:** Radix UI (accessible, unstyled)
 - **Icons:** Lucide React
@@ -74,7 +74,7 @@ Agents reach agreement through weighted voting, where each agent's contribution 
 ### Build & Testing
 
 - **Build Tool:** Vite (fast, modern)
-- **Testing:** Vitest + Testing Library
+- **Testing:** Vitest and Testing Library
 - **Linter:** Biome (fast linter/formatter)
 - **Type Checking:** TypeScript strict mode
 
@@ -83,7 +83,7 @@ Agents reach agreement through weighted voting, where each agent's contribution 
 - **AI Platform:** Relevance AI SDK
 - **Multi-Agent:** Workforce orchestration
 - **RAG:** Retrieval-augmented generation
-- **Datasets:** Credit card, PaySim, MomTSim fraud data
+- **Datasets:** Credit card, PaySim, MomtSim fraud data (Kaggle)
 
 ## Project Structure
 

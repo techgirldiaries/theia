@@ -1,5 +1,6 @@
 import { computed, signal } from "@preact/signals";
 import { Agent, type Client, type Task, Workforce } from "@relevanceai/sdk";
+import { ACCESS_PASSPHRASE } from "@/constant";
 import {
   loadChatSessionsFromStorage,
   loadDatasetsFromStorage,
@@ -24,7 +25,8 @@ import type {
 // ── Startup: archive previous session then start fresh ────────────────────────
 const _savedMessages = loadMessagesFromStorage();
 if (_savedMessages.length > 0) {
-  saveChatSessionToHistory(_savedMessages);
+  // Fire-and-forget: archive is a background operation.
+  void saveChatSessionToHistory(_savedMessages);
   localStorage.removeItem("fraud-chat-history");
 }
 
@@ -47,6 +49,12 @@ export const isInitialized = signal(false);
 export const loadingError = signal<string | null>(null);
 export const toasts = signal<ToastMessage[]>([]);
 export const connectionRetryCount = signal(0);
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
+/** Display name of the authenticated user; used in audit log entries. */
+export const currentUserId = signal<string>("anonymous");
+/** Whether the user has passed the auth gate. Always true when no passphrase is configured. */
+export const isAuthenticated = signal<boolean>(!ACCESS_PASSPHRASE);
 
 // ── UI state ──────────────────────────────────────────────────────────────────
 export const showAnalytics = signal(false);

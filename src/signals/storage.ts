@@ -6,41 +6,88 @@ import type {
   PerformanceMetric,
 } from "./types";
 
-// ── Encryption ────────────────────────────────────────────────────────────────
+// ── AES-GCM Encryption ────────────────────────────────────────────────────────
 
-const ENCRYPTION_KEY = "fraud-intelligence-key-2026";
+const PBKDF2_ITERATIONS = 100_000;
+const SALT_STORAGE_KEY = "fraud-enc-salt";
 
-export function simpleEncrypt(text: string): string {
-  try {
-    let encrypted = "";
-    for (let i = 0; i < text.length; i++) {
-      encrypted += String.fromCharCode(
-        text.charCodeAt(i) ^
-          ENCRYPTION_KEY.charCodeAt(i % ENCRYPTION_KEY.length),
-      );
-    }
-    return btoa(encrypted);
-  } catch (error) {
-    console.error("Encryption failed:", error);
-    return text;
+// In-memory AES-GCM key. null = open mode (no passphrase set).
+let _activeKey: CryptoKey | null = null;
+
+/**
+ * Derives an AES-256-GCM key from the given passphrase via PBKDF2 and caches
+ * it in memory (never written to disk). A random salt is persisted to
+ * localStorage so the same passphrase always yields the same derived key,
+ * enabling decryption of data across page reloads.
+ * Call this after the user authenticates; it also reloads the sessions cache.
+ */
+export async function initEncryptionKeyFromPassphrase(
+  passphrase: string,
+): Promise<void> {
+  let saltHex = localStorage.getItem(SALT_STORAGE_KEY);
+  if (!saltHex) {
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    saltHex = Array.from(salt)
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+    localStorage.setItem(SALT_STORAGE_KEY, saltHex);
   }
+  const salt = new Uint8Array(
+    saltHex.match(/.{2}/g)!.map((h) => Number.parseInt(h, 16)),
+  );
+  const keyMaterial = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(passphrase),
+    "PBKDF2",
+    false,
+    ["deriveKey"],
+  );
+  _activeKey = await crypto.subtle.deriveKey(
+    { name: "PBKDF2", salt, iterations: PBKDF2_ITERATIONS, hash: "SHA-256" },
+    keyMaterial,
+    { name: "AES-GCM", length: 256 },
+    false,
+    ["encrypt", "decrypt"],
+  );
+  // Reload sessions cache using the newly derived key.
+  await _loadSessionsFromDisk();
 }
 
-export function simpleDecrypt(encrypted: string): string {
-  try {
-    const decoded = atob(encrypted);
-    let decrypted = "";
-    for (let i = 0; i < decoded.length; i++) {
-      decrypted += String.fromCharCode(
-        decoded.charCodeAt(i) ^
-          ENCRYPTION_KEY.charCodeAt(i % ENCRYPTION_KEY.length),
-      );
-    }
-    return decrypted;
-  } catch (error) {
-    console.error("Decryption failed:", error);
-    throw new Error(`Decryption failed: ${error}`);
-  }
+/**
+ * Encrypts plaintext with AES-256-GCM.
+ * In open (no-passphrase) mode returns the value unchanged so that history
+ * continues to persist as readable JSON.
+ */
+export async function encryptData(plaintext: string): Promise<string> {
+  if (!_activeKey) return plaintext;
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const encoded = new TextEncoder().encode(plaintext);
+  const ciphertext = await crypto.subtle.encrypt(
+    { name: "AES-GCM", iv },
+    _activeKey,
+    encoded,
+  );
+  const combined = new Uint8Array(12 + ciphertext.byteLength);
+  combined.set(iv);
+  combined.set(new Uint8Array(ciphertext), 12);
+  return btoa(String.fromCharCode(...combined));
+}
+
+/**
+ * Decrypts a value produced by encryptData.
+ * In open mode returns the value unchanged.
+ */
+export async function decryptData(ciphertext: string): Promise<string> {
+  if (!_activeKey) return ciphertext;
+  const combined = Uint8Array.from(atob(ciphertext), (c) => c.charCodeAt(0));
+  const iv = combined.slice(0, 12);
+  const data = combined.slice(12);
+  const decrypted = await crypto.subtle.decrypt(
+    { name: "AES-GCM", iv },
+    _activeKey,
+    data,
+  );
+  return new TextDecoder().decode(decrypted);
 }
 
 // ── PII Redaction ─────────────────────────────────────────────────────────────
@@ -146,43 +193,50 @@ function deserializeSession(s: any): ChatSession {
   };
 }
 
-export function loadChatSessionsFromStorage(): ChatSession[] {
+// ── Sessions in-memory cache ──────────────────────────────────────────────────
+
+let _sessionsCache: ChatSession[] = [];
+
+async function _loadSessionsFromDisk(): Promise<void> {
   try {
     const saved = localStorage.getItem("fraud-chat-sessions");
-    if (!saved) return [];
-    let jsonString: string;
-    try {
-      jsonString = simpleDecrypt(saved);
-      JSON.parse(jsonString); // validate
-    } catch (decryptError) {
-      console.warn(
-        "Chat sessions decryption failed, clearing corrupted data:",
-        decryptError,
-      );
-      localStorage.removeItem("fraud-chat-sessions");
-      return [];
+    if (!saved) {
+      _sessionsCache = [];
+      return;
     }
-    return JSON.parse(jsonString).map(deserializeSession);
-  } catch (error) {
-    console.error("Failed to load chat sessions:", error);
-    return [];
+    const json = await decryptData(saved);
+    _sessionsCache = JSON.parse(json).map(deserializeSession);
+  } catch {
+    // Corrupted data or wrong key — clear so the app stays usable.
+    localStorage.removeItem("fraud-chat-sessions");
+    _sessionsCache = [];
   }
 }
 
-export function saveChatSessionToHistory(msgs: Message[]): void {
-  try {
-    if (msgs.length === 0) return;
-    let riskLevel: "low" | "medium" | "high" | undefined;
-    for (const msg of msgs) {
-      const match = msg.text.match(/Risk\s+Score[:\s]+(\d+)/i);
-      if (match) {
-        const score = parseInt(match[1], 10);
-        riskLevel = score >= 70 ? "high" : score >= 45 ? "medium" : "low";
-        break;
-      }
+/** Resolves once the sessions cache has been populated from localStorage. */
+export const sessionsReady: Promise<void> = _loadSessionsFromDisk();
+
+/** Synchronous read from the in-memory cache. Always up-to-date. */
+export function loadChatSessionsFromStorage(): ChatSession[] {
+  return [..._sessionsCache];
+}
+
+/** Archive a completed conversation to history. */
+export async function saveChatSessionToHistory(msgs: Message[]): Promise<void> {
+  if (msgs.length === 0) return;
+  await sessionsReady; // ensure initial load is complete before appending
+  let riskLevel: "low" | "medium" | "high" | undefined;
+  for (const msg of msgs) {
+    const match = msg.text.match(/Risk\s+Score[:\s]+(\d+)/i);
+    if (match) {
+      const score = Number.parseInt(match[1], 10);
+      riskLevel = score >= 70 ? "high" : score >= 45 ? "medium" : "low";
+      break;
     }
-    const sessions = loadChatSessionsFromStorage();
-    sessions.push({
+  }
+  const updated: ChatSession[] = [
+    ..._sessionsCache,
+    {
       id: `session-${Date.now()}`,
       startTime: msgs[0].createdAt,
       endTime: new Date(),
@@ -190,22 +244,21 @@ export function saveChatSessionToHistory(msgs: Message[]): void {
       messageCount: msgs.length,
       tags: [],
       riskLevel,
-    });
-    const jsonString = JSON.stringify(
-      sessions.slice(-10).map(serializeSession),
-    );
-    localStorage.setItem("fraud-chat-sessions", simpleEncrypt(jsonString));
-  } catch (error) {
-    console.error("Failed to save chat session:", error);
-  }
+    },
+  ].slice(-10);
+  await persistSessions(updated);
 }
 
-/** Persist sessions as plain JSON (used by tag/delete operations). */
-export function persistSessions(sessions: ChatSession[]) {
-  localStorage.setItem(
-    "fraud-chat-sessions",
-    JSON.stringify(sessions.map(serializeSession)),
-  );
+/**
+ * Persist sessions — updates the in-memory cache immediately (synchronous) so
+ * callers reading via loadChatSessionsFromStorage() see up-to-date data even
+ * before the async disk-write completes.
+ */
+export async function persistSessions(sessions: ChatSession[]): Promise<void> {
+  _sessionsCache = sessions;
+  const json = JSON.stringify(sessions.map(serializeSession));
+  const encrypted = await encryptData(json);
+  localStorage.setItem("fraud-chat-sessions", encrypted);
 }
 
 // ── Datasets ──────────────────────────────────────────────────────────────────

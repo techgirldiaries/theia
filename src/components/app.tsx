@@ -3,6 +3,7 @@ import type { Attachment } from "@relevanceai/sdk";
 import { AgentMessage } from "@/components/agent-message";
 import { AnalyticsDashboard } from "@/components/analytics-dashboard";
 import { AuditLogViewer } from "@/components/audit-log-viewer";
+import { AuthGate } from "@/components/auth-gate";
 import { DatasetsManager } from "@/components/datasets-manager";
 import { EmptyState } from "@/components/empty-state";
 import { Footer } from "@/components/footer";
@@ -24,6 +25,7 @@ import { FileManagerPanel } from "@/components/file-manager";
 import {
   dismissToast,
   isAgentTyping,
+  isAuthenticated,
   isInitialized,
   loadingError,
   messages,
@@ -50,6 +52,11 @@ type Message = {
 };
 
 export function App() {
+  // Show auth gate when passphrase is configured and user hasn't authenticated yet.
+  if (!isAuthenticated.value) {
+    return <AuthGate />;
+  }
+
   if (!isInitialized.value) {
     return (
       <div class="flex items-center justify-center min-h-dvh bg-zinc-50 dark:bg-zinc-950">

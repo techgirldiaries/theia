@@ -217,6 +217,7 @@ effect(() => {
       isAgentTyping.value = true;
     } else if (
       (t.status as string) === "completed" ||
+      (t.status as string) === "complete" ||
       (t.status as string) === "success"
     ) {
       isAgentTyping.value = false;
@@ -259,9 +260,19 @@ effect(() => {
     );
 
     if (optimisticIdx !== -1) {
-      // Replace the optimistic placeholder with the first confirmed message
       const copy = [...msgs];
-      copy[optimisticIdx] = message;
+      if (message.type === "user-message" || !message.isAgent?.()) {
+        // The SDK echoes the full user turn which includes all system-injected
+        // file content. Preserve the clean display text the user typed; only
+        // adopt the real message id so future updates find this entry.
+        copy[optimisticIdx] = {
+          ...copy[optimisticIdx],
+          id: message.id ?? copy[optimisticIdx].id,
+          status: "sent" as const,
+        };
+      } else {
+        copy[optimisticIdx] = message;
+      }
       messages.value = copy;
       isAgentTyping.value = true;
     } else {

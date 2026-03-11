@@ -17,7 +17,7 @@ export interface RecentFile {
   fileUrl: string;
   uploadedAt: Date;
   size?: number;
-  /** Stored preview so the agent can access data even if temp URL expired */
+  /** Small stored excerpt so the agent still has schema/sample context. */
   preview?: string;
   previewFormat?: string;
 }

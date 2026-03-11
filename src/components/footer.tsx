@@ -1,5 +1,5 @@
 import type { Attachment } from "@relevanceai/sdk";
-import { Mic, MicOff, Paperclip, SendHorizonal, X } from "lucide-react";
+import { Clock, Mic, MicOff, Paperclip, SendHorizonal, X } from "lucide-react";
 import type { SubmitEventHandler } from "preact";
 import { useCallback, useEffect, useRef, useState } from "preact/hooks";
 import { AttachmentMenu, type RecentFile } from "@/components/attachment-menu";
@@ -38,7 +38,9 @@ type Message = {
 
 const MAX_MESSAGE_LENGTH = 20_000;
 const MAX_FILES = 5;
-const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
+const MAX_PREVIEW_READ_BYTES = 128 * 1024;
+const MAX_PREVIEW_LINES = 20;
+const MAX_PREVIEW_CHARACTERS = 2_500;
 const ALLOWED_MIME_TYPES = new Set([
   "text/csv",
   "application/json",
@@ -50,12 +52,50 @@ const ALLOWED_MIME_TYPES = new Set([
 const ALLOWED_EXTENSIONS = /\.(csv|json|txt|log|tsv)$/i;
 const SUBMIT_COOLDOWN_MS = 2_000;
 
+function formatFileSize(bytes: number): string {
+  if (bytes >= 1024 * 1024 * 1024) {
+    return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+  }
+  if (bytes >= 1024 * 1024) {
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+  }
+  if (bytes >= 1024) {
+    return `${(bytes / 1024).toFixed(2)} KB`;
+  }
+  return `${bytes} B`;
+}
+
+function trimPreviewText(
+  text: string,
+  maxLines: number,
+): { preview: string; wasTrimmed: boolean } {
+  const normalized = text.replace(/\r\n/g, "\n").trimEnd();
+  const lines = normalized.split("\n");
+  const limitedLines = lines.slice(0, maxLines).join("\n").trimEnd();
+  let preview = limitedLines;
+  let wasTrimmed = lines.length > maxLines;
+
+  if (preview.length > MAX_PREVIEW_CHARACTERS) {
+    preview = preview.slice(0, MAX_PREVIEW_CHARACTERS).trimEnd();
+    wasTrimmed = true;
+  }
+
+  if (wasTrimmed && preview.length > 0) {
+    preview = `${preview}\n...`;
+  }
+
+  return { preview, wasTrimmed };
+}
+
 export function Footer() {
   const input = useRef<HTMLTextAreaElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const dropZone = useRef<HTMLDivElement>(null);
   const lastSubmitTime = useRef(0);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [selectedRecentFiles, setSelectedRecentFiles] = useState<RecentFile[]>(
+    [],
+  );
   const [isUploading, setIsUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [recognition, setRecognition] = useState<any>(null);
@@ -201,8 +241,6 @@ export function Footer() {
   }, []);
 
   const validateFile = useCallback((file: File): string | null => {
-    if (file.size > MAX_FILE_SIZE_BYTES)
-      return `"${file.name}" exceeds the 10 MB limit.`;
     const mimeOk = ALLOWED_MIME_TYPES.has(file.type);
     const extOk = ALLOWED_EXTENSIONS.test(file.name);
     if (!mimeOk && !extOk)
@@ -241,71 +279,113 @@ export function Footer() {
     [validateFile],
   );
 
-  // Helper to read CSV preview (first 5 rows)
-  const readCSVPreview = async (file: File): Promise<string> => {
-    try {
-      const text = await file.text();
-      const lines = text.split("\n").slice(0, 6); // Header + 5 rows
-      return lines.join("\n");
-    } catch (error) {
-      console.error("Failed to read CSV preview:", error);
-      return "";
-    }
-  };
+  const readFileSlice = useCallback(
+    async (
+      file: File,
+    ): Promise<{ text: string; sourceWasTrimmed: boolean }> => {
+      const text = await file.slice(0, MAX_PREVIEW_READ_BYTES).text();
+      return {
+        text,
+        sourceWasTrimmed: file.size > MAX_PREVIEW_READ_BYTES,
+      };
+    },
+    [],
+  );
 
-  const readJSONPreview = async (file: File): Promise<string> => {
-    try {
-      const text = await file.text();
-      const json = JSON.parse(text);
-      // Pretty print JSON with max 20 lines preview
-      const formatted = JSON.stringify(json, null, 2);
-      const lines = formatted.split("\n").slice(0, 20);
-      return (
-        lines.join("\n") + (formatted.split("\n").length > 20 ? "\n..." : "")
-      );
-    } catch (error) {
-      console.error("Failed to read JSON preview:", error);
-      return "";
-    }
-  };
+  const readCSVPreview = useCallback(
+    async (file: File) => {
+      try {
+        const { text, sourceWasTrimmed } = await readFileSlice(file);
+        const preview = trimPreviewText(text, 6);
+        return {
+          preview: preview.preview,
+          isPartial: sourceWasTrimmed || preview.wasTrimmed,
+        };
+      } catch (error) {
+        console.error("Failed to read CSV preview:", error);
+        return { preview: "", isPartial: false };
+      }
+    },
+    [readFileSlice],
+  );
 
-  const readTXTPreview = async (file: File): Promise<string> => {
-    try {
-      const text = await file.text();
-      const lines = text.split("\n").slice(0, 15); // First 15 lines
-      return lines.join("\n") + (text.split("\n").length > 15 ? "\n..." : "");
-    } catch (error) {
-      console.error("Failed to read TXT preview:", error);
-      return "";
-    }
-  };
+  const readJSONPreview = useCallback(
+    async (file: File) => {
+      try {
+        const { text, sourceWasTrimmed } = await readFileSlice(file);
 
-  const readTSVPreview = async (file: File): Promise<string> => {
-    try {
-      const text = await file.text();
-      const lines = text.split("\n").slice(0, 6); // Header + 5 rows
-      return lines.join("\n");
-    } catch (error) {
-      console.error("Failed to read TSV preview:", error);
-      return "";
-    }
-  };
+        if (!sourceWasTrimmed) {
+          const json = JSON.parse(text);
+          const formatted = JSON.stringify(json, null, 2);
+          const preview = trimPreviewText(formatted, MAX_PREVIEW_LINES);
+          return {
+            preview: preview.preview,
+            isPartial: preview.wasTrimmed,
+          };
+        }
+
+        const preview = trimPreviewText(text, MAX_PREVIEW_LINES);
+        return {
+          preview: preview.preview,
+          isPartial: sourceWasTrimmed || preview.wasTrimmed,
+        };
+      } catch (error) {
+        console.error("Failed to read JSON preview:", error);
+        return { preview: "", isPartial: false };
+      }
+    },
+    [readFileSlice],
+  );
+
+  const readTXTPreview = useCallback(
+    async (file: File) => {
+      try {
+        const { text, sourceWasTrimmed } = await readFileSlice(file);
+        const preview = trimPreviewText(text, 15);
+        return {
+          preview: preview.preview,
+          isPartial: sourceWasTrimmed || preview.wasTrimmed,
+        };
+      } catch (error) {
+        console.error("Failed to read TXT preview:", error);
+        return { preview: "", isPartial: false };
+      }
+    },
+    [readFileSlice],
+  );
+
+  const readTSVPreview = useCallback(
+    async (file: File) => {
+      try {
+        const { text, sourceWasTrimmed } = await readFileSlice(file);
+        const preview = trimPreviewText(text, 6);
+        return {
+          preview: preview.preview,
+          isPartial: sourceWasTrimmed || preview.wasTrimmed,
+        };
+      } catch (error) {
+        console.error("Failed to read TSV preview:", error);
+        return { preview: "", isPartial: false };
+      }
+    },
+    [readFileSlice],
+  );
 
   const getFilePreview = async (
     file: File,
-  ): Promise<{ preview: string; format: string }> => {
+  ): Promise<{ preview: string; format: string; isPartial: boolean }> => {
     const fileName = file.name.toLowerCase();
 
     if (fileName.endsWith(".csv")) {
-      return { preview: await readCSVPreview(file), format: "csv" };
+      return { ...(await readCSVPreview(file)), format: "csv" };
     } else if (fileName.endsWith(".json")) {
-      return { preview: await readJSONPreview(file), format: "json" };
+      return { ...(await readJSONPreview(file)), format: "json" };
     } else if (fileName.endsWith(".txt") || fileName.endsWith(".log")) {
-      return { preview: await readTXTPreview(file), format: "text" };
+      return { ...(await readTXTPreview(file)), format: "text" };
     } else if (fileName.endsWith(".tsv")) {
-      return { preview: await readTSVPreview(file), format: "tsv" };
+      return { ...(await readTSVPreview(file)), format: "tsv" };
     } else {
-      return { preview: "", format: "unknown" };
+      return { preview: "", format: "unknown", isPartial: false };
     }
   };
 
@@ -347,6 +427,10 @@ export function Footer() {
 
   const removeFile = useCallback((index: number) => {
     setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
+  }, []);
+
+  const removeRecentFile = useCallback((index: number) => {
+    setSelectedRecentFiles((prev) => prev.filter((_, i) => i !== index));
   }, []);
 
   const handleInput = useCallback(() => {
@@ -428,7 +512,11 @@ export function Footer() {
       const form = e.currentTarget;
       const data = new FormData(form);
       const message = data.get("message") as string | null;
-      if (!message?.trim() && selectedFiles.length === 0) {
+      if (
+        !message?.trim() &&
+        selectedFiles.length === 0 &&
+        selectedRecentFiles.length === 0
+      ) {
         return;
       }
 
@@ -475,31 +563,68 @@ export function Footer() {
               uploadedAt: new Date(),
               size: file.size,
               preview: previews[index].preview || undefined,
-              previewFormat: previews[index].format,
+              previewFormat: previews[index].preview
+                ? previews[index].format
+                : undefined,
             });
 
             // Build detailed file info with preview
-            let fileDetail = `- File: ${attachment.fileName}\n  URL: ${attachment.fileUrl}\n  Size: ${(file.size / 1024).toFixed(2)} KB`;
+            let fileDetail = `- File: ${attachment.fileName}\n  URL: ${attachment.fileUrl}\n  Size: ${formatFileSize(file.size)}`;
             if (previews[index].preview) {
               const previewFormat = previews[index].format;
-              fileDetail += `\n  Preview (first rows):\n\`\`\`${previewFormat}\n${previews[index].preview}\n\`\`\``;
+              const previewHeading = previews[index].isPartial
+                ? "Preview excerpt"
+                : "Preview";
+              fileDetail += `\n  ${previewHeading}:\n\`\`\`${previewFormat}\n${previews[index].preview}\n\`\`\``;
             }
             fileDetailsWithPreviews.push(fileDetail);
           });
         } catch (error) {
           console.error("Failed to upload files:", error);
-          alert("Failed to upload files. Please try again.");
+          showToast(
+            "Failed to upload files. The temporary upload service may still reject very large datasets.",
+            "error",
+          );
           setIsUploading(false);
           return;
         }
         setIsUploading(false);
       }
 
+      // Append re-used recent files — no new upload needed, use stored URL and preview
+      for (const recentFile of selectedRecentFiles) {
+        const att = {
+          fileUrl: recentFile.fileUrl,
+          fileName: recentFile.fileName,
+        } as Attachment;
+        uploadedAttachments = [...uploadedAttachments, att];
+
+        const sizeNote = recentFile.size
+          ? ` (${formatFileSize(recentFile.size)})`
+          : "";
+        let fileDetail = `- File: ${recentFile.fileName}${sizeNote}\n  URL: ${recentFile.fileUrl}`;
+        if (recentFile.preview) {
+          const previewFormat = recentFile.previewFormat ?? "csv";
+          fileDetail += `\n  Preview excerpt:\n\`\`\`${previewFormat}\n${recentFile.preview}\n\`\`\``;
+        }
+        fileDetailsWithPreviews.push(fileDetail);
+      }
+
       // Build message with file information
       let messageText = message?.trim() || "";
       if (uploadedAttachments.length > 0) {
         const fileList = fileDetailsWithPreviews.join("\n\n");
-        messageText = `${messageText}\n\n📎 Dataset Files:\n${fileList}\n\n✅ Instructions: The file(s) are uploaded and accessible at the URL(s) above. Please fetch and analyze the complete dataset from the provided URL(s). The preview shows the structure (column names and sample rows).`;
+        const allFiles = [...selectedFiles, ...selectedRecentFiles];
+        const LARGE_FILE_THRESHOLD = 50 * 1024 * 1024; // 50 MB
+        const hasLargeFile = allFiles.some(
+          (f) =>
+            ((f as File).size ?? (f as RecentFile).size ?? 0) >
+            LARGE_FILE_THRESHOLD,
+        );
+        const instructions = hasLargeFile
+          ? "✅ Instructions: The file(s) are accessible at the URL(s) above. These datasets are large — use the preview excerpt to understand the schema and column layout, then sample or stream rows from the URL rather than loading the entire file at once."
+          : "✅ Instructions: The file(s) are uploaded and accessible at the URL(s) above. Please fetch and analyse the dataset from the provided URL(s). The preview shows the structure (column names and sample rows).";
+        messageText = `${messageText}\n\n📎 Dataset Files:\n${fileList}\n\n${instructions}`;
       }
 
       messages.value = [
@@ -552,8 +677,9 @@ export function Footer() {
         messageDraft.value = "";
       }
       setSelectedFiles([]);
+      setSelectedRecentFiles([]);
     },
-    [input, selectedFiles, isUploading],
+    [input, selectedFiles, selectedRecentFiles, isUploading],
   );
 
   // Cloud storage handlers
@@ -583,41 +709,21 @@ export function Footer() {
       previewFormat: d.previewFormat,
     }));
 
-  const handleRecentFileSelect = useCallback((file: RecentFile) => {
-    if (!input.current) return;
-    const current = input.current.value.trimEnd();
-
-    let snippet: string;
-
-    if (file.preview) {
-      // We have inline preview data — give the agent the actual data rows so it
-      // never needs to fetch the (now-expired) temp URL.
-      const sizeNote = file.size
-        ? ` (${(file.size / 1024).toFixed(1)} KB)`
-        : "";
-      snippet =
-        (current ? `${current}\n\n` : "") +
-        `Please analyse the following dataset — **${file.fileName}**${sizeNote}.\n\n` +
-        `Here is the full available data:\n` +
-        `\`\`\`${file.previewFormat ?? "csv"}\n${file.preview}\n\`\`\`\n\n` +
-        `✅ Instructions: Use the data above for your analysis. ` +
-        `Do not attempt to fetch an external URL — the data is provided inline above.`;
-    } else {
-      // No preview stored — the temp URL is likely expired, warn the agent.
-      snippet =
-        (current ? `${current}\n\n` : "") +
-        `I would like to re-analyse **${file.fileName}** but the original upload URL may have expired.\n` +
-        `Please let me know if I should re-upload the file.`;
-    }
-
-    input.current.value = snippet;
-    messageDraft.value = snippet;
-    // Trigger resize so the textarea expands to fit the injected text
-    input.current.style.height = "auto";
-    input.current.style.height = `${Math.min(input.current.scrollHeight, 400)}px`;
-    input.current.focus();
-    logAuditEntry("action", `Re-used recent dataset: ${file.fileName}`);
-  }, []);
+  const handleRecentFileSelect = useCallback(
+    (file: RecentFile) => {
+      setSelectedRecentFiles((prev) => {
+        if (prev.some((f) => f.id === file.id)) return prev;
+        if (prev.length + selectedFiles.length >= MAX_FILES) {
+          showToast(`Maximum ${MAX_FILES} files per submission.`, "error");
+          return prev;
+        }
+        return [...prev, file];
+      });
+      input.current?.focus();
+      logAuditEntry("action", `Re-used recent dataset: ${file.fileName}`);
+    },
+    [selectedFiles],
+  );
 
   return (
     <footer class="fixed bottom-0 left-0 right-0 h-auto min-h-16 pl-0 md:pl-16 lg:pl-16 1440:pl-56 pr-0 py-2 border-t border-zinc-500/25 bg-white dark:bg-zinc-900 transition-all duration-300 z-10 flex items-center">
@@ -651,7 +757,7 @@ export function Footer() {
           onDragOver={handleDragOver}
           onDrop={handleDrop}
         >
-          {selectedFiles.length > 0 && (
+          {(selectedFiles.length > 0 || selectedRecentFiles.length > 0) && (
             <div class="flex flex-wrap gap-2">
               {selectedFiles.map((file, index) => (
                 <div
@@ -664,6 +770,27 @@ export function Footer() {
                     onClick={() => removeFile(index)}
                     class="p-0.5 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-full transition-colors"
                     aria-label={`Remove ${file.name}`}
+                  >
+                    <X size={14} strokeWidth={2} />
+                  </button>
+                </div>
+              ))}
+              {selectedRecentFiles.map((file, index) => (
+                <div
+                  key={`${file.id}-recent`}
+                  class="flex items-center gap-x-1.5 bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 dark:border-indigo-800 px-3 py-1.5 rounded-full text-sm text-indigo-700 dark:text-indigo-300 transition-colors"
+                >
+                  <Clock
+                    size={12}
+                    strokeWidth={2}
+                    class="shrink-0 opacity-70"
+                  />
+                  <span class="truncate max-w-50">{file.fileName}</span>
+                  <button
+                    type="button"
+                    onClick={() => removeRecentFile(index)}
+                    class="p-0.5 hover:bg-indigo-100 dark:hover:bg-indigo-900 rounded-full transition-colors"
+                    aria-label={`Remove ${file.fileName}`}
                   >
                     <X size={14} strokeWidth={2} />
                   </button>

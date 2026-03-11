@@ -6,6 +6,38 @@ import type {
   PerformanceMetric,
 } from "./types";
 
+const MAX_STORED_DATASET_PREVIEW_CHARACTERS = 2_500;
+
+function clampStoredDatasetPreview(preview?: string): string | undefined {
+  if (!preview) return undefined;
+  if (preview.length <= MAX_STORED_DATASET_PREVIEW_CHARACTERS) {
+    return preview;
+  }
+  return `${preview.slice(0, MAX_STORED_DATASET_PREVIEW_CHARACTERS).trimEnd()}\n...`;
+}
+
+function serializeDataset(dataset: DatasetInfo) {
+  const preview = clampStoredDatasetPreview(dataset.preview);
+
+  return {
+    ...dataset,
+    preview,
+    previewFormat: preview ? dataset.previewFormat : undefined,
+    uploadedAt: dataset.uploadedAt.toISOString(),
+  };
+}
+
+function deserializeDataset(dataset: any): DatasetInfo {
+  const preview = clampStoredDatasetPreview(dataset.preview);
+
+  return {
+    ...dataset,
+    preview,
+    previewFormat: preview ? dataset.previewFormat : undefined,
+    uploadedAt: new Date(dataset.uploadedAt),
+  };
+}
+
 // ── AES-GCM Encryption ────────────────────────────────────────────────────────
 
 const PBKDF2_ITERATIONS = 100_000;
@@ -267,9 +299,7 @@ export function saveDatasetsToStorage(datasets: DatasetInfo[]) {
   try {
     localStorage.setItem(
       "fraud-datasets",
-      JSON.stringify(
-        datasets.map((d) => ({ ...d, uploadedAt: d.uploadedAt.toISOString() })),
-      ),
+      JSON.stringify(datasets.map(serializeDataset)),
     );
   } catch (error) {
     console.error("Failed to save datasets:", error);
@@ -280,10 +310,7 @@ export function loadDatasetsFromStorage(): DatasetInfo[] {
   try {
     const saved = localStorage.getItem("fraud-datasets");
     if (!saved) return [];
-    return JSON.parse(saved).map((d: any) => ({
-      ...d,
-      uploadedAt: new Date(d.uploadedAt),
-    }));
+    return JSON.parse(saved).map(deserializeDataset);
   } catch (error) {
     console.error("Failed to load datasets:", error);
     return [];

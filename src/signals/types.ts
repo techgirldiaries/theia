@@ -28,7 +28,7 @@ export type DatasetInfo = {
   fileUrl: string;
   uploadedAt: Date;
   size?: number;
-  /** First few rows captured at upload time so re-use doesn't depend on temp URL */
+  /** Small stored excerpt so re-use still has schema/sample context. */
   preview?: string;
   previewFormat?: string;
 };

@@ -4,8 +4,6 @@
 
 A production-ready fraud intelligence platform using 5 specialised MARAG agents with collaborative retrieval-augmented generation (MARAG). Features a 15-phase detection pipeline, multi-dataset benchmarking and comprehensive visualisation system.
 
----
-
 ## Project Overview
 
 THEIA is an advanced fraud detection system that combines:
@@ -28,8 +26,6 @@ Unlike traditional single-agent systems, THEIA uses 5 specialised agents that wo
 
 Agents reach agreement through weighted voting, where each agent's contribution is evaluated based on its confidence level and past accuracy. If agents disagree, the system uses conflict resolution rules to make a final decision.
 
----
-
 ## Features
 
 ### Core Fraud Detection
@@ -37,7 +33,7 @@ Agents reach agreement through weighted voting, where each agent's contribution 
 - **MARAG Multi-Agent System** - 5 collaborative AI agents
 - **15-Phase Detection Pipeline** - Sequential/parallel/convergent execution
 - **Enhanced Fraud Reports** - Comprehensive analysis with 6 tabbed sections
-- **Risk Scoring** - 0-100 scale with 5-tier categorisation
+- **Risk Scoring** - 0-100 scale with 5-levels of categorisation
 - **Real-time Status Tracking** - Live pipeline updates
 
 ### Analytics & Benchmarking
@@ -64,14 +60,12 @@ Agents reach agreement through weighted voting, where each agent's contribution 
 - **Dataset Manager** - Upload and manage multiple datasets
 - **Workflow Dashboard** - Visualise agent collaboration
 
----
-
 ## Technology Stack
 
 ### Frontend
 
 - **Framework:** Preact (React-compatible, lightweight)
-- **Language:** TypeScript (100% type coverage)
+- **Language:** TypeScript
 - **Styling:** Tailwind CSS 4.x
 - **UI Components:** Radix UI (accessible, unstyled)
 - **Icons:** Lucide React
@@ -80,7 +74,7 @@ Agents reach agreement through weighted voting, where each agent's contribution 
 ### Build & Testing
 
 - **Build Tool:** Vite (fast, modern)
-- **Testing:** Vitest + Testing Library
+- **Testing:** Vitest and Testing Library
 - **Linter:** Biome (fast linter/formatter)
 - **Type Checking:** TypeScript strict mode
 
@@ -89,16 +83,14 @@ Agents reach agreement through weighted voting, where each agent's contribution 
 - **AI Platform:** Relevance AI SDK
 - **Multi-Agent:** Workforce orchestration
 - **RAG:** Retrieval-augmented generation
-- **Datasets:** Credit card, PaySim, MomTSim fraud data
-
----
+- **Datasets:** Credit card, PaySim, MomTSim fraud data from Kaggle
 
 ## Project Structure
 
 ```text
 theia-fraud-intelligence/
 ├── src/
-│   ├── components/          # 48 UI components
+│   ├── components/          # UI components
 │   │   ├── marag-status-panel.tsx
 │   │   ├── marag-consensus-radar.tsx
 │   │   ├── enhanced-fraud-report-display.tsx
@@ -135,8 +127,6 @@ theia-fraud-intelligence/
 └── README.md                # This file
 ```
 
----
-
 ## Getting Started
 
 ### Prerequisites
@@ -161,7 +151,7 @@ theia-fraud-intelligence/
 
 3. **Verify environment**
    - `.env` file is included for assessment purposes
-   - Contains Relevance AI API credentials
+   - Contains API credentials
 
 ### Development
 
@@ -202,44 +192,14 @@ npm run preview
 npx tsc --noEmit
 ```
 
----
-
-## Documentation
-
-### For Quick Start
-
-- **[README.md](README.md)** - This file
-- **[PROJECT_AUDIT.md](PROJECT_AUDIT.md)** - Submission readiness report
-- **[COMPONENT_INVENTORY.md](COMPONENT_INVENTORY.md)** - All 48 components
-
-### For Implementation Details
-
-- **[THEIA_UI_UPDATE_REQUIREMENTS.md](docs/THEIA_UI_UPDATE_REQUIREMENTS.md)** - Complete requirements (1,194 lines)
-- **[MARAG_INTEGRATION_GUIDE.md](docs/MARAG_INTEGRATION_GUIDE.md)** - MARAG system guide (537 lines)
-- **[IMPLEMENTATION_GUIDE.md](docs/IMPLEMENTATION_GUIDE.md)** - Step-by-step implementation
-
-### For Testing & Evaluation
-
-- **[PERFORMANCE_EVALUATION.md](docs/PERFORMANCE_EVALUATION.md)** - Performance analysis (525 lines)
-- **[EVALUATION_SUMMARY.md](docs/EVALUATION_SUMMARY.md)** - Quick metrics (220 lines)
-- **[RESPONSIVE_IMPLEMENTATION.md](docs/RESPONSIVE_IMPLEMENTATION.md)** - Responsive design (291 lines)
-
-### For Next Steps
-
-- **[NEXT_STEPS.md](NEXT_STEPS.md)** - Backend integration guide
-- **[OPTIONAL_ENHANCEMENTS.md](OPTIONAL_ENHANCEMENTS.md)** - Future features
-
----
-
 ## Configuration
 
 ### Environment Variables
 
 ```env
-VITE_RELEVANCE_REGION=...
-VITE_RELEVANCE_PROJECT_ID=...
-VITE_AGENT_ID=...
-VITE_CLIENT_KEY=...
+VITE_REGION=...
+VITE_PROJECT=...
+VITE_WORKFORCE_ID=...
 ```
 
 ### TypeScript Configuration
@@ -253,8 +213,6 @@ VITE_CLIENT_KEY=...
 - `vite.config.ts` - Vite build settings
 - `biome.json` - Linter/formatter configuration
 - `vitest.config.ts` - Test configuration
-
----
 
 ## Limitations & Minor Gaps (Research-backed)
 
@@ -274,8 +232,6 @@ VITE_CLIENT_KEY=...
 | **False Negatives** | Real-time tracking missing | Unknown fraud leakage initially                        | Discovered through customer reports/audits                  |
 
 **Justification:** Fully implemented in benchmarking context (see test data with 92-97% precision). Production systems require manual validation loops that take 3-7 days to establish verified fraud data.
-
-**Documentation:** PERFORMANCE_EVALUATION.md Section 3.2, Benchmarking implementation in `benchmark-comparison.tsx`
 
 ### 2. Confusion Matrix Tracking (Minor Gap)
 
@@ -308,11 +264,7 @@ VITE_CLIENT_KEY=...
 
 All limitations are academically justified, well-documented, and represent common industry constraints rather than implementation failures.
 
----
-
 ## Future Enhancements
-
-See [OPTIONAL_ENHANCEMENTS.md](OPTIONAL_ENHANCEMENTS.md) for detailed plans:
 
 1. **Evidence Network Graph**
    - Interactive agent correlation visualisation
@@ -330,8 +282,6 @@ See [OPTIONAL_ENHANCEMENTS.md](OPTIONAL_ENHANCEMENTS.md) for detailed plans:
    - Expandable agent findings
    - Evidence drill-down
 
----
-
 ## Support & Contact
 
 ### Project Resources
@@ -341,35 +291,23 @@ See [OPTIONAL_ENHANCEMENTS.md](OPTIONAL_ENHANCEMENTS.md) for detailed plans:
 - **Issues:** GitHub Issues
 - **Discussions:** GitHub Discussions
 
-### For Assessment
-
-- **Project Audit:** [PROJECT_AUDIT.md](PROJECT_AUDIT.md)
-- **Component List:** [COMPONENT_INVENTORY.md](COMPONENT_INVENTORY.md)
-- **Performance Analysis:** [docs/PERFORMANCE_EVALUATION.md](docs/PERFORMANCE_EVALUATION.md)
-
----
-
 ## License
 
 See [LICENSE.md](LICENSE.md) for details
-
----
 
 ## Acknowledgments
 
 - **Relevance AI** - Multi-agent workforce platform
 - **Preact Team** - Lightweight React alternative
 - **Radix UI** - Accessible component primitives
-- **Datasets:** Credit card fraud (Kaggle), PaySim, MomtSim
-
----
+- **Datasets:** Credit card fraud, PaySim, MomtSim (Kaggle)
 
 ## Submission Checklist
 
-- [x] All 48 components implemented
-- [x] 249 lines of type definitions
-- [x] 485+ lines of tests
-- [x] 3,000+ lines of documentation
+- [x] All components implemented
+- [x] Type definitions
+- [x] Tests
+- [x] Technical documentation
 - [x] Responsive design (mobile/tablet/desktop)
 - [x] MARAG system (5 agents)
 - [x] 15-phase pipeline

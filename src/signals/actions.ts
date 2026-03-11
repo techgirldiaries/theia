@@ -7,6 +7,7 @@ import {
   saveChatSessionToHistory,
 } from "./storage";
 import {
+  currentUserId,
   isAgentTyping,
   messages,
   performanceMetrics,
@@ -43,7 +44,7 @@ export function logAuditEntry(
     id: `audit-${Date.now()}`,
     timestamp: new Date(),
     action,
-    userId: "current-user",
+    userId: currentUserId.value,
     details,
     sessionId,
   });
@@ -138,10 +139,10 @@ export function clearChatHistory() {
   localStorage.removeItem("fraud-chat-sessions");
 }
 
-export function startNewChat() {
+export async function startNewChat() {
   if (messages.value.length > 0) {
     const sessionId = `session-${Date.now()}`;
-    saveChatSessionToHistory(messages.value);
+    await saveChatSessionToHistory(messages.value);
     logAuditEntry(
       "session_end",
       `Ended session with ${messages.value.length} messages`,
@@ -163,8 +164,8 @@ export function startNewChat() {
   setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 100);
 }
 
-export function restoreSession(session: ChatSession) {
-  if (messages.value.length > 0) saveChatSessionToHistory(messages.value);
+export async function restoreSession(session: ChatSession) {
+  if (messages.value.length > 0) await saveChatSessionToHistory(messages.value);
   messages.value = session.messages;
   if (task.value) {
     task.value.unsubscribe();
@@ -175,7 +176,7 @@ export function restoreSession(session: ChatSession) {
   setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 100);
 }
 
-export function addTagToSession(sessionId: string, tag: string) {
+export async function addTagToSession(sessionId: string, tag: string) {
   try {
     const sessions = loadChatSessionsFromStorage();
     const session = sessions.find((s) => s.id === sessionId);
@@ -183,7 +184,7 @@ export function addTagToSession(sessionId: string, tag: string) {
       if (!session.tags) session.tags = [];
       if (!session.tags.includes(tag)) {
         session.tags.push(tag);
-        persistSessions(sessions);
+        await persistSessions(sessions);
         showToast(`Tag "${tag}" added`, "success");
       }
     }
@@ -192,13 +193,13 @@ export function addTagToSession(sessionId: string, tag: string) {
   }
 }
 
-export function removeTagFromSession(sessionId: string, tag: string) {
+export async function removeTagFromSession(sessionId: string, tag: string) {
   try {
     const sessions = loadChatSessionsFromStorage();
     const session = sessions.find((s) => s.id === sessionId);
     if (session?.tags) {
       session.tags = session.tags.filter((t) => t !== tag);
-      persistSessions(sessions);
+      await persistSessions(sessions);
       showToast(`Tag "${tag}" removed`, "success");
     }
   } catch (error) {
@@ -206,9 +207,9 @@ export function removeTagFromSession(sessionId: string, tag: string) {
   }
 }
 
-export function deleteSession(sessionId: string) {
+export async function deleteSession(sessionId: string) {
   try {
-    persistSessions(
+    await persistSessions(
       loadChatSessionsFromStorage().filter((s) => s.id !== sessionId),
     );
     showToast("Session deleted", "success");

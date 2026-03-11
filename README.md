@@ -151,6 +151,7 @@ npm install
 ```
 
 3. **Verify environment**
+
    - `.env` file is included for assessment purposes
    - Contains Relevance AI API credentials
 
@@ -162,7 +163,7 @@ npm run dev
 
 Vite will start a local server. Open your browser to:
 
-```
+```sh
 http://localhost:5173
 ```
 

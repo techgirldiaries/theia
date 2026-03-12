@@ -423,9 +423,12 @@ export function LeftSidebar() {
 
           {/* Bottom Section */}
           <div class="pb-6 flex flex-col space-y-2 px-3 border-t border-zinc-300 dark:border-zinc-800 pt-4">
-            <div class="text-xs text-zinc-500 dark:text-zinc-600 px-3 mb-2">
-              System Controls
-            </div>
+            {/* System Controls Label - Only show when expanded */}
+            {showLabel && (
+              <div class="text-xs text-zinc-500 dark:text-zinc-600 px-3 mb-2">
+                System Controls
+              </div>
+            )}
 
             {/* Quick Actions */}
             <button

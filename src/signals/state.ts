@@ -95,6 +95,12 @@ export const agentMode = signal<"auto" | "fast" | "expert" | "heavy">(
   (localStorage.getItem("agentMode") as any) || "expert",
 );
 
+// Interface mode: Controls UI complexity and feature visibility
+export type InterfaceMode = "focus" | "balanced" | "expert";
+export const interfaceMode = signal<InterfaceMode>(
+  (localStorage.getItem("interfaceMode") as InterfaceMode) || "balanced",
+);
+
 // ── MARAG, Visualization, Benchmark ──────────────────────────────────────────
 export const maragAgents = signal<MARAGAgent[]>([]);
 export const maragConsensus = signal<MARAGConsensus | null>(null);

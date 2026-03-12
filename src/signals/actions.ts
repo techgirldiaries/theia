@@ -8,6 +8,7 @@ import {
 } from "./storage";
 import {
   currentUserId,
+  interfaceMode,
   isAgentTyping,
   messages,
   performanceMetrics,
@@ -16,6 +17,7 @@ import {
   toasts,
   uploadedDatasets,
 } from "./state";
+import type { InterfaceMode } from "./state";
 
 // ── Toast ─────────────────────────────────────────────────────────────────────
 
@@ -31,6 +33,28 @@ export function showToast(
 
 export function dismissToast(id: string) {
   toasts.value = toasts.value.filter((t) => t.id !== id);
+}
+
+// ── UI Preferences ────────────────────────────────────────────────────────────
+
+/**
+ * Changes the interface mode (focus/balanced/expert) and persists the preference.
+ * - Focus: Minimal UI, just chat
+ * - Balanced: Essential features visible
+ * - Expert: All panels and advanced features available
+ */
+export function setInterfaceMode(mode: InterfaceMode) {
+  interfaceMode.value = mode;
+  localStorage.setItem("interfaceMode", mode);
+  logAuditEntry("view", `Changed interface mode to: ${mode}`);
+
+  const modeLabels = {
+    focus: "Focus Mode - Minimal distractions",
+    balanced: "Balanced Mode - Essential features",
+    expert: "Expert Mode - All features visible",
+  };
+
+  showToast(modeLabels[mode], "success");
 }
 
 // ── Audit ─────────────────────────────────────────────────────────────────────

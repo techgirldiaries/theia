@@ -1,17 +1,21 @@
-import { ChevronDown, Search, Sparkles, Users } from "lucide-react";
+import { ChevronDown, Focus, Layers, Sparkles, Users, Zap } from "lucide-react";
 import { useEffect, useRef, useState } from "preact/hooks";
 import {
+  interfaceMode,
   messageDraft,
   quickTemplates,
-  showFileManager,
+  setInterfaceMode,
   showToast,
 } from "@/signals";
+import type { InterfaceMode } from "@/signals/state";
 
 export function EmptyState() {
   const [showQuickTemplates, setShowQuickTemplates] = useState(false);
   const [showAgentSelector, setShowAgentSelector] = useState(false);
+  const [showInterfaceMode, setShowInterfaceMode] = useState(false);
   const templatesRef = useRef<HTMLDivElement>(null);
   const agentsRef = useRef<HTMLDivElement>(null);
+  const interfaceModeRef = useRef<HTMLDivElement>(null);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -28,16 +32,22 @@ export function EmptyState() {
       ) {
         setShowAgentSelector(false);
       }
+      if (
+        interfaceModeRef.current &&
+        !interfaceModeRef.current.contains(event.target as Node)
+      ) {
+        setShowInterfaceMode(false);
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleDeepSearch = () => {
-    // Open file manager to upload datasets for deep search
-    showFileManager.value = true;
-    showToast("Open File Manager to upload datasets for deep analysis", "info");
+  const handleSelectInterfaceMode = (mode: InterfaceMode, modeName: string) => {
+    setInterfaceMode(mode);
+    setShowInterfaceMode(false);
+    showToast(`Switched to ${modeName} mode`, "success");
   };
 
   const handleSelectTemplate = (prompt: string) => {
@@ -145,14 +155,86 @@ export function EmptyState() {
 
       {/* Action Buttons */}
       <div class="flex items-center gap-x-3 mb-8">
-        {/* DeepSearch Button */}
-        <button
-          onClick={handleDeepSearch}
-          class="flex items-center gap-x-2 px-4 py-2.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-full text-sm font-medium transition-all border border-zinc-200 dark:border-zinc-700 hover:scale-105 active:scale-95"
-        >
-          <Search size={16} strokeWidth={2} />
-          <span>DeepSearch</span>
-        </button>
+        {/* Switch Interface Mode Button with Dropdown */}
+        <div class="relative" ref={interfaceModeRef}>
+          <button
+            onClick={() => setShowInterfaceMode(!showInterfaceMode)}
+            class="flex items-center gap-x-2 px-4 py-2.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-full text-sm font-medium transition-all border border-zinc-200 dark:border-zinc-700 hover:scale-105 active:scale-95"
+          >
+            {interfaceMode.value === "focus" && (
+              <Focus size={16} strokeWidth={2} />
+            )}
+            {interfaceMode.value === "balanced" && (
+              <Layers size={16} strokeWidth={2} />
+            )}
+            {interfaceMode.value === "expert" && (
+              <Zap size={16} strokeWidth={2} />
+            )}
+            <span>Switch Interface Mode</span>
+            <ChevronDown
+              size={14}
+              strokeWidth={2}
+              class={`transition-transform ${showInterfaceMode ? "rotate-180" : ""}`}
+            />
+          </button>
+
+          {showInterfaceMode && (
+            <div class="absolute top-full left-0 mt-2 w-72 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+              <div class="p-2 space-y-1">
+                <button
+                  onClick={() => handleSelectInterfaceMode("focus", "Focus")}
+                  class={`w-full text-left px-3 py-2.5 rounded-lg transition-colors flex items-center gap-x-2 ${
+                    interfaceMode.value === "focus"
+                      ? "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300"
+                      : "text-zinc-900 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-700"
+                  }`}
+                >
+                  <Focus size={16} />
+                  <div class="flex-1">
+                    <div class="font-medium text-sm">Focus Mode</div>
+                    <div class="text-xs opacity-75 mt-0.5">
+                      Minimal distractions for deep work
+                    </div>
+                  </div>
+                </button>
+                <button
+                  onClick={() =>
+                    handleSelectInterfaceMode("balanced", "Balanced")
+                  }
+                  class={`w-full text-left px-3 py-2.5 rounded-lg transition-colors flex items-center gap-x-2 ${
+                    interfaceMode.value === "balanced"
+                      ? "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300"
+                      : "text-zinc-900 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-700"
+                  }`}
+                >
+                  <Layers size={16} />
+                  <div class="flex-1">
+                    <div class="font-medium text-sm">Balanced Mode</div>
+                    <div class="text-xs opacity-75 mt-0.5">
+                      Essential features visible (default)
+                    </div>
+                  </div>
+                </button>
+                <button
+                  onClick={() => handleSelectInterfaceMode("expert", "Expert")}
+                  class={`w-full text-left px-3 py-2.5 rounded-lg transition-colors flex items-center gap-x-2 ${
+                    interfaceMode.value === "expert"
+                      ? "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300"
+                      : "text-zinc-900 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-700"
+                  }`}
+                >
+                  <Zap size={16} />
+                  <div class="flex-1">
+                    <div class="font-medium text-sm">Expert Mode</div>
+                    <div class="text-xs opacity-75 mt-0.5">
+                      All advanced features accessible
+                    </div>
+                  </div>
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Quick Templates Button with Dropdown */}
         <div class="relative" ref={templatesRef}>
@@ -221,9 +303,31 @@ export function EmptyState() {
       </div>
 
       {/* Info Text */}
-      <p class="text-center text-sm text-zinc-500 dark:text-zinc-400 max-w-2xl">
+      <p class="text-center text-sm text-zinc-500 dark:text-zinc-400 max-w-2xl mb-6">
         Detect Risk Early. Act Decisively. Stay Compliant.
       </p>
+
+      {/* Interface Mode Indicator */}
+      <div class="flex items-center gap-x-2 px-4 py-2 bg-zinc-100 dark:bg-zinc-800 rounded-full text-xs text-zinc-600 dark:text-zinc-400">
+        {interfaceMode.value === "focus" && (
+          <>
+            <Focus size={14} />
+            <span>Focus Mode - Minimal distractions enabled</span>
+          </>
+        )}
+        {interfaceMode.value === "balanced" && (
+          <>
+            <Layers size={14} />
+            <span>Balanced Mode - Essential features visible</span>
+          </>
+        )}
+        {interfaceMode.value === "expert" && (
+          <>
+            <Zap size={14} />
+            <span>Expert Mode - All features accessible</span>
+          </>
+        )}
+      </div>
     </div>
   );
 }

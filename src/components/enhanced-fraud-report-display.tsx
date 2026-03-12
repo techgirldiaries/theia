@@ -301,8 +301,8 @@ export function EnhancedFraudReportDisplay({
                     <div class="flex items-center gap-2">
                       <div class="w-24 bg-zinc-200 dark:bg-zinc-700 rounded-full h-2">
                         <div
-                          class="bg-indigo-600 h-2 rounded-full"
-                          style={{ width: `${correlation * 100}%` }}
+                          class="bg-indigo-600 h-2 rounded-full correlation-bar"
+                          data-width={correlation * 100}
                         ></div>
                       </div>
                       <span class="text-sm font-bold text-zinc-900 dark:text-white w-12 text-right">

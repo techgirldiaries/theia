@@ -31,7 +31,9 @@ if (_savedMessages.length > 0) {
 }
 
 // ── Core signals ──────────────────────────────────────────────────────────────
-export const messages = signal<Message[]>([]);
+export const messages = signal<Message[]>(
+  _savedMessages.length > 0 ? _savedMessages : [],
+);
 export const uploadedDatasets = signal<DatasetInfo[]>(
   loadDatasetsFromStorage(),
 );
@@ -78,6 +80,7 @@ export const showDataManagement = signal(false);
 export const showAuditLog = signal(false);
 export const showSettings = signal(false);
 export const showQuickActions = signal(false);
+export const showPerformanceDashboard = signal(false);
 export const compactView = signal(
   localStorage.getItem("compactView") === "true",
 );

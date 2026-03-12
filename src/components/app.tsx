@@ -13,6 +13,7 @@ import { HistorySidebar } from "@/components/history-sidebar";
 import { KeyboardShortcutsPanel } from "@/components/keyboard-shortcuts";
 import { LeftSidebar } from "@/components/left-sidebar";
 import { LoadingSkeleton } from "@/components/loading-skeleton";
+import PerformanceDashboard from "@/components/performance-dashboard";
 import { PerformanceMetrics } from "@/components/performance-metrics";
 import { QuickActions } from "@/components/quick-actions";
 import { RightActionBar } from "@/components/right-action-bar";
@@ -30,12 +31,14 @@ import {
   isInitialized,
   loadingError,
   messages,
+  performanceMetrics,
   showAnalytics,
   showAuditLog,
   showFileManager,
   showQuickActions,
   showReports,
   showSettings,
+  showPerformanceDashboard,
   splitScreenMode,
   toasts,
   workforce,
@@ -137,6 +140,13 @@ export function App() {
           {showAnalytics.value && !splitScreenMode.value && (
             <div class="max-w-6xl mx-auto">
               <AnalyticsDashboard />
+            </div>
+          )}
+
+          {/* Show performance dashboard when selected */}
+          {showPerformanceDashboard?.value && !splitScreenMode.value && (
+            <div class="max-w-6xl mx-auto">
+              <PerformanceDashboard metrics={performanceMetrics.value} />
             </div>
           )}
 

@@ -616,14 +616,32 @@ export function Footer() {
         const fileList = fileDetailsWithPreviews.join("\n\n");
         const allFiles = [...selectedFiles, ...selectedRecentFiles];
         const LARGE_FILE_THRESHOLD = 50 * 1024 * 1024; // 50 MB
+        const VERY_LARGE_FILE_THRESHOLD = 300 * 1024 * 1024; // 300 MB
         const hasLargeFile = allFiles.some(
           (f) =>
             ((f as File).size ?? (f as RecentFile).size ?? 0) >
             LARGE_FILE_THRESHOLD,
         );
-        const instructions = hasLargeFile
-          ? "✅ Instructions: The file(s) are accessible at the URL(s) above. These datasets are large — use the preview excerpt to understand the schema and column layout, then sample or stream rows from the URL rather than loading the entire file at once."
-          : "✅ Instructions: The file(s) are uploaded and accessible at the URL(s) above. Please fetch and analyse the dataset from the provided URL(s). The preview shows the structure (column names and sample rows).";
+        const hasVeryLargeFile = allFiles.some(
+          (f) =>
+            ((f as File).size ?? (f as RecentFile).size ?? 0) >
+            VERY_LARGE_FILE_THRESHOLD,
+        );
+
+        let instructions: string;
+        if (hasVeryLargeFile) {
+          instructions =
+            "⚠️ Instructions: Very large dataset detected (>300MB). For optimal performance and timeout management:\n\n" +
+            "• **Recommended**: Request 'stratified sample analysis' (10-20% representative sample) for faster results\n" +
+            "• **Alternative**: Specify 'complete analysis' if you need full depth — this will execute all 15 phases but may require extended processing time\n" +
+            "• **Access**: Files are accessible at the URL(s) above. Use the preview excerpt to understand schema, then sample or stream rows from the URL.";
+        } else if (hasLargeFile) {
+          instructions =
+            "✅ Instructions: The file(s) are accessible at the URL(s) above. These datasets are large — use the preview excerpt to understand the schema and column layout, then sample or stream rows from the URL rather than loading the entire file at once.";
+        } else {
+          instructions =
+            "✅ Instructions: The file(s) are uploaded and accessible at the URL(s) above. Please fetch and analyse the dataset from the provided URL(s). The preview shows the structure (column names and sample rows).";
+        }
         messageText = `${messageText}\n\n📎 Dataset Files:\n${fileList}\n\n${instructions}`;
       }
 

@@ -1,5 +1,5 @@
 import type { Attachment } from "@relevanceai/sdk";
-import { Mic, MicOff, Paperclip, SendHorizonal, X } from "lucide-react";
+import { Clock, Mic, MicOff, Paperclip, SendHorizonal, X } from "lucide-react";
 import type { SubmitEventHandler } from "preact";
 import { useCallback, useEffect, useRef, useState } from "preact/hooks";
 import { AttachmentMenu, type RecentFile } from "@/components/attachment-menu";
@@ -11,6 +11,7 @@ import {
   autoCompleteQuery,
   client,
   fraudAnalysisTerms,
+  interfaceMode,
   isAgentTyping,
   isVoiceRecording,
   logAuditEntry,
@@ -56,6 +57,9 @@ export function Footer() {
   const dropZone = useRef<HTMLDivElement>(null);
   const lastSubmitTime = useRef(0);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [selectedRecentFiles, setSelectedRecentFiles] = useState<RecentFile[]>(
+    [],
+  );
   const [isUploading, setIsUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [recognition, setRecognition] = useState<any>(null);
@@ -63,6 +67,7 @@ export function Footer() {
     string[]
   >([]);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
   // Initialize Web Speech API
   useEffect(() => {
@@ -169,9 +174,14 @@ export function Footer() {
   useEffect(() => {
     if (input.current && input.current.value !== messageDraft.value) {
       input.current.value = messageDraft.value || "";
-      // Only handle the auto-resize, don't call full handleInput to avoid loops
-      input.current.style.height = "auto";
-      input.current.style.height = `${Math.min(input.current.scrollHeight, 400)}px`;
+      // Auto-resize for templates and restored drafts
+      if (messageDraft.value) {
+        input.current.style.height = "auto";
+        input.current.style.height = `${Math.min(input.current.scrollHeight, 400)}px`;
+      } else {
+        // Reset to single line when cleared
+        input.current.style.height = "24px";
+      }
     }
   }, [messageDraft.value]);
 
@@ -253,59 +263,113 @@ export function Footer() {
     }
   };
 
-  const readJSONPreview = async (file: File): Promise<string> => {
-    try {
-      const text = await file.text();
-      const json = JSON.parse(text);
-      // Pretty print JSON with max 20 lines preview
-      const formatted = JSON.stringify(json, null, 2);
-      const lines = formatted.split("\n").slice(0, 20);
-      return (
-        lines.join("\n") + (formatted.split("\n").length > 20 ? "\n..." : "")
-      );
-    } catch (error) {
-      console.error("Failed to read JSON preview:", error);
-      return "";
-    }
-  };
+  const readFileSlice = useCallback(
+    async (
+      file: File,
+    ): Promise<{ text: string; sourceWasTrimmed: boolean }> => {
+      const text = await file.slice(0, MAX_PREVIEW_READ_BYTES).text();
+      return {
+        text,
+        sourceWasTrimmed: file.size > MAX_PREVIEW_READ_BYTES,
+      };
+    },
+    [],
+  );
 
-  const readTXTPreview = async (file: File): Promise<string> => {
-    try {
-      const text = await file.text();
-      const lines = text.split("\n").slice(0, 15); // First 15 lines
-      return lines.join("\n") + (text.split("\n").length > 15 ? "\n..." : "");
-    } catch (error) {
-      console.error("Failed to read TXT preview:", error);
-      return "";
-    }
-  };
+  const readCSVPreview = useCallback(
+    async (file: File) => {
+      try {
+        const { text, sourceWasTrimmed } = await readFileSlice(file);
+        const preview = trimPreviewText(text, 6);
+        return {
+          preview: preview.preview,
+          isPartial: sourceWasTrimmed || preview.wasTrimmed,
+        };
+      } catch (error) {
+        console.error("Failed to read CSV preview:", error);
+        return { preview: "", isPartial: false };
+      }
+    },
+    [readFileSlice],
+  );
 
-  const readTSVPreview = async (file: File): Promise<string> => {
-    try {
-      const text = await file.text();
-      const lines = text.split("\n").slice(0, 6); // Header + 5 rows
-      return lines.join("\n");
-    } catch (error) {
-      console.error("Failed to read TSV preview:", error);
-      return "";
-    }
-  };
+  const readJSONPreview = useCallback(
+    async (file: File) => {
+      try {
+        const { text, sourceWasTrimmed } = await readFileSlice(file);
+
+        if (!sourceWasTrimmed) {
+          const json = JSON.parse(text);
+          const formatted = JSON.stringify(json, null, 2);
+          const preview = trimPreviewText(formatted, MAX_PREVIEW_LINES);
+          return {
+            preview: preview.preview,
+            isPartial: preview.wasTrimmed,
+          };
+        }
+
+        const preview = trimPreviewText(text, MAX_PREVIEW_LINES);
+        return {
+          preview: preview.preview,
+          isPartial: sourceWasTrimmed || preview.wasTrimmed,
+        };
+      } catch (error) {
+        console.error("Failed to read JSON preview:", error);
+        return { preview: "", isPartial: false };
+      }
+    },
+    [readFileSlice],
+  );
+
+  const readTXTPreview = useCallback(
+    async (file: File) => {
+      try {
+        const { text, sourceWasTrimmed } = await readFileSlice(file);
+        const preview = trimPreviewText(text, 15);
+        return {
+          preview: preview.preview,
+          isPartial: sourceWasTrimmed || preview.wasTrimmed,
+        };
+      } catch (error) {
+        console.error("Failed to read TXT preview:", error);
+        return { preview: "", isPartial: false };
+      }
+    },
+    [readFileSlice],
+  );
+
+  const readTSVPreview = useCallback(
+    async (file: File) => {
+      try {
+        const { text, sourceWasTrimmed } = await readFileSlice(file);
+        const preview = trimPreviewText(text, 6);
+        return {
+          preview: preview.preview,
+          isPartial: sourceWasTrimmed || preview.wasTrimmed,
+        };
+      } catch (error) {
+        console.error("Failed to read TSV preview:", error);
+        return { preview: "", isPartial: false };
+      }
+    },
+    [readFileSlice],
+  );
 
   const getFilePreview = async (
     file: File,
-  ): Promise<{ preview: string; format: string }> => {
+  ): Promise<{ preview: string; format: string; isPartial: boolean }> => {
     const fileName = file.name.toLowerCase();
 
     if (fileName.endsWith(".csv")) {
-      return { preview: await readCSVPreview(file), format: "csv" };
+      return { ...(await readCSVPreview(file)), format: "csv" };
     } else if (fileName.endsWith(".json")) {
-      return { preview: await readJSONPreview(file), format: "json" };
+      return { ...(await readJSONPreview(file)), format: "json" };
     } else if (fileName.endsWith(".txt") || fileName.endsWith(".log")) {
-      return { preview: await readTXTPreview(file), format: "text" };
+      return { ...(await readTXTPreview(file)), format: "text" };
     } else if (fileName.endsWith(".tsv")) {
-      return { preview: await readTSVPreview(file), format: "tsv" };
+      return { ...(await readTSVPreview(file)), format: "tsv" };
     } else {
-      return { preview: "", format: "unknown" };
+      return { preview: "", format: "unknown", isPartial: false };
     }
   };
 
@@ -349,12 +413,13 @@ export function Footer() {
     setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
   }, []);
 
+  const removeRecentFile = useCallback((index: number) => {
+    setSelectedRecentFiles((prev) => prev.filter((_, i) => i !== index));
+  }, []);
+
   const handleInput = useCallback(() => {
     if (input.current) {
-      // Auto-resize textarea
-      input.current.style.height = "auto";
-      input.current.style.height = `${Math.min(input.current.scrollHeight, 400)}px`;
-      // Save draft
+      // Save draft without auto-resizing
       messageDraft.value = input.current.value;
     }
   }, []);
@@ -391,8 +456,30 @@ export function Footer() {
         return;
       }
 
-      // Submit on Enter (without Shift), allow Shift+Enter for new lines
-      if (e.key === "Enter" && !e.shiftKey) {
+      // Expand textarea on Shift+Enter (Windows/Linux) or Cmd+Enter (macOS)
+      if (e.key === "Enter" && (e.shiftKey || e.metaKey)) {
+        e.preventDefault();
+        if (input.current) {
+          const start = input.current.selectionStart;
+          const end = input.current.selectionEnd;
+          const value = input.current.value;
+          const newValue =
+            value.substring(0, start) + "\n" + value.substring(end);
+          input.current.value = newValue;
+          input.current.selectionStart = input.current.selectionEnd = start + 1;
+
+          // Expand the textarea
+          input.current.style.height = "auto";
+          input.current.style.height = `${Math.min(input.current.scrollHeight, 400)}px`;
+
+          // Save the draft
+          messageDraft.value = newValue;
+        }
+        return;
+      }
+
+      // Submit on Enter (without modifiers)
+      if (e.key === "Enter" && !e.shiftKey && !e.metaKey && !e.ctrlKey) {
         e.preventDefault();
         const form = input.current?.closest("form");
         if (form && !isAgentTyping.value && !isUploading) {
@@ -428,7 +515,21 @@ export function Footer() {
       const form = e.currentTarget;
       const data = new FormData(form);
       const message = data.get("message") as string | null;
-      if (!message?.trim() && selectedFiles.length === 0) {
+      if (
+        !message?.trim() &&
+        selectedFiles.length === 0 &&
+        selectedRecentFiles.length === 0
+      ) {
+        return;
+      }
+
+      // Enforce message length cap
+      if ((message?.length ?? 0) > MAX_MESSAGE_LENGTH) {
+        setError("Character limit exceeded");
+        showToast(
+          `Message exceeds the ${MAX_MESSAGE_LENGTH.toLocaleString()} character limit.`,
+          "error",
+        );
         return;
       }
 
@@ -456,7 +557,10 @@ export function Footer() {
             getFilePreview(file),
           );
 
-          uploadedAttachments = await Promise.all(uploadPromises);
+          const uploadResults = await Promise.all(uploadPromises);
+          uploadedAttachments = uploadResults.filter(
+            (att): att is Attachment => att !== undefined,
+          );
           const previews = await Promise.all(previewPromises);
 
           // Log audit entry
@@ -475,31 +579,87 @@ export function Footer() {
               uploadedAt: new Date(),
               size: file.size,
               preview: previews[index].preview || undefined,
-              previewFormat: previews[index].format,
+              previewFormat: previews[index].preview
+                ? previews[index].format
+                : undefined,
+              type: "",
+              description: undefined,
             });
 
             // Build detailed file info with preview
-            let fileDetail = `- File: ${attachment.fileName}\n  URL: ${attachment.fileUrl}\n  Size: ${(file.size / 1024).toFixed(2)} KB`;
+            let fileDetail = `- File: ${attachment.fileName}\n  URL: ${attachment.fileUrl}\n  Size: ${formatFileSize(file.size)}`;
             if (previews[index].preview) {
               const previewFormat = previews[index].format;
-              fileDetail += `\n  Preview (first rows):\n\`\`\`${previewFormat}\n${previews[index].preview}\n\`\`\``;
+              const previewHeading = previews[index].isPartial
+                ? "Preview excerpt"
+                : "Preview";
+              fileDetail += `\n  ${previewHeading}:\n\`\`\`${previewFormat}\n${previews[index].preview}\n\`\`\``;
             }
             fileDetailsWithPreviews.push(fileDetail);
           });
         } catch (error) {
           console.error("Failed to upload files:", error);
-          alert("Failed to upload files. Please try again.");
+          showToast(
+            "Failed to upload files. The temporary upload service may still reject very large datasets.",
+            "error",
+          );
           setIsUploading(false);
           return;
         }
         setIsUploading(false);
       }
 
+      // Append re-used recent files — no new upload needed, use stored URL and preview
+      for (const recentFile of selectedRecentFiles) {
+        const att = {
+          fileUrl: recentFile.fileUrl,
+          fileName: recentFile.fileName,
+        } as Attachment;
+        uploadedAttachments = [...uploadedAttachments, att];
+
+        const sizeNote = recentFile.size
+          ? ` (${formatFileSize(recentFile.size)})`
+          : "";
+        let fileDetail = `- File: ${recentFile.fileName}${sizeNote}\n  URL: ${recentFile.fileUrl}`;
+        if (recentFile.preview) {
+          const previewFormat = recentFile.previewFormat ?? "csv";
+          fileDetail += `\n  Preview excerpt:\n\`\`\`${previewFormat}\n${recentFile.preview}\n\`\`\``;
+        }
+        fileDetailsWithPreviews.push(fileDetail);
+      }
+
       // Build message with file information
-      let messageText = message?.trim() || "";
       if (uploadedAttachments.length > 0) {
         const fileList = fileDetailsWithPreviews.join("\n\n");
-        messageText = `${messageText}\n\n📎 Dataset Files:\n${fileList}\n\n✅ Instructions: The file(s) are uploaded and accessible at the URL(s) above. Please fetch and analyze the complete dataset from the provided URL(s). The preview shows the structure (column names and sample rows).`;
+        const allFiles = [...selectedFiles, ...selectedRecentFiles];
+        const LARGE_FILE_THRESHOLD = 50 * 1024 * 1024; // 50 MB
+        const VERY_LARGE_FILE_THRESHOLD = 300 * 1024 * 1024; // 300 MB
+        const hasLargeFile = allFiles.some(
+          (f) =>
+            ((f as File).size ?? (f as RecentFile).size ?? 0) >
+            LARGE_FILE_THRESHOLD,
+        );
+        const hasVeryLargeFile = allFiles.some(
+          (f) =>
+            ((f as File).size ?? (f as RecentFile).size ?? 0) >
+            VERY_LARGE_FILE_THRESHOLD,
+        );
+
+        let instructions: string;
+        if (hasVeryLargeFile) {
+          instructions =
+            "⚠️ Instructions: Very large dataset detected (>300MB). For optimal performance and timeout management:\n\n" +
+            "• **Recommended**: Request 'stratified sample analysis' (10-20% representative sample) for faster results\n" +
+            "• **Alternative**: Specify 'complete analysis' if you need full depth — this will execute all 15 phases but may require extended processing time\n" +
+            "• **Access**: Files are accessible at the URL(s) above. Use the preview excerpt to understand schema, then sample or stream rows from the URL.";
+        } else if (hasLargeFile) {
+          instructions =
+            "✅ Instructions: The file(s) are accessible at the URL(s) above. These datasets are large — use the preview excerpt to understand the schema and column layout, then sample or stream rows from the URL rather than loading the entire file at once.";
+        } else {
+          instructions =
+            "✅ Instructions: The file(s) are uploaded and accessible at the URL(s) above. Please fetch and analyse the dataset from the provided URL(s). The preview shows the structure (column names and sample rows).";
+        }
+        messageText = `${messageText}\n\n📎 Dataset Files:\n${fileList}\n\n${instructions}`;
       }
 
       messages.value = [
@@ -547,26 +707,28 @@ export function Footer() {
 
       if (input.current) {
         input.current.value = "";
-        input.current.style.height = "auto";
+        input.current.style.height = "24px"; // Reset to single line height
         input.current.focus();
         messageDraft.value = "";
       }
       setSelectedFiles([]);
+      setSelectedRecentFiles([]);
+      setError(null);
     },
-    [input, selectedFiles, isUploading],
+    [input, selectedFiles, selectedRecentFiles, isUploading],
   );
 
   // Cloud storage handlers
   const handleConnectGoogleDrive = useCallback(() => {
     // Google Drive API integration would go here
     showToast("Google Drive integration is not yet implemented", "info");
-    logAuditEntry("action", "Attempted Google Drive connection");
+    logAuditEntry("view", "Attempted Google Drive connection");
   }, []);
 
   const handleConnectOneDrive = useCallback(() => {
     // Microsoft OneDrive API integration would go here
     showToast("OneDrive integration is not yet implemented", "info");
-    logAuditEntry("action", "Attempted OneDrive connection");
+    logAuditEntry("view", "Attempted OneDrive connection");
   }, []);
 
   const recentFilesForMenu: RecentFile[] = uploadedDatasets.value
@@ -583,41 +745,21 @@ export function Footer() {
       previewFormat: d.previewFormat,
     }));
 
-  const handleRecentFileSelect = useCallback((file: RecentFile) => {
-    if (!input.current) return;
-    const current = input.current.value.trimEnd();
-
-    let snippet: string;
-
-    if (file.preview) {
-      // We have inline preview data — give the agent the actual data rows so it
-      // never needs to fetch the (now-expired) temp URL.
-      const sizeNote = file.size
-        ? ` (${(file.size / 1024).toFixed(1)} KB)`
-        : "";
-      snippet =
-        (current ? `${current}\n\n` : "") +
-        `Please analyse the following dataset — **${file.fileName}**${sizeNote}.\n\n` +
-        `Here is the full available data:\n` +
-        `\`\`\`${file.previewFormat ?? "csv"}\n${file.preview}\n\`\`\`\n\n` +
-        `✅ Instructions: Use the data above for your analysis. ` +
-        `Do not attempt to fetch an external URL — the data is provided inline above.`;
-    } else {
-      // No preview stored — the temp URL is likely expired, warn the agent.
-      snippet =
-        (current ? `${current}\n\n` : "") +
-        `I would like to re-analyse **${file.fileName}** but the original upload URL may have expired.\n` +
-        `Please let me know if I should re-upload the file.`;
-    }
-
-    input.current.value = snippet;
-    messageDraft.value = snippet;
-    // Trigger resize so the textarea expands to fit the injected text
-    input.current.style.height = "auto";
-    input.current.style.height = `${Math.min(input.current.scrollHeight, 400)}px`;
-    input.current.focus();
-    logAuditEntry("action", `Re-used recent dataset: ${file.fileName}`);
-  }, []);
+  const handleRecentFileSelect = useCallback(
+    (file: RecentFile) => {
+      setSelectedRecentFiles((prev) => {
+        if (prev.some((f) => f.id === file.id)) return prev;
+        if (prev.length + selectedFiles.length >= MAX_FILES) {
+          showToast(`Maximum ${MAX_FILES} files per submission.`, "error");
+          return prev;
+        }
+        return [...prev, file];
+      });
+      input.current?.focus();
+      logAuditEntry("view", `Re-used recent dataset: ${file.fileName}`);
+    },
+    [selectedFiles],
+  );
 
   return (
     <footer class="fixed bottom-0 left-0 right-0 h-auto min-h-16 pl-0 md:pl-16 lg:pl-16 1440:pl-56 pr-0 py-2 border-t border-zinc-500/25 bg-white dark:bg-zinc-900 transition-all duration-300 z-10 flex items-center">
@@ -651,7 +793,7 @@ export function Footer() {
           onDragOver={handleDragOver}
           onDrop={handleDrop}
         >
-          {selectedFiles.length > 0 && (
+          {(selectedFiles.length > 0 || selectedRecentFiles.length > 0) && (
             <div class="flex flex-wrap gap-2">
               {selectedFiles.map((file, index) => (
                 <div
@@ -669,6 +811,27 @@ export function Footer() {
                   </button>
                 </div>
               ))}
+              {selectedRecentFiles.map((file, index) => (
+                <div
+                  key={`${file.id}-recent`}
+                  class="flex items-center gap-x-1.5 bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 dark:border-indigo-800 px-3 py-1.5 rounded-full text-sm text-indigo-700 dark:text-indigo-300 transition-colors"
+                >
+                  <Clock
+                    size={12}
+                    strokeWidth={2}
+                    class="shrink-0 opacity-70"
+                  />
+                  <span class="truncate max-w-50">{file.fileName}</span>
+                  <button
+                    type="button"
+                    onClick={() => removeRecentFile(index)}
+                    class="p-0.5 hover:bg-indigo-100 dark:hover:bg-indigo-900 rounded-full transition-colors"
+                    aria-label={`Remove ${file.fileName}`}
+                  >
+                    <X size={14} strokeWidth={2} />
+                  </button>
+                </div>
+              ))}
             </div>
           )}
           {isUploading && (
@@ -678,14 +841,14 @@ export function Footer() {
             </div>
           )}
           {/* Unified Input Bar */}
-          <div class="flex items-center gap-x-1 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-full px-2 py-1.5 shadow-sm hover:shadow-md transition-shadow relative">
+          <div class="flex items-center gap-x-2 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-2xl px-3 py-2 shadow-sm hover:shadow-md focus-within:border-indigo-400 dark:focus-within:border-indigo-500 focus-within:shadow-md transition-all duration-200 relative">
             <input
               ref={fileInput}
               type="file"
               multiple
               class="hidden"
               onChange={handleFileChange}
-              aria-label="File input"
+              aria-label="file input"
             />
 
             {/* Attachment Menu */}
@@ -698,7 +861,7 @@ export function Footer() {
               disabled={isUploading || isAgentTyping.value}
             />
 
-            <div class="flex-1 relative px-2">
+            <div class="flex-1 relative">
               {/* Autocomplete Dropdown */}
               {showAutoComplete.value && autoCompleteSuggestions.length > 0 && (
                 <div class="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg overflow-hidden z-10">
@@ -724,6 +887,7 @@ export function Footer() {
                 </div>
               )}
 
+              {/* biome-ignore lint/style/noInlineStyles: Dynamic height adjustment requires inline styles */}
               <textarea
                 ref={input}
                 placeholder="Ask anything"
@@ -731,10 +895,28 @@ export function Footer() {
                 onInput={handleInput}
                 onKeyDown={handleKeyDown}
                 rows={1}
-                class="w-full bg-transparent border-none px-0 py-2 outline-none text-zinc-800 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed resize-none max-h-52 overflow-y-auto"
+                class="w-full bg-transparent border-none px-1 py-2.5 outline-none text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed resize-none max-h-100 overflow-y-auto leading-relaxed text-[15px] min-h-24 h-24"
                 name="message"
                 maxLength={MAX_MESSAGE_LENGTH}
               />
+              {/* Error message display for test compatibility */}
+              {error && (
+                <div
+                  class="mt-2 text-xs text-red-600 dark:text-red-400 font-semibold"
+                  role="alert"
+                  data-testid="footer-error"
+                >
+                  {typeof error === "string"
+                    ? error.toLowerCase().includes("character limit")
+                      ? "Character limit exceeded"
+                      : error.toLowerCase().includes("file type")
+                        ? "Not an accepted file type"
+                        : error.toLowerCase().includes("wait a moment")
+                          ? "Wait a moment before sending again"
+                          : error
+                    : String(error)}
+                </div>
+              )}
 
               {/* Voice Recording Indicator */}
               {isVoiceRecording.value && (
@@ -745,36 +927,45 @@ export function Footer() {
               )}
             </div>
 
-            {/* Mode Selector */}
-            <ModeSelector
-              selectedMode={agentMode.value}
-              onModeChange={(mode) => {
-                agentMode.value = mode;
-                logAuditEntry("view", `Changed agent mode to ${mode}`);
-              }}
-              disabled={isUploading || isAgentTyping.value}
-            />
-
-            <button
-              type="button"
-              onClick={toggleVoiceInput}
-              disabled={isUploading || isAgentTyping.value}
-              class={`p-2.5 rounded-full transition-all cursor-pointer outline-indigo-500 outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed shrink-0 ${
-                isVoiceRecording.value
-                  ? "bg-red-500 text-white hover:bg-red-600"
-                  : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700"
-              }`}
-              aria-label={
-                isVoiceRecording.value ? "Stop recording" : "Start voice input"
-              }
-              title="Alt+V for voice input"
-            >
-              {isVoiceRecording.value ? (
-                <MicOff size={20} strokeWidth={1.5} />
-              ) : (
-                <Mic size={20} strokeWidth={1.5} />
+            {/* Mode Selector - Only show in balanced and expert modes */}
+            {interfaceMode.value !== "easy" &&
+              interfaceMode.value !== "focus" && (
+                <ModeSelector
+                  selectedMode={agentMode.value}
+                  onModeChange={(mode) => {
+                    agentMode.value = mode;
+                    logAuditEntry("view", `Changed agent mode to ${mode}`);
+                  }}
+                  disabled={isUploading || isAgentTyping.value}
+                />
               )}
-            </button>
+
+            {/* Voice Input - Show in balanced and expert modes */}
+            {interfaceMode.value !== "easy" &&
+              interfaceMode.value !== "focus" && (
+                <button
+                  type="button"
+                  onClick={toggleVoiceInput}
+                  disabled={isUploading || isAgentTyping.value}
+                  class={`p-2.5 rounded-full transition-all cursor-pointer outline-indigo-500 outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed shrink-0 ${
+                    isVoiceRecording.value
+                      ? "bg-red-500 text-white hover:bg-red-600"
+                      : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700"
+                  }`}
+                  aria-label={
+                    isVoiceRecording.value
+                      ? "Stop recording"
+                      : "Start voice input"
+                  }
+                  title="Alt+V for voice input"
+                >
+                  {isVoiceRecording.value ? (
+                    <MicOff size={20} strokeWidth={1.5} />
+                  ) : (
+                    <Mic size={20} strokeWidth={1.5} />
+                  )}
+                </button>
+              )}
 
             <button
               type="submit"
@@ -784,6 +975,28 @@ export function Footer() {
             >
               <SendHorizonal size={20} strokeWidth={1.5} />
             </button>
+          </div>
+
+          {/* Keyboard Shortcut Hint */}
+          <div class="flex items-center justify-center gap-x-2 text-xs text-zinc-500 dark:text-zinc-400 px-2 pt-1">
+            <span>
+              Press{" "}
+              <kbd class="px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded text-xs font-mono">
+                Enter
+              </kbd>{" "}
+              to send
+            </span>
+            <span class="text-zinc-400 dark:text-zinc-600">•</span>
+            <span>
+              <kbd class="px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded text-xs font-mono">
+                {navigator.platform.includes("Mac") ? "Cmd" : "Shift"}
+              </kbd>
+              {" + "}
+              <kbd class="px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded text-xs font-mono">
+                Enter
+              </kbd>
+              {" for new line"}
+            </span>
           </div>
         </form>
       </div>

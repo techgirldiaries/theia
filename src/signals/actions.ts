@@ -16,6 +16,7 @@ import {
   toasts,
   uploadedDatasets,
 } from "./state";
+import type { InterfaceMode } from "./state";
 
 // ── Toast ─────────────────────────────────────────────────────────────────────
 
@@ -31,6 +32,45 @@ export function showToast(
 
 export function dismissToast(id: string) {
   toasts.value = toasts.value.filter((t) => t.id !== id);
+}
+
+// ── UI Preferences ────────────────────────────────────────────────────────────
+
+/**
+ * Changes the interface mode (easy/focus/balanced/expert) and persists the preference.
+ * Also automatically sets the corresponding agent mode:
+ * - Easy → Fast (Quick responses for simple tasks)
+ * - Focus → Heavy (Team of multi-agent experts for deep analysis)
+ * - Balanced → Auto (Automatically chooses Fast or Expert based on complexity)
+ * - Expert → Expert (Deep thinking for complex problems)
+ */
+export function setInterfaceMode(mode: InterfaceMode) {
+  interfaceMode.value = mode;
+  localStorage.setItem("interfaceMode", mode);
+
+  // Automatically set corresponding agent mode
+  const agentModeMap = {
+    easy: "fast" as const,
+    focus: "heavy" as const, // Team of multi-agent experts
+    balanced: "auto" as const,
+    expert: "expert" as const,
+  };
+
+  agentMode.value = agentModeMap[mode];
+  localStorage.setItem("agentMode", agentModeMap[mode]);
+  logAuditEntry(
+    "view",
+    `Changed interface mode to: ${mode}, agent mode to: ${agentModeMap[mode]}`,
+  );
+
+  const modeLabels = {
+    easy: "Easy Mode - Fast responses",
+    focus: "Focus Mode - Team of experts",
+    balanced: "Balanced Mode - Smart auto-selection",
+    expert: "Expert Mode - Deep analysis",
+  };
+
+  showToast(modeLabels[mode], "success");
 }
 
 // ── Audit ─────────────────────────────────────────────────────────────────────
@@ -116,13 +156,42 @@ export function endPerformanceTracking(
 
 // ── Messages ──────────────────────────────────────────────────────────────────
 
+/**
+ * Removes a failed message from the chat and triggers a retry.
+ * Only works for messages with 'failed' status.
+ */
 export function retryFailedMessage(messageId: string) {
   const msg = messages.value.find((m) => m.id === messageId);
   if (!msg || msg.status !== "failed") return;
+
+  // Remove the failed message; user can resend manually
   messages.value = messages.value.filter((m) => m.id !== messageId);
   showToast("Retrying message...", "info");
 }
 
+/**
+ * Updates the text content of an existing message.
+ * Useful when users need to correct typos or incomplete thoughts.
+ */
+export function editMessage(messageId: string, newText: string) {
+  const index = messages.value.findIndex((m) => m.id === messageId);
+  if (index === -1) return;
+
+  // Create a new array to trigger reactivity
+  const updatedMessages = [...messages.value];
+  updatedMessages[index] = {
+    ...updatedMessages[index],
+    text: newText,
+  };
+
+  messages.value = updatedMessages;
+  showToast("Message updated", "success");
+  logAuditEntry("view", `Edited message: ${messageId}`);
+}
+
+/**
+ * Marks all messages as read (used for notification management).
+ */
 export function markMessagesAsRead() {
   messages.value = messages.value.map((m) => ({ ...m, read: true }));
 }

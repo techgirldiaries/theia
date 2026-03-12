@@ -16,7 +16,7 @@ export function StopButton() {
     }
 
     const confirmStop = confirm(
-      "Are you sure you want to stop the current workflow? This action cannot be undone.",
+      "Stop listening to the current workflow? The backend may continue processing.",
     );
 
     if (!confirmStop) {
@@ -24,35 +24,44 @@ export function StopButton() {
     }
 
     try {
-      // For workforce tasks, we can try to update the requested state to "stop"
-      if (workforce.value) {
-        await client.value.fetch(
-          `/workforce/tasks/${task.value.id}/metadata` as any,
-          {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              requested_state: "stop",
-            }),
-          },
-        );
+      // Unsubscribe from task events to stop receiving updates
+      task.value.unsubscribe();
+      isAgentTyping.value = false;
 
-        showToast("Workflow stop requested", "info");
-        isAgentTyping.value = false;
+      // Try to signal the backend to stop (best-effort, may not be supported)
+      if (workforce.value) {
+        try {
+          await client.value.fetch(
+            `/workforce/tasks/${task.value.id}/update` as any,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                state: "cancelled",
+              }),
+            },
+          );
+          showToast("Workflow stopped successfully", "success");
+        } catch (cancelError) {
+          // Best-effort cancellation failed, but we've already unsubscribed
+          console.warn("Backend cancellation not supported:", cancelError);
+          showToast(
+            "Disconnected from workflow. Backend may continue processing.",
+            "info",
+          );
+        }
       } else {
-        // For agent tasks, we can't directly stop them but we can unsubscribe
-        task.value.unsubscribe();
-        showToast("Disconnected from task", "info");
-        isAgentTyping.value = false;
+        showToast(
+          "Disconnected from task. Backend may continue processing.",
+          "info",
+        );
       }
     } catch (error) {
       console.error("Failed to stop workflow:", error);
-      showToast(
-        "Failed to stop workflow. It may complete on its own.",
-        "error",
-      );
+      showToast("Disconnected from workflow", "info");
+      isAgentTyping.value = false;
     }
   }, []);
 

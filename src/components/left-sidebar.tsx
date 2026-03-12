@@ -15,11 +15,9 @@ import {
   Zap,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "preact/hooks";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
 import {
   isDarkMode,
   isSidebarExpanded,
-  logAuditEntry,
   showAnalytics,
   showAuditLog,
   showDataManagement,
@@ -29,14 +27,30 @@ import {
   showQuickActions,
   showReports,
   showSettings,
+  showPerformanceDashboard,
   splitScreenMode,
-  startNewChat,
-} from "@/signals";
+} from "@/signals/state";
+import { startNewChat } from "@/signals/actions";
+
+import { logAuditEntry } from "@/signals/actions";
 
 export function LeftSidebar() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeItem, setActiveItem] = useState<string | null>(null);
   const sidebarRef = useRef<HTMLElement>(null);
+
+  // Media query hook
+  const useMediaQuery = (query: string) => {
+    const [matches, setMatches] = useState(false);
+    useEffect(() => {
+      const media = window.matchMedia(query);
+      setMatches(media.matches);
+      const listener = () => setMatches(media.matches);
+      media.addEventListener("change", listener);
+      return () => media.removeEventListener("change", listener);
+    }, [query]);
+    return matches;
+  };
 
   // Use media query hooks for responsive behavior
   const isMobile = useMediaQuery("(max-width: 767px)");
@@ -149,10 +163,26 @@ export function LeftSidebar() {
     showAuditLog.value = false;
     showQuickActions.value = false;
     showSettings.value = false;
+    showPerformanceDashboard.value = false;
     splitScreenMode.value = false;
     // Toggle analytics
     showAnalytics.value = !showAnalytics.value;
     setActiveItem("analytics");
+    if (isMobile || isTablet) isSidebarExpanded.value = false;
+  };
+
+  const handlePerformanceDashboard = () => {
+    // Close all other views
+    showAnalytics.value = false;
+    showFileManager.value = false;
+    showReports.value = false;
+    showAuditLog.value = false;
+    showQuickActions.value = false;
+    showSettings.value = false;
+    splitScreenMode.value = false;
+    // Toggle performance dashboard
+    showPerformanceDashboard.value = !showPerformanceDashboard.value;
+    setActiveItem("performance-dashboard");
     if (isMobile || isTablet) isSidebarExpanded.value = false;
   };
 
@@ -265,13 +295,6 @@ export function LeftSidebar() {
       label: "New Analysis",
       onClick: handleNewChat,
       ariaLabel: "Start new fraud analysis session (Alt+1)",
-    },
-    {
-      id: "search",
-      icon: Search,
-      label: "Search",
-      onClick: handleSearch,
-      ariaLabel: "Search through analysis history (Alt+2)",
     },
     {
       id: "files",
@@ -423,9 +446,12 @@ export function LeftSidebar() {
 
           {/* Bottom Section */}
           <div class="pb-6 flex flex-col space-y-2 px-3 border-t border-zinc-300 dark:border-zinc-800 pt-4">
-            <div class="text-xs text-zinc-500 dark:text-zinc-600 px-3 mb-2">
-              System Controls
-            </div>
+            {/* System Controls Label - Only show when expanded */}
+            {showLabel && (
+              <div class="text-xs text-zinc-500 dark:text-zinc-600 px-3 mb-2">
+                System Controls
+              </div>
+            )}
 
             {/* Quick Actions */}
             <button

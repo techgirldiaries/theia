@@ -31,7 +31,7 @@ if (_savedMessages.length > 0) {
 }
 
 // ── Core signals ──────────────────────────────────────────────────────────────
-export const messages = signal<Message[]>([]);
+// ...existing code...
 export const uploadedDatasets = signal<DatasetInfo[]>(
   loadDatasetsFromStorage(),
 );
@@ -78,6 +78,7 @@ export const showDataManagement = signal(false);
 export const showAuditLog = signal(false);
 export const showSettings = signal(false);
 export const showQuickActions = signal(false);
+export const showPerformanceDashboard = signal(false);
 export const compactView = signal(
   localStorage.getItem("compactView") === "true",
 );
@@ -93,6 +94,12 @@ export const showAutoComplete = signal(false);
 export const autoCompleteQuery = signal("");
 export const agentMode = signal<"auto" | "fast" | "expert" | "heavy">(
   (localStorage.getItem("agentMode") as any) || "expert",
+);
+
+// Interface mode: Controls UI complexity and feature visibility
+export type InterfaceMode = "easy" | "focus" | "balanced" | "expert";
+export const interfaceMode = signal<InterfaceMode>(
+  (localStorage.getItem("interfaceMode") as InterfaceMode) || "balanced",
 );
 
 // ── MARAG, Visualization, Benchmark ──────────────────────────────────────────

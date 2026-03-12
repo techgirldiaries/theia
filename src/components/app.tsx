@@ -13,6 +13,7 @@ import { HistorySidebar } from "@/components/history-sidebar";
 import { KeyboardShortcutsPanel } from "@/components/keyboard-shortcuts";
 import { LeftSidebar } from "@/components/left-sidebar";
 import { LoadingSkeleton } from "@/components/loading-skeleton";
+import PerformanceDashboard from "@/components/performance-dashboard";
 import { PerformanceMetrics } from "@/components/performance-metrics";
 import { QuickActions } from "@/components/quick-actions";
 import { RightActionBar } from "@/components/right-action-bar";
@@ -24,17 +25,20 @@ import { UserMessage } from "@/components/user-message";
 import { FileManagerPanel } from "@/components/file-manager";
 import {
   dismissToast,
+  interfaceMode,
   isAgentTyping,
   isAuthenticated,
   isInitialized,
   loadingError,
   messages,
+  performanceMetrics,
   showAnalytics,
   showAuditLog,
   showFileManager,
   showQuickActions,
   showReports,
   showSettings,
+  showPerformanceDashboard,
   splitScreenMode,
   toasts,
   workforce,
@@ -103,18 +107,27 @@ export function App() {
 
   return (
     <div class="flex flex-col min-h-dvh bg-zinc-50 dark:bg-zinc-950">
-      {/* Left Navigation Sidebar */}
-      <LeftSidebar />
+      {/* Left Navigation Sidebar - Hidden in easy and focus modes */}
+      {interfaceMode.value !== "easy" && interfaceMode.value !== "focus" && (
+        <LeftSidebar />
+      )}
 
-      {/* Right Action Bar */}
-      <RightActionBar />
+      {/* Right Action Bar - Expert mode only */}
+      {interfaceMode.value === "expert" && <RightActionBar />}
 
       <Header />
       <div
         class={`flex flex-1 pt-16 pb-20 ${splitScreenMode.value ? "flex-col lg:flex-row" : "flex-col"}`}
       >
         <main
-          class={`${splitScreenMode.value ? "w-full lg:w-1/2" : "w-full"} pl-0 md:pl-16 lg:pl-16 1440:pl-56 pr-0 py-4 bg-zinc-50 dark:bg-zinc-950 transition-all duration-300 overflow-auto`}
+          class={`${splitScreenMode.value ? "w-full lg:w-1/2" : "w-full"} ${
+            // Adjust padding based on interface mode
+            interfaceMode.value === "easy" || interfaceMode.value === "focus"
+              ? "pl-0 pr-0" // No sidebars in easy/focus mode
+              : interfaceMode.value === "balanced"
+                ? "pl-0 md:pl-16 lg:pl-16 1440:pl-56 pr-0" // Left sidebar only
+                : "pl-0 md:pl-16 lg:pl-16 1440:pl-56 pr-0" // Both sidebars in expert
+          } py-4 bg-zinc-50 dark:bg-zinc-950 transition-all duration-300 overflow-auto`}
         >
           {/* Show dataset manager inline when Datasets is selected */}
           {showFileManager.value && !splitScreenMode.value && (
@@ -127,6 +140,13 @@ export function App() {
           {showAnalytics.value && !splitScreenMode.value && (
             <div class="max-w-6xl mx-auto">
               <AnalyticsDashboard />
+            </div>
+          )}
+
+          {/* Show performance dashboard when selected */}
+          {showPerformanceDashboard?.value && !splitScreenMode.value && (
+            <div class="max-w-6xl mx-auto">
+              <PerformanceDashboard metrics={performanceMetrics.value} />
             </div>
           )}
 
@@ -195,8 +215,15 @@ export function App() {
       <Footer />
       <StopButton />
       <ScrollToBottomButton />
-      <HistorySidebar />
+
+      {/* History Sidebar - Available in balanced and expert modes */}
+      {interfaceMode.value !== "easy" && interfaceMode.value !== "focus" && (
+        <HistorySidebar />
+      )}
+
+      {/* Keyboard Shortcuts Panel - Available in all modes */}
       <KeyboardShortcutsPanel />
+
       {/* Toast notifications */}
       <For each={toasts}>
         {(toast) => (

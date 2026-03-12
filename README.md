@@ -33,7 +33,7 @@ Agents reach agreement through weighted voting, where each agent's contribution 
 - **MARAG Multi-Agent System** - 5 collaborative AI agents
 - **15-Phase Detection Pipeline** - Sequential/parallel/convergent execution
 - **Enhanced Fraud Reports** - Comprehensive analysis with 6 tabbed sections
-- **Risk Scoring** - 0-100 scale with 5-tier categorisation
+- **Risk Scoring** - 0-100 scale with 5-levels of categorisation
 - **Real-time Status Tracking** - Live pipeline updates
 
 ### Analytics & Benchmarking
@@ -90,7 +90,7 @@ Agents reach agreement through weighted voting, where each agent's contribution 
 ```text
 theia-fraud-intelligence/
 ├── src/
-│   ├── components/          # 48 UI components
+│   ├── components/          # UI components
 │   │   ├── marag-status-panel.tsx
 │   │   ├── marag-consensus-radar.tsx
 │   │   ├── enhanced-fraud-report-display.tsx
@@ -184,6 +184,19 @@ Vite will start a local server. Open your browser to:
 ```
 http://localhost:5173
 ```
+
+The app hot-reloads automatically on any file change — no restart needed.
+
+### 5. Verify the System is Running
+
+Once the browser loads, confirm:
+
+- [ ] The THEIA header and chat interface are visible
+- [ ] The MARAG status panel shows 5 agents (TIRA, RCRA, HPRA, ERRA, BARA)
+- [ ] Typing a message triggers the 15-phase pipeline
+- [ ] The connection status indicator shows **Connected**
+
+If agents fail to respond, double-check your `.env` credentials and ensure the project is active.
 
 The app hot-reloads automatically on any file change — no restart needed.
 

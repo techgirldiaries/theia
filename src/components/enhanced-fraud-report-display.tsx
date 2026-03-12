@@ -172,7 +172,7 @@ export function EnhancedFraudReportDisplay({
                   Phases Completed
                 </p>
                 <p class="text-lg font-bold text-zinc-900 dark:text-white">
-                  {report.processing_metadata.phases_completed}/15
+                  {report.processing_metadata?.phases_completed ?? 0}/15
                 </p>
               </div>
               <div>
@@ -180,7 +180,7 @@ export function EnhancedFraudReportDisplay({
                   Processing Time
                 </p>
                 <p class="text-lg font-bold text-zinc-900 dark:text-white">
-                  {report.processing_metadata.total_processing_time}
+                  {report.processing_metadata?.total_processing_time ?? "N/A"}
                 </p>
               </div>
             </div>
@@ -253,7 +253,7 @@ export function EnhancedFraudReportDisplay({
       label: "MARAG Intelligence",
       icon: Brain,
       badge: hasMarag
-        ? report.processing_metadata.marag_agents_deployed
+        ? report.processing_metadata?.marag_agents_deployed
         : undefined,
       condition: hasMarag,
       content: maragResults?.agent_consensus ? (
@@ -301,8 +301,8 @@ export function EnhancedFraudReportDisplay({
                     <div class="flex items-center gap-2">
                       <div class="w-24 bg-zinc-200 dark:bg-zinc-700 rounded-full h-2">
                         <div
-                          class="bg-indigo-600 h-2 rounded-full"
-                          style={{ width: `${correlation * 100}%` }}
+                          class="bg-indigo-600 h-2 rounded-full correlation-bar"
+                          data-width={correlation * 100}
                         ></div>
                       </div>
                       <span class="text-sm font-bold text-zinc-900 dark:text-white w-12 text-right">
@@ -324,7 +324,7 @@ export function EnhancedFraudReportDisplay({
       label: "Benchmarking",
       icon: BarChart3,
       badge: hasBenchmark
-        ? report.processing_metadata.datasets_compared
+        ? report.processing_metadata?.datasets_compared
         : undefined,
       condition: hasBenchmark,
       content: adaptedBenchmarkResults ? (
@@ -347,12 +347,12 @@ export function EnhancedFraudReportDisplay({
       id: "phases",
       label: "Phase Pipeline",
       icon: Clock,
-      badge: report.processing_metadata.phases_completed,
+      badge: report.processing_metadata?.phases_completed,
       content: (
         <div class="space-y-4">
           <p class="text-sm text-zinc-600 dark:text-zinc-400">
-            All {report.processing_metadata.phases_completed} phases completed
-            successfully
+            All {report.processing_metadata?.phases_completed ?? 0} phases
+            completed successfully
           </p>
 
           {/* Phase Results Summary */}

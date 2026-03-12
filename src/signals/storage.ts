@@ -267,9 +267,7 @@ export function saveDatasetsToStorage(datasets: DatasetInfo[]) {
   try {
     localStorage.setItem(
       "fraud-datasets",
-      JSON.stringify(
-        datasets.map((d) => ({ ...d, uploadedAt: d.uploadedAt.toISOString() })),
-      ),
+      JSON.stringify(datasets.map(serializeDataset)),
     );
   } catch (error) {
     console.error("Failed to save datasets:", error);
@@ -280,10 +278,7 @@ export function loadDatasetsFromStorage(): DatasetInfo[] {
   try {
     const saved = localStorage.getItem("fraud-datasets");
     if (!saved) return [];
-    return JSON.parse(saved).map((d: any) => ({
-      ...d,
-      uploadedAt: new Date(d.uploadedAt),
-    }));
+    return JSON.parse(saved).map(deserializeDataset);
   } catch (error) {
     console.error("Failed to load datasets:", error);
     return [];

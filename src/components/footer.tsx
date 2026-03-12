@@ -484,14 +484,15 @@ export function Footer() {
           const start = input.current.selectionStart;
           const end = input.current.selectionEnd;
           const value = input.current.value;
-          const newValue = value.substring(0, start) + "\n" + value.substring(end);
+          const newValue =
+            value.substring(0, start) + "\n" + value.substring(end);
           input.current.value = newValue;
           input.current.selectionStart = input.current.selectionEnd = start + 1;
-          
+
           // Expand the textarea
           input.current.style.height = "auto";
           input.current.style.height = `${Math.min(input.current.scrollHeight, 400)}px`;
-          
+
           // Save the draft
           messageDraft.value = newValue;
         }
@@ -567,7 +568,8 @@ export function Footer() {
             getFilePreview(file),
           );
 
-          uploadedAttachments = await Promise.all(uploadPromises);
+          const uploadResults = await Promise.all(uploadPromises);
+          uploadedAttachments = uploadResults.filter((att): att is Attachment => att !== undefined);
           const previews = await Promise.all(previewPromises);
 
           // Log audit entry
@@ -589,6 +591,8 @@ export function Footer() {
               previewFormat: previews[index].preview
                 ? previews[index].format
                 : undefined,
+              type: "",
+              description: undefined
             });
 
             // Build detailed file info with preview
@@ -727,13 +731,13 @@ export function Footer() {
   const handleConnectGoogleDrive = useCallback(() => {
     // Google Drive API integration would go here
     showToast("Google Drive integration is not yet implemented", "info");
-    logAuditEntry("action", "Attempted Google Drive connection");
+    logAuditEntry("view", "Attempted Google Drive connection");
   }, []);
 
   const handleConnectOneDrive = useCallback(() => {
     // Microsoft OneDrive API integration would go here
     showToast("OneDrive integration is not yet implemented", "info");
-    logAuditEntry("action", "Attempted OneDrive connection");
+    logAuditEntry("view", "Attempted OneDrive connection");
   }, []);
 
   const recentFilesForMenu: RecentFile[] = uploadedDatasets.value
@@ -761,7 +765,7 @@ export function Footer() {
         return [...prev, file];
       });
       input.current?.focus();
-      logAuditEntry("action", `Re-used recent dataset: ${file.fileName}`);
+      logAuditEntry("view", `Re-used recent dataset: ${file.fileName}`);
     },
     [selectedFiles],
   );
@@ -955,16 +959,26 @@ export function Footer() {
               <SendHorizonal size={20} strokeWidth={1.5} />
             </button>
           </div>
-          
+
           {/* Keyboard Shortcut Hint */}
           <div class="flex items-center justify-center gap-x-2 text-xs text-zinc-500 dark:text-zinc-400 px-2 pt-1">
-            <span>Press <kbd class="px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded text-xs font-mono">Enter</kbd> to send</span>
+            <span>
+              Press{" "}
+              <kbd class="px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded text-xs font-mono">
+                Enter
+              </kbd>{" "}
+              to send
+            </span>
             <span class="text-zinc-400 dark:text-zinc-600">•</span>
             <span>
-              <kbd class="px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded text-xs font-mono">{navigator.platform.includes('Mac') ? 'Cmd' : 'Shift'}</kbd>
-              {' + '}
-              <kbd class="px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded text-xs font-mono">Enter</kbd>
-              {' for new line'}
+              <kbd class="px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded text-xs font-mono">
+                {navigator.platform.includes("Mac") ? "Cmd" : "Shift"}
+              </kbd>
+              {" + "}
+              <kbd class="px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded text-xs font-mono">
+                Enter
+              </kbd>
+              {" for new line"}
             </span>
           </div>
         </form>

@@ -96,7 +96,7 @@ export const agentMode = signal<"auto" | "fast" | "expert" | "heavy">(
 );
 
 // Interface mode: Controls UI complexity and feature visibility
-export type InterfaceMode = "focus" | "balanced" | "expert";
+export type InterfaceMode = "easy" | "focus" | "balanced" | "expert";
 export const interfaceMode = signal<InterfaceMode>(
   (localStorage.getItem("interfaceMode") as InterfaceMode) || "balanced",
 );

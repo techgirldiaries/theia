@@ -3,6 +3,7 @@ import {
   Focus,
   Layers,
   Lightbulb,
+  Smile,
   Sparkles,
   Users,
   Zap,
@@ -200,6 +201,9 @@ export function EmptyState() {
               class="flex items-center gap-x-2 px-4 py-2.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-full text-sm font-medium transition-all border border-zinc-200 dark:border-zinc-700 hover:scale-105 active:scale-95"
               title="Customize your workspace complexity level"
             >
+              {interfaceMode.value === "easy" && (
+                <Smile size={16} strokeWidth={2} />
+              )}
               {interfaceMode.value === "focus" && (
                 <Focus size={16} strokeWidth={2} />
               )}
@@ -221,6 +225,22 @@ export function EmptyState() {
               <div class="absolute top-full left-0 mt-2 w-72 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                 <div class="p-2 space-y-1">
                   <button
+                    onClick={() => handleSelectInterfaceMode("easy", "Easy")}
+                    class={`w-full text-left px-3 py-2.5 rounded-lg transition-colors flex items-center gap-x-2 ${
+                      interfaceMode.value === "easy"
+                        ? "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300"
+                        : "text-zinc-900 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-700"
+                    }`}
+                  >
+                    <Smile size={16} />
+                    <div class="flex-1">
+                      <div class="font-medium text-sm">Easy Mode</div>
+                      <div class="text-xs opacity-75 mt-0.5">
+                        Fast responses for quick tasks
+                      </div>
+                    </div>
+                  </button>
+                  <button
                     onClick={() => handleSelectInterfaceMode("focus", "Focus")}
                     class={`w-full text-left px-3 py-2.5 rounded-lg transition-colors flex items-center gap-x-2 ${
                       interfaceMode.value === "focus"
@@ -232,7 +252,7 @@ export function EmptyState() {
                     <div class="flex-1">
                       <div class="font-medium text-sm">Focus Mode</div>
                       <div class="text-xs opacity-75 mt-0.5">
-                        Minimal distractions for deep work
+                        Team of multi-agent experts (Heavy)
                       </div>
                     </div>
                   </button>
@@ -250,7 +270,7 @@ export function EmptyState() {
                     <div class="flex-1">
                       <div class="font-medium text-sm">Balanced Mode</div>
                       <div class="text-xs opacity-75 mt-0.5">
-                        Essential features visible (default)
+                        Auto-selects Fast or Expert (default)
                       </div>
                     </div>
                   </button>
@@ -400,22 +420,28 @@ export function EmptyState() {
 
       {/* Interface Mode Indicator */}
       <div class="flex items-center gap-x-2 px-4 py-2 bg-zinc-100 dark:bg-zinc-800 rounded-full text-xs text-zinc-600 dark:text-zinc-400">
+        {interfaceMode.value === "easy" && (
+          <>
+            <Smile size={14} />
+            <span>Easy Mode - Fast responses enabled</span>
+          </>
+        )}
         {interfaceMode.value === "focus" && (
           <>
             <Focus size={14} />
-            <span>Focus Mode - Minimal distractions enabled</span>
+            <span>Focus Mode - Multi-agent team enabled (Heavy)</span>
           </>
         )}
         {interfaceMode.value === "balanced" && (
           <>
             <Layers size={14} />
-            <span>Balanced Mode - Essential features visible</span>
+            <span>Balanced Mode - Auto-selects Fast or Expert</span>
           </>
         )}
         {interfaceMode.value === "expert" && (
           <>
             <Zap size={14} />
-            <span>Expert Mode - All features accessible</span>
+            <span>Expert Mode - Deep thinking enabled</span>
           </>
         )}
       </div>

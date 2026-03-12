@@ -104,10 +104,12 @@ export function App() {
 
   return (
     <div class="flex flex-col min-h-dvh bg-zinc-50 dark:bg-zinc-950">
-      {/* Left Navigation Sidebar - Hidden in focus mode */}
-      {interfaceMode.value !== "focus" && <LeftSidebar />}
+      {/* Left Navigation Sidebar - Hidden in easy and focus modes */}
+      {interfaceMode.value !== "easy" && interfaceMode.value !== "focus" && (
+        <LeftSidebar />
+      )}
 
-      {/* Right Action Bar - Hidden in focus mode, expert mode only */}
+      {/* Right Action Bar - Expert mode only */}
       {interfaceMode.value === "expert" && <RightActionBar />}
 
       <Header />
@@ -117,8 +119,8 @@ export function App() {
         <main
           class={`${splitScreenMode.value ? "w-full lg:w-1/2" : "w-full"} ${
             // Adjust padding based on interface mode
-            interfaceMode.value === "focus"
-              ? "pl-0 pr-0" // No sidebars in focus mode
+            interfaceMode.value === "easy" || interfaceMode.value === "focus"
+              ? "pl-0 pr-0" // No sidebars in easy/focus mode
               : interfaceMode.value === "balanced"
                 ? "pl-0 md:pl-16 lg:pl-16 1440:pl-56 pr-0" // Left sidebar only
                 : "pl-0 md:pl-16 lg:pl-16 1440:pl-56 pr-0" // Both sidebars in expert
@@ -205,7 +207,9 @@ export function App() {
       <ScrollToBottomButton />
 
       {/* History Sidebar - Available in balanced and expert modes */}
-      {interfaceMode.value !== "focus" && <HistorySidebar />}
+      {interfaceMode.value !== "easy" && interfaceMode.value !== "focus" && (
+        <HistorySidebar />
+      )}
 
       {/* Keyboard Shortcuts Panel - Available in all modes */}
       <KeyboardShortcutsPanel />

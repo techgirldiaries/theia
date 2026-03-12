@@ -923,42 +923,44 @@ export function Footer() {
             </div>
 
             {/* Mode Selector - Only show in balanced and expert modes */}
-            {interfaceMode.value !== "focus" && (
-              <ModeSelector
-                selectedMode={agentMode.value}
-                onModeChange={(mode) => {
-                  agentMode.value = mode;
-                  logAuditEntry("view", `Changed agent mode to ${mode}`);
-                }}
-                disabled={isUploading || isAgentTyping.value}
-              />
-            )}
+            {interfaceMode.value !== "easy" &&
+              interfaceMode.value !== "focus" && (
+                <ModeSelector
+                  selectedMode={agentMode.value}
+                  onModeChange={(mode) => {
+                    agentMode.value = mode;
+                    logAuditEntry("view", `Changed agent mode to ${mode}`);
+                  }}
+                  disabled={isUploading || isAgentTyping.value}
+                />
+              )}
 
             {/* Voice Input - Show in balanced and expert modes */}
-            {interfaceMode.value !== "focus" && (
-              <button
-                type="button"
-                onClick={toggleVoiceInput}
-                disabled={isUploading || isAgentTyping.value}
-                class={`p-2.5 rounded-full transition-all cursor-pointer outline-indigo-500 outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed shrink-0 ${
-                  isVoiceRecording.value
-                    ? "bg-red-500 text-white hover:bg-red-600"
-                    : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700"
-                }`}
-                aria-label={
-                  isVoiceRecording.value
-                    ? "Stop recording"
-                    : "Start voice input"
-                }
-                title="Alt+V for voice input"
-              >
-                {isVoiceRecording.value ? (
-                  <MicOff size={20} strokeWidth={1.5} />
-                ) : (
-                  <Mic size={20} strokeWidth={1.5} />
-                )}
-              </button>
-            )}
+            {interfaceMode.value !== "easy" &&
+              interfaceMode.value !== "focus" && (
+                <button
+                  type="button"
+                  onClick={toggleVoiceInput}
+                  disabled={isUploading || isAgentTyping.value}
+                  class={`p-2.5 rounded-full transition-all cursor-pointer outline-indigo-500 outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed shrink-0 ${
+                    isVoiceRecording.value
+                      ? "bg-red-500 text-white hover:bg-red-600"
+                      : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700"
+                  }`}
+                  aria-label={
+                    isVoiceRecording.value
+                      ? "Stop recording"
+                      : "Start voice input"
+                  }
+                  title="Alt+V for voice input"
+                >
+                  {isVoiceRecording.value ? (
+                    <MicOff size={20} strokeWidth={1.5} />
+                  ) : (
+                    <Mic size={20} strokeWidth={1.5} />
+                  )}
+                </button>
+              )}
 
             <button
               type="submit"

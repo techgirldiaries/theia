@@ -7,6 +7,7 @@ import {
   saveChatSessionToHistory,
 } from "./storage";
 import {
+  agentMode,
   currentUserId,
   interfaceMode,
   isAgentTyping,
@@ -38,20 +39,37 @@ export function dismissToast(id: string) {
 // ── UI Preferences ────────────────────────────────────────────────────────────
 
 /**
- * Changes the interface mode (focus/balanced/expert) and persists the preference.
- * - Focus: Minimal UI, just chat
- * - Balanced: Essential features visible
- * - Expert: All panels and advanced features available
+ * Changes the interface mode (easy/focus/balanced/expert) and persists the preference.
+ * Also automatically sets the corresponding agent mode:
+ * - Easy → Fast (Quick responses for simple tasks)
+ * - Focus → Heavy (Team of multi-agent experts for deep analysis)
+ * - Balanced → Auto (Automatically chooses Fast or Expert based on complexity)
+ * - Expert → Expert (Deep thinking for complex problems)
  */
 export function setInterfaceMode(mode: InterfaceMode) {
   interfaceMode.value = mode;
   localStorage.setItem("interfaceMode", mode);
-  logAuditEntry("view", `Changed interface mode to: ${mode}`);
+
+  // Automatically set corresponding agent mode
+  const agentModeMap = {
+    easy: "fast" as const,
+    focus: "heavy" as const, // Team of multi-agent experts
+    balanced: "auto" as const,
+    expert: "expert" as const,
+  };
+
+  agentMode.value = agentModeMap[mode];
+  localStorage.setItem("agentMode", agentModeMap[mode]);
+  logAuditEntry(
+    "view",
+    `Changed interface mode to: ${mode}, agent mode to: ${agentModeMap[mode]}`,
+  );
 
   const modeLabels = {
-    focus: "Focus Mode - Minimal distractions",
-    balanced: "Balanced Mode - Essential features",
-    expert: "Expert Mode - All features visible",
+    easy: "Easy Mode - Fast responses",
+    focus: "Focus Mode - Team of experts",
+    balanced: "Balanced Mode - Smart auto-selection",
+    expert: "Expert Mode - Deep analysis",
   };
 
   showToast(modeLabels[mode], "success");

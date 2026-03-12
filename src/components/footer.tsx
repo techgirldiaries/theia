@@ -39,9 +39,7 @@ type Message = {
 
 const MAX_MESSAGE_LENGTH = 20_000;
 const MAX_FILES = 5;
-const MAX_PREVIEW_READ_BYTES = 128 * 1024;
-const MAX_PREVIEW_LINES = 20;
-const MAX_PREVIEW_CHARACTERS = 2_500;
+const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
 const ALLOWED_MIME_TYPES = new Set([
   "text/csv",
   "application/json",
@@ -52,51 +50,6 @@ const ALLOWED_MIME_TYPES = new Set([
 ]);
 const ALLOWED_EXTENSIONS = /\.(csv|json|txt|log|tsv)$/i;
 const SUBMIT_COOLDOWN_MS = 2_000;
-
-// Strong sanitizer: escape all HTML special chars
-function sanitizeInput(input: string): string {
-  return input
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/\"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
-function formatFileSize(bytes: number): string {
-  if (bytes >= 1024 * 1024 * 1024) {
-    return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
-  }
-  if (bytes >= 1024 * 1024) {
-    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
-  }
-  if (bytes >= 1024) {
-    return `${(bytes / 1024).toFixed(2)} KB`;
-  }
-  return `${bytes} B`;
-}
-
-function trimPreviewText(
-  text: string,
-  maxLines: number,
-): { preview: string; wasTrimmed: boolean } {
-  const normalized = text.replace(/\r\n/g, "\n").trimEnd();
-  const lines = normalized.split("\n");
-  const limitedLines = lines.slice(0, maxLines).join("\n").trimEnd();
-  let preview = limitedLines;
-  let wasTrimmed = lines.length > maxLines;
-
-  if (preview.length > MAX_PREVIEW_CHARACTERS) {
-    preview = preview.slice(0, MAX_PREVIEW_CHARACTERS).trimEnd();
-    wasTrimmed = true;
-  }
-
-  if (wasTrimmed && preview.length > 0) {
-    preview = `${preview}\n...`;
-  }
-
-  return { preview, wasTrimmed };
-}
 
 export function Footer() {
   const input = useRef<HTMLTextAreaElement>(null);
@@ -258,9 +211,12 @@ export function Footer() {
   }, []);
 
   const validateFile = useCallback((file: File): string | null => {
+    if (file.size > MAX_FILE_SIZE_BYTES)
+      return `"${file.name}" exceeds the 10 MB limit.`;
     const mimeOk = ALLOWED_MIME_TYPES.has(file.type);
     const extOk = ALLOWED_EXTENSIONS.test(file.name);
-    if (!mimeOk && !extOk) return `Not an accepted file type`;
+    if (!mimeOk && !extOk)
+      return `"${file.name}" is not an accepted file type (CSV, JSON, TXT, TSV).`;
     return null;
   }, []);
 
@@ -275,8 +231,7 @@ export function Footer() {
         const incoming = Array.from(files);
         const errors = incoming.map(validateFile).filter(Boolean);
         if (errors.length > 0) {
-          setError(String(errors[0]!));
-          showToast(String(errors[0]!), "error");
+          showToast(errors[0]!, "error");
           return;
         }
         setSelectedFiles((prev) => {
@@ -295,6 +250,18 @@ export function Footer() {
     },
     [validateFile],
   );
+
+  // Helper to read CSV preview (first 5 rows)
+  const readCSVPreview = async (file: File): Promise<string> => {
+    try {
+      const text = await file.text();
+      const lines = text.split("\n").slice(0, 6); // Header + 5 rows
+      return lines.join("\n");
+    } catch (error) {
+      console.error("Failed to read CSV preview:", error);
+      return "";
+    }
+  };
 
   const readFileSlice = useCallback(
     async (
@@ -418,8 +385,7 @@ export function Footer() {
       for (const file of incoming) {
         const err = validateFile(file);
         if (err) {
-          setError(String(err));
-          showToast(String(err), "error");
+          showToast(err, "error");
           if (fileInput.current) fileInput.current.value = "";
           return;
         }
@@ -541,7 +507,6 @@ export function Footer() {
       // Rate limit: enforce minimum gap between submissions
       const now = Date.now();
       if (now - lastSubmitTime.current < SUBMIT_COOLDOWN_MS) {
-        setError("Wait a moment before sending again");
         showToast("Please wait a moment before sending again.", "info");
         return;
       }
@@ -568,8 +533,14 @@ export function Footer() {
         return;
       }
 
-      // Sanitize message input
-      let messageText = message ? sanitizeInput(message.trim()) : "";
+      // Enforce message length cap
+      if ((message?.length ?? 0) > MAX_MESSAGE_LENGTH) {
+        showToast(
+          `Message exceeds the ${MAX_MESSAGE_LENGTH.toLocaleString()} character limit.`,
+          "error",
+        );
+        return;
+      }
 
       // Upload files first if any are selected
       let uploadedAttachments: Attachment[] = [];
@@ -927,7 +898,6 @@ export function Footer() {
                 class="w-full bg-transparent border-none px-1 py-2.5 outline-none text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed resize-none max-h-100 overflow-y-auto leading-relaxed text-[15px] min-h-24 h-24"
                 name="message"
                 maxLength={MAX_MESSAGE_LENGTH}
-                aria-label="ask anything"
               />
               {/* Error message display for test compatibility */}
               {error && (

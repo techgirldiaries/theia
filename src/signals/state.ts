@@ -23,7 +23,12 @@ import type {
 } from "./types";
 
 // ── Startup: archive previous session then start fresh ────────────────────────
-export const messages = signal<Message[]>(loadMessagesFromStorage());
+const _savedMessages = loadMessagesFromStorage();
+if (_savedMessages.length > 0) {
+  // Fire-and-forget: archive is a background operation.
+  void saveChatSessionToHistory(_savedMessages);
+  localStorage.removeItem("fraud-chat-history");
+}
 
 // ── Core signals ──────────────────────────────────────────────────────────────
 // ...existing code...

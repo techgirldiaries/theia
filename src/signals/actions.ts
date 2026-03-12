@@ -7,9 +7,7 @@ import {
   saveChatSessionToHistory,
 } from "./storage";
 import {
-  agentMode,
   currentUserId,
-  interfaceMode,
   isAgentTyping,
   messages,
   performanceMetrics,

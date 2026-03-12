@@ -209,9 +209,14 @@ export function Footer() {
   useEffect(() => {
     if (input.current && input.current.value !== messageDraft.value) {
       input.current.value = messageDraft.value || "";
-      // Only handle the auto-resize, don't call full handleInput to avoid loops
-      input.current.style.height = "auto";
-      input.current.style.height = `${Math.min(input.current.scrollHeight, 400)}px`;
+      // Auto-resize for templates and restored drafts
+      if (messageDraft.value) {
+        input.current.style.height = "auto";
+        input.current.style.height = `${Math.min(input.current.scrollHeight, 400)}px`;
+      } else {
+        // Reset to single line when cleared
+        input.current.style.height = "24px";
+      }
     }
   }, [messageDraft.value]);
 
@@ -435,10 +440,7 @@ export function Footer() {
 
   const handleInput = useCallback(() => {
     if (input.current) {
-      // Auto-resize textarea
-      input.current.style.height = "auto";
-      input.current.style.height = `${Math.min(input.current.scrollHeight, 400)}px`;
-      // Save draft
+      // Save draft without auto-resizing
       messageDraft.value = input.current.value;
     }
   }, []);
@@ -475,8 +477,29 @@ export function Footer() {
         return;
       }
 
-      // Submit on Enter (without Shift), allow Shift+Enter for new lines
-      if (e.key === "Enter" && !e.shiftKey) {
+      // Expand textarea on Shift+Enter (Windows/Linux) or Cmd+Enter (macOS)
+      if (e.key === "Enter" && (e.shiftKey || e.metaKey)) {
+        e.preventDefault();
+        if (input.current) {
+          const start = input.current.selectionStart;
+          const end = input.current.selectionEnd;
+          const value = input.current.value;
+          const newValue = value.substring(0, start) + "\n" + value.substring(end);
+          input.current.value = newValue;
+          input.current.selectionStart = input.current.selectionEnd = start + 1;
+          
+          // Expand the textarea
+          input.current.style.height = "auto";
+          input.current.style.height = `${Math.min(input.current.scrollHeight, 400)}px`;
+          
+          // Save the draft
+          messageDraft.value = newValue;
+        }
+        return;
+      }
+
+      // Submit on Enter (without modifiers)
+      if (e.key === "Enter" && !e.shiftKey && !e.metaKey && !e.ctrlKey) {
         e.preventDefault();
         const form = input.current?.closest("form");
         if (form && !isAgentTyping.value && !isUploading) {
@@ -690,7 +713,7 @@ export function Footer() {
 
       if (input.current) {
         input.current.value = "";
-        input.current.style.height = "auto";
+        input.current.style.height = "24px"; // Reset to single line height
         input.current.focus();
         messageDraft.value = "";
       }
@@ -823,7 +846,7 @@ export function Footer() {
             </div>
           )}
           {/* Unified Input Bar */}
-          <div class="flex items-center gap-x-1 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-full px-2 py-1.5 shadow-sm hover:shadow-md transition-shadow relative">
+          <div class="flex items-center gap-x-2 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-2xl px-3 py-2 shadow-sm hover:shadow-md focus-within:border-indigo-400 dark:focus-within:border-indigo-500 focus-within:shadow-md transition-all duration-200 relative">
             <input
               ref={fileInput}
               type="file"
@@ -843,7 +866,7 @@ export function Footer() {
               disabled={isUploading || isAgentTyping.value}
             />
 
-            <div class="flex-1 relative px-2">
+            <div class="flex-1 relative">
               {/* Autocomplete Dropdown */}
               {showAutoComplete.value && autoCompleteSuggestions.length > 0 && (
                 <div class="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg overflow-hidden z-10">
@@ -869,6 +892,7 @@ export function Footer() {
                 </div>
               )}
 
+              {/* biome-ignore lint/style/noInlineStyles: Dynamic height adjustment requires inline styles */}
               <textarea
                 ref={input}
                 placeholder="Ask anything"
@@ -876,9 +900,10 @@ export function Footer() {
                 onInput={handleInput}
                 onKeyDown={handleKeyDown}
                 rows={1}
-                class="w-full bg-transparent border-none px-0 py-2 outline-none text-zinc-800 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed resize-none max-h-52 overflow-y-auto"
+                class="w-full bg-transparent border-none px-1 py-2.5 outline-none text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed resize-none max-h-100 overflow-y-auto leading-relaxed text-[15px]"
                 name="message"
                 maxLength={MAX_MESSAGE_LENGTH}
+                style="min-height: 24px; height: 24px;"
               />
 
               {/* Voice Recording Indicator */}
@@ -929,6 +954,18 @@ export function Footer() {
             >
               <SendHorizonal size={20} strokeWidth={1.5} />
             </button>
+          </div>
+          
+          {/* Keyboard Shortcut Hint */}
+          <div class="flex items-center justify-center gap-x-2 text-xs text-zinc-500 dark:text-zinc-400 px-2 pt-1">
+            <span>Press <kbd class="px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded text-xs font-mono">Enter</kbd> to send</span>
+            <span class="text-zinc-400 dark:text-zinc-600">•</span>
+            <span>
+              <kbd class="px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded text-xs font-mono">{navigator.platform.includes('Mac') ? 'Cmd' : 'Shift'}</kbd>
+              {' + '}
+              <kbd class="px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded text-xs font-mono">Enter</kbd>
+              {' for new line'}
+            </span>
           </div>
         </form>
       </div>

@@ -123,6 +123,20 @@ export function retryFailedMessage(messageId: string) {
   showToast("Retrying message...", "info");
 }
 
+export function editMessage(messageId: string, newText: string) {
+  const index = messages.value.findIndex((m) => m.id === messageId);
+  if (index === -1) return;
+
+  const updatedMessages = [...messages.value];
+  updatedMessages[index] = {
+    ...updatedMessages[index],
+    text: newText,
+  };
+  messages.value = updatedMessages;
+  showToast("Message updated", "success");
+  logAuditEntry("view", `Edited message: ${messageId}`);
+}
+
 export function markMessagesAsRead() {
   messages.value = messages.value.map((m) => ({ ...m, read: true }));
 }

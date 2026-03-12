@@ -23,17 +23,10 @@ import type {
 } from "./types";
 
 // ── Startup: archive previous session then start fresh ────────────────────────
-const _savedMessages = loadMessagesFromStorage();
-if (_savedMessages.length > 0) {
-  // Fire-and-forget: archive is a background operation.
-  void saveChatSessionToHistory(_savedMessages);
-  localStorage.removeItem("fraud-chat-history");
-}
+export const messages = signal<Message[]>(loadMessagesFromStorage());
 
 // ── Core signals ──────────────────────────────────────────────────────────────
-export const messages = signal<Message[]>(
-  _savedMessages.length > 0 ? _savedMessages : [],
-);
+// ...existing code...
 export const uploadedDatasets = signal<DatasetInfo[]>(
   loadDatasetsFromStorage(),
 );

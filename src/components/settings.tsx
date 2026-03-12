@@ -105,7 +105,7 @@ export function Settings() {
               </button>
             </div>
           </div>
-
+          // ...existing code...
           {/* Theme Settings */}
           <div class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg p-4 mb-4 transition-colors">
             <h3 class="text-lg font-semibold text-zinc-900 dark:text-white mb-4 flex items-center gap-2">
@@ -220,7 +220,6 @@ export function Settings() {
               </fieldset>
             </div>
           </div>
-
           {/* Privacy & Data */}
           <div class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg p-4 transition-colors">
             <h3 class="text-lg font-semibold text-zinc-900 dark:text-white mb-4">

@@ -30,9 +30,9 @@ import {
   showPerformanceDashboard,
   splitScreenMode,
 } from "@/signals/state";
+import { startNewChat } from "@/signals/actions";
 
 import { logAuditEntry } from "@/signals/actions";
-import { startNewChat } from "@/signals/actions";
 
 export function LeftSidebar() {
   const [isExpanded, setIsExpanded] = useState(false);

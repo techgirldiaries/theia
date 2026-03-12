@@ -116,27 +116,42 @@ export function endPerformanceTracking(
 
 // ── Messages ──────────────────────────────────────────────────────────────────
 
+/**
+ * Removes a failed message from the chat and triggers a retry.
+ * Only works for messages with 'failed' status.
+ */
 export function retryFailedMessage(messageId: string) {
   const msg = messages.value.find((m) => m.id === messageId);
   if (!msg || msg.status !== "failed") return;
+
+  // Remove the failed message; user can resend manually
   messages.value = messages.value.filter((m) => m.id !== messageId);
   showToast("Retrying message...", "info");
 }
 
+/**
+ * Updates the text content of an existing message.
+ * Useful when users need to correct typos or incomplete thoughts.
+ */
 export function editMessage(messageId: string, newText: string) {
   const index = messages.value.findIndex((m) => m.id === messageId);
   if (index === -1) return;
 
+  // Create a new array to trigger reactivity
   const updatedMessages = [...messages.value];
   updatedMessages[index] = {
     ...updatedMessages[index],
     text: newText,
   };
+
   messages.value = updatedMessages;
   showToast("Message updated", "success");
   logAuditEntry("view", `Edited message: ${messageId}`);
 }
 
+/**
+ * Marks all messages as read (used for notification management).
+ */
 export function markMessagesAsRead() {
   messages.value = messages.value.map((m) => ({ ...m, read: true }));
 }

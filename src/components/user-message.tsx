@@ -18,20 +18,30 @@ import {
   showToast,
 } from "@/signals";
 
+/**
+ * Parses simple markdown syntax in user messages.
+ * Supports: **bold**, *italic*, [links](url), and line breaks.
+ * HTML is escaped for security.
+ */
 function parseUserMarkdown(text: string): string {
   if (!text) return "";
+
+  // Escape HTML characters to prevent XSS
   let html = text
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
+
+  // Apply markdown formatting
   html = html
-    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-    .replace(/\*(.*?)\*/g, "<em>$1</em>")
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") // **bold**
+    .replace(/\*(.*?)\*/g, "<em>$1</em>") // *italic*
     .replace(
       /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,
       '<a href="$2" target="_blank" rel="noopener noreferrer" class="underline opacity-90 hover:opacity-100 break-all">$1</a>',
-    )
-    .replace(/\n/g, "<br>");
+    ) // [text](url)
+    .replace(/\n/g, "<br>"); // Line breaks
+
   return html;
 }
 
@@ -52,10 +62,12 @@ interface UserMessageProps {
 }
 
 export function UserMessage({ message }: UserMessageProps) {
+  // Component state
   const [copied, setCopied] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedText, setEditedText] = useState(message.text);
 
+  // Copy message text to clipboard
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(message.text);
@@ -67,15 +79,18 @@ export function UserMessage({ message }: UserMessageProps) {
     }
   };
 
+  // Retry sending a failed message
   const handleRetry = () => {
     retryFailedMessage(message.id);
   };
 
+  // Enter edit mode
   const handleEdit = () => {
     setIsEditing(true);
     setEditedText(message.text);
   };
 
+  // Save edited message
   const handleSaveEdit = () => {
     if (!editedText.trim()) {
       showToast("Message cannot be empty", "error");
@@ -85,11 +100,13 @@ export function UserMessage({ message }: UserMessageProps) {
     setIsEditing(false);
   };
 
+  // Cancel editing and revert to original text
   const handleCancelEdit = () => {
     setIsEditing(false);
     setEditedText(message.text);
   };
 
+  // Keyboard shortcuts for edit mode: Ctrl+Enter to save, Escape to cancel
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
@@ -118,6 +135,7 @@ export function UserMessage({ message }: UserMessageProps) {
         </Avatar.Root>
       </div>
       <div class="flex flex-col gap-y-1 items-end flex-1">
+        {/* Message header with timestamp and action buttons */}
         <div class="flex items-center justify-between w-full flex-row-reverse">
           <small class="flex gap-x-1.5 flex-row-reverse">
             <span class="text-zinc-700 dark:text-zinc-300">You</span>{" "}
@@ -132,7 +150,10 @@ export function UserMessage({ message }: UserMessageProps) {
               </span>
             )}
           </small>
+
+          {/* Action buttons: retry, edit, copy */}
           <div class="flex items-center gap-x-1">
+            {/* Show retry button only for failed messages */}
             {message.status === "failed" && (
               <button
                 onClick={handleRetry}
@@ -142,6 +163,8 @@ export function UserMessage({ message }: UserMessageProps) {
                 <RefreshCw size={14} class="text-red-600 dark:text-red-400" />
               </button>
             )}
+
+            {/* Show edit button only for sent messages (not during sending or editing) */}
             {message.status !== "sending" &&
               message.id !== "optimistic" &&
               !isEditing && (
@@ -153,6 +176,8 @@ export function UserMessage({ message }: UserMessageProps) {
                   <Pencil size={14} class="text-zinc-500 dark:text-zinc-400" />
                 </button>
               )}
+
+            {/* Copy button - always available */}
             <button
               onClick={handleCopy}
               class="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all"
@@ -166,8 +191,10 @@ export function UserMessage({ message }: UserMessageProps) {
             </button>
           </div>
         </div>
+        {/* Message content: either edit mode or display mode */}
         <div class="flex flex-col gap-y-2 items-end w-full">
           {isEditing ? (
+            // Edit mode: textarea with save/cancel buttons
             <div class="w-full max-w-full flex flex-col gap-y-2">
               <textarea
                 value={editedText}
@@ -197,6 +224,7 @@ export function UserMessage({ message }: UserMessageProps) {
               </div>
             </div>
           ) : (
+            // Display mode: rendered message with styling
             <div
               class={`relative py-2 px-4 rounded-3xl rounded-tr-xs max-w-full ${
                 message.status === "failed"
@@ -211,6 +239,7 @@ export function UserMessage({ message }: UserMessageProps) {
                   __html: parseUserMarkdown(message.text),
                 }}
               />
+              {/* Show error message for failed sends */}
               {message.status === "failed" && (
                 <div class="flex items-center gap-x-1 mt-1 text-xs text-red-200">
                   <AlertCircle size={12} />
@@ -219,6 +248,8 @@ export function UserMessage({ message }: UserMessageProps) {
               )}
             </div>
           )}
+
+          {/* Display file attachments if present */}
           {message.attachments && message.attachments.length > 0 && (
             <div class="flex flex-col gap-y-1">
               {message.attachments.map((attachment) => (

@@ -6,38 +6,6 @@ import type {
   PerformanceMetric,
 } from "./types";
 
-const MAX_STORED_DATASET_PREVIEW_CHARACTERS = 2_500;
-
-function clampStoredDatasetPreview(preview?: string): string | undefined {
-  if (!preview) return undefined;
-  if (preview.length <= MAX_STORED_DATASET_PREVIEW_CHARACTERS) {
-    return preview;
-  }
-  return `${preview.slice(0, MAX_STORED_DATASET_PREVIEW_CHARACTERS).trimEnd()}\n...`;
-}
-
-function serializeDataset(dataset: DatasetInfo) {
-  const preview = clampStoredDatasetPreview(dataset.preview);
-
-  return {
-    ...dataset,
-    preview,
-    previewFormat: preview ? dataset.previewFormat : undefined,
-    uploadedAt: dataset.uploadedAt.toISOString(),
-  };
-}
-
-function deserializeDataset(dataset: any): DatasetInfo {
-  const preview = clampStoredDatasetPreview(dataset.preview);
-
-  return {
-    ...dataset,
-    preview,
-    previewFormat: preview ? dataset.previewFormat : undefined,
-    uploadedAt: new Date(dataset.uploadedAt),
-  };
-}
-
 // ── AES-GCM Encryption ────────────────────────────────────────────────────────
 
 const PBKDF2_ITERATIONS = 100_000;

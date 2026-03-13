@@ -2,9 +2,7 @@
 
 ## Multi-Agent RAG (MARAG) Financial Fraud Detection System
 
-A production-ready fraud intelligence platform using 5 specialised multi-agent with collaborative retrieval-augmented generation (MARAG). Features a 15-phase detection pipeline, multi-dataset benchmarking and comprehensive visualisation system.
-
----
+A production-ready fraud intelligence platform using 5 specialised multi-agents with collaborative retrieval-augmented generation (MARAG). Features a 15-phase detection pipeline, multi-dataset benchmarking and comprehensive visualisation system.
 
 ## Project Overview
 
@@ -85,9 +83,7 @@ Agents reach agreement through weighted voting, where each agent's contribution 
 - **AI Platform:** Relevance AI SDK
 - **Multi-Agent:** Workforce orchestration
 - **RAG:** Retrieval-augmented generation
-- **Datasets:** Credit card, PaySim, MomTSim fraud data
-
----
+- **Datasets:** Credit card, PaySim, MomtSim fraud data (Kaggle)
 
 ## Project Structure
 
@@ -150,12 +146,34 @@ cd theia
 npm install
 ```
 
-3. **Verify environment**
+This installs all production and development dependencies defined in `package.json`, including Preact, Tailwind CSS 4.x, Radix UI, Lucide, Vitest and the Relevance AI SDK.
 
-   - `.env` file is included for assessment purposes
-   - Contains Relevance AI API credentials
+### 3. Configure Environment Variables
 
-### Development
+Create a `.env` file in the project root (or populate the existing one):
+
+```bash
+# Copy the example template (if provided)
+cp .env.example .env
+```
+
+Then open `.env` and fill in your Relevance AI credentials:
+
+```env
+# Relevance AI region (e.g. "us-east-1" or "au-east-1")
+VITE_REGION=your-region
+
+# Your Relevance AI project ID
+VITE_PROJECT_ID=your-project-id
+
+# The MARAG Workforce / Agent ID to invoke
+VITE_WORKFORCE_ID=your-workforce-id
+
+```
+
+> **Note for assessment:** A pre-configured `.env` file with working credentials is included in the submission zip file. No manual setup is required to evaluate the system.
+
+### 4. Start the Development Server
 
 ```bash
 npm run dev
@@ -163,9 +181,22 @@ npm run dev
 
 Vite will start a local server. Open your browser to:
 
-```sh
+```
 http://localhost:5173
 ```
+
+The app hot-reloads automatically on any file change — no restart needed.
+
+### 5. Verify the System is Running
+
+Once the browser loads, confirm:
+
+- [ ] The THEIA header and chat interface are visible
+- [ ] The MARAG status panel shows 5 agents (TIRA, RCRA, HPRA, ERRA, BARA)
+- [ ] Typing a message triggers the 15-phase pipeline
+- [ ] The connection status indicator shows **Connected**
+
+If agents fail to respond, double-check your `.env` credentials and ensure the project is active.
 
 The app hot-reloads automatically on any file change — no restart needed.
 
@@ -219,44 +250,39 @@ npm run preview
 npx tsc --noEmit
 ```
 
----
+The project uses TypeScript strict mode. All type errors must be resolved before building.
 
-## Documentation
+### Linting & Formatting
 
-### For Quick Start
+```bash
+# Check for lint errors and formatting issues
+npx biome check .
 
-- **[README.md](README.md)** - This file
-- **[PROJECT_AUDIT.md](PROJECT_AUDIT.md)** - Submission readiness report
-- **[COMPONENT_INVENTORY.md](COMPONENT_INVENTORY.md)** - All 48 components
+# Auto-fix safe issues
+npx biome check --write .
+```
 
-### For Implementation Details
+Biome is configured via `biome.json` and replaces both ESLint and Prettier.
 
-- **[THEIA_UI_UPDATE_REQUIREMENTS.md](docs/THEIA_UI_UPDATE_REQUIREMENTS.md)** - Complete requirements (1,194 lines)
-- **[MARAG_INTEGRATION_GUIDE.md](docs/MARAG_INTEGRATION_GUIDE.md)** - MARAG system guide (537 lines)
-- **[IMPLEMENTATION_GUIDE.md](docs/IMPLEMENTATION_GUIDE.md)** - Step-by-step implementation
+### Troubleshooting
 
-### For Testing & Evaluation
-
-- **[PERFORMANCE_EVALUATION.md](docs/PERFORMANCE_EVALUATION.md)** - Performance analysis (525 lines)
-- **[EVALUATION_SUMMARY.md](docs/EVALUATION_SUMMARY.md)** - Quick metrics (220 lines)
-- **[RESPONSIVE_IMPLEMENTATION.md](docs/RESPONSIVE_IMPLEMENTATION.md)** - Responsive design (291 lines)
-
-### For Next Steps
-
-- **[NEXT_STEPS.md](NEXT_STEPS.md)** - Backend integration guide
-- **[OPTIONAL_ENHANCEMENTS.md](OPTIONAL_ENHANCEMENTS.md)** - Future features
-
----
+| Problem                      | Likely Cause                    | Fix                                                             |
+| ---------------------------- | ------------------------------- | --------------------------------------------------------------- |
+| `npm install` fails          | Node.js version too old         | Upgrade to Node.js 18+                                          |
+| Blank page on `npm run dev`  | `.env` missing or malformed     | Re-check all three `VITE_*` variables                            |
+| Agents not responding        | Invalid API key or region       | Verify credentials in Relevance AI dashboard                    |
+| TypeScript errors on install | Stale `node_modules`            | Delete `node_modules/` and re-run `npm install`                 |
+| Port 5173 already in use     | Another Vite dev server running | Kill the other process or run `npm run dev -- --port 5174`      |
+| `crypto` shim errors         | Node version mismatch           | Ensure Node.js 18+ and clear Vite cache with `npx vite --force` |
 
 ## Configuration
 
 ### Environment Variables
 
 ```env
-VITE_RELEVANCE_REGION=...
-VITE_RELEVANCE_PROJECT_ID=...
-VITE_AGENT_ID=...
-VITE_CLIENT_KEY=...
+VITE_REGION=...
+VITE_PROJECT_ID=...
+VITE_WORKFORCE_ID=...
 ```
 
 ### TypeScript Configuration
@@ -316,9 +342,7 @@ VITE_CLIENT_KEY=...
 **Minor:** 3 gaps (all academically justified and documented)  
 **Blockers:** None
 
-All limitations are academically justified, well-documented, and represent common industry constraints rather than implementation failures.
-
----
+All limitations are academically justified, well-documented and represent common industry constraints rather than implementation failures.
 
 ## Future Enhancements
 
@@ -356,36 +380,4 @@ See [LICENSE.md](LICENSE.md) for details
 - **Relevance AI** - Multi-agent workforce platform
 - **Preact Team** - Lightweight React alternative
 - **Radix UI** - Accessible component primitives
-- **Datasets:** Credit card fraud (Kaggle), PaySim, MomtSim
-
----
-
-## Submission Checklist
-
-- [x] All 48 components implemented
-- [x] 249 lines of type definitions
-- [x] 485+ lines of tests
-- [x] 3,000+ lines of documentation
-- [x] Responsive design (mobile/tablet/desktop)
-- [x] MARAG system (5 agents)
-- [x] 15-phase pipeline
-- [x] Benchmarking system
-- [x] visualisation gallery
-- [x] Performance evaluation
-- [x] Known limitations documented
-- [x] Future work identified
-- [x] Project audit complete
-
----
-
-````text
-│ ├── risk-badge.tsx
-│ └── ...
-├── prompt/ # AI agent configurations
-└── shims/ # Polyfills and compatibility layers
-
-```text
-shims/
- # Polyfills and compatibility layers
-
-````
+- **Datasets:** Credit card fraud, PaySim, MomtSim (Kaggle)

@@ -31,7 +31,7 @@ if (_savedMessages.length > 0) {
 }
 
 // ── Core signals ──────────────────────────────────────────────────────────────
-// ...existing code...
+export const messages = signal<Message[]>([]);
 export const uploadedDatasets = signal<DatasetInfo[]>(
   loadDatasetsFromStorage(),
 );

@@ -50,6 +50,24 @@ const ALLOWED_MIME_TYPES = new Set([
 ]);
 const ALLOWED_EXTENSIONS = /\.(csv|json|txt|log|tsv)$/i;
 const SUBMIT_COOLDOWN_MS = 2_000;
+const MAX_PREVIEW_READ_BYTES = 256 * 1024; // 256 KB
+const MAX_PREVIEW_LINES = 50;
+
+function trimPreviewText(
+  text: string,
+  maxLines: number,
+): { preview: string; wasTrimmed: boolean } {
+  const lines = text.split("\n");
+  if (lines.length <= maxLines) return { preview: text, wasTrimmed: false };
+  return { preview: lines.slice(0, maxLines).join("\n"), wasTrimmed: true };
+}
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
+}
 
 export function Footer() {
   const input = useRef<HTMLTextAreaElement>(null);
@@ -250,18 +268,6 @@ export function Footer() {
     },
     [validateFile],
   );
-
-  // Helper to read CSV preview (first 5 rows)
-  const readCSVPreview = async (file: File): Promise<string> => {
-    try {
-      const text = await file.text();
-      const lines = text.split("\n").slice(0, 6); // Header + 5 rows
-      return lines.join("\n");
-    } catch (error) {
-      console.error("Failed to read CSV preview:", error);
-      return "";
-    }
-  };
 
   const readFileSlice = useCallback(
     async (
@@ -533,16 +539,8 @@ export function Footer() {
         return;
       }
 
-      // Enforce message length cap
-      if ((message?.length ?? 0) > MAX_MESSAGE_LENGTH) {
-        showToast(
-          `Message exceeds the ${MAX_MESSAGE_LENGTH.toLocaleString()} character limit.`,
-          "error",
-        );
-        return;
-      }
-
       // Upload files first if any are selected
+      let messageText = message?.trim() || "";
       let uploadedAttachments: Attachment[] = [];
       const fileDetailsWithPreviews: string[] = [];
 

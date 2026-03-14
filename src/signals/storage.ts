@@ -263,6 +263,20 @@ export async function persistSessions(sessions: ChatSession[]): Promise<void> {
 
 // ── Datasets ──────────────────────────────────────────────────────────────────
 
+function serializeDataset(d: DatasetInfo) {
+  return {
+    ...d,
+    uploadedAt: d.uploadedAt.toISOString(),
+  };
+}
+
+function deserializeDataset(d: any): DatasetInfo {
+  return {
+    ...d,
+    uploadedAt: new Date(d.uploadedAt),
+  };
+}
+
 export function saveDatasetsToStorage(datasets: DatasetInfo[]) {
   try {
     localStorage.setItem(

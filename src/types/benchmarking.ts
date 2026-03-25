@@ -3,11 +3,25 @@
  * Theia Fraud Intelligence
  */
 
+export interface ConfusionMatrixValues {
+  tp: number;
+  fp: number;
+  fn: number;
+  tn: number;
+}
+
+export interface RocPoint {
+  fpr: number; // false positive rate (x-axis)
+  tpr: number; // true positive rate (y-axis)
+}
+
 export interface DatasetMetrics {
   precision: number;
   recall: number;
   f1_score: number;
   auc_roc: number;
+  confusion_matrix?: ConfusionMatrixValues;
+  roc_curve?: RocPoint[];
 }
 
 export interface StatisticalTest {

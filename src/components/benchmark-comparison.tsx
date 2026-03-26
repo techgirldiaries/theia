@@ -1,5 +1,4 @@
 import { useState } from "preact/hooks";
-import { signal } from "@preact/signals";
 import {
   BarChart3,
   TrendingUp,
@@ -44,8 +43,50 @@ export interface BenchmarkResults {
   recommendations: string[];
 }
 
-export const benchmarkResults = signal<BenchmarkResults | null>(null);
-export const showBenchmarkPanel = signal(false);
+// Signals imported from central state — populated by effects.ts in real-time
+import {
+  benchmarkResults,
+  evaluationStreamState,
+  showBenchmarkPanel,
+} from "@/signals";
+
+// Re-export for consumers that used the old local signal
+export { benchmarkResults, showBenchmarkPanel };
+
+// ── Real-time stream indicator ────────────────────────────────────────────────
+function EvaluationStreamIndicator() {
+  const state = evaluationStreamState.value;
+  const { isStreaming, lastParsedAt } = state;
+
+  if (!lastParsedAt && !isStreaming) {
+    return (
+      <span class="flex items-center gap-1 px-2 py-1 bg-zinc-100 dark:bg-zinc-700 text-zinc-500 dark:text-zinc-400 text-xs rounded-full">
+        <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 inline-block" />
+        No live data
+      </span>
+    );
+  }
+
+  if (isStreaming) {
+    return (
+      <span class="flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs rounded-full">
+        <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse inline-block" />
+        Streaming…
+      </span>
+    );
+  }
+
+  const secondsAgo = lastParsedAt
+    ? Math.round((Date.now() - lastParsedAt.getTime()) / 1000)
+    : null;
+
+  return (
+    <span class="flex items-center gap-1 px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs rounded-full">
+      <span class="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />
+      Live{secondsAgo !== null ? ` · ${secondsAgo}s ago` : ""}
+    </span>
+  );
+}
 
 interface BenchmarkComparisonProps {
   results?: BenchmarkResults;
@@ -134,9 +175,12 @@ export function BenchmarkComparison({
             Multi-Dataset Performance Benchmarking
           </h3>
         </div>
-        <span className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-sm font-medium rounded-full">
-          {results.datasetsAnalyzed.length} datasets
-        </span>
+        <div class="flex items-center gap-2">
+          <EvaluationStreamIndicator />
+          <span className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-sm font-medium rounded-full">
+            {results.datasetsAnalyzed.length} datasets
+          </span>
+        </div>
       </div>
 
       {/* Metric Selector */}

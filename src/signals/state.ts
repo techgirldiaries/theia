@@ -21,6 +21,13 @@ import type {
   ToastMessage,
   Visualization,
 } from "./types";
+import type {
+  EvaluationStreamState,
+  LiveCaseProgress,
+  PerDatasetEvaluation,
+  QualitativeEvaluation,
+} from "@/types/evaluation";
+import type { EnhancedFraudReport } from "@/types/fraud-report";
 
 // ── Startup: archive previous session then start fresh ────────────────────────
 const _savedMessages = loadMessagesFromStorage();
@@ -102,7 +109,7 @@ export const interfaceMode = signal<InterfaceMode>(
   (localStorage.getItem("interfaceMode") as InterfaceMode) || "balanced",
 );
 
-// ── MARAG, Visualization, Benchmark ──────────────────────────────────────────
+// ── MARAG, Visualisation, Benchmark ──────────────────────────────────────────
 export const maragAgents = signal<MARAGAgent[]>([]);
 export const maragConsensus = signal<MARAGConsensus | null>(null);
 export const showMARAGPanel = signal(false);
@@ -111,6 +118,23 @@ export const showVisualizationGallery = signal(false);
 export const selectedVisualization = signal<Visualization | null>(null);
 export const benchmarkResults = signal<BenchmarkResults | null>(null);
 export const showBenchmarkPanel = signal(false);
+
+// ── Evaluation signals ────────────────────────────────────────────────────────
+/** The fully parsed report from the most recent completed task */
+export const latestEnhancedReport = signal<EnhancedFraudReport | null>(null);
+/** Qualitative evaluation derived from latestEnhancedReport */
+export const qualitativeEvaluation = signal<QualitativeEvaluation | null>(null);
+/** Per-dataset qualitative evaluations keyed by dataset name — same pipeline, every dataset */
+export const perDatasetEvaluations = signal<Record<string, PerDatasetEvaluation> | null>(null);
+/** Live phase progress translated from phase_results in the latest report */
+export const liveCaseProgress = signal<LiveCaseProgress | null>(null);
+/** Metadata about the streaming / parse lifecycle */
+export const evaluationStreamState = signal<EvaluationStreamState>({
+  lastParsedAt: null,
+  successfulParseCount: 0,
+  lastParseError: null,
+  isStreaming: false,
+});
 
 // ── Computed ──────────────────────────────────────────────────────────────────
 export const agentName = computed(
@@ -130,37 +154,16 @@ export const fraudStats = computed<FraudStats>(() => {
   const metrics = performanceMetrics.value.filter((m) => m.endTime);
   const totalAnalyzed = metrics.length;
 
-  if (totalAnalyzed === 0) {
-    return {
-      totalAnalyzed: 0,
-      highRisk: 0,
-      mediumRisk: 0,
-      lowRisk: 0,
-      avgResponseTime: 0,
-      successRate: 0,
-    };
-  }
-
-  const highRisk = metrics.filter((m) => (m.riskScore ?? 0) >= 70).length;
-  const mediumRisk = metrics.filter(
-    (m) => (m.riskScore ?? 0) >= 45 && (m.riskScore ?? 0) < 70,
-  ).length;
-  const lowRisk = metrics.filter((m) => (m.riskScore ?? 0) < 45).length;
-  const avgResponseTime =
-    metrics.reduce((sum, m) => sum + (m.duration ?? 0), 0) / totalAnalyzed;
-  const successRate =
-    (metrics.filter((m) => m.status === "complete" || m.status === "success")
-      .length /
-      totalAnalyzed) *
-    100;
+  if (totalAnalyzed === 0)
+    return { totalAnalyzed: 0, highRisk: 0, mediumRisk: 0, lowRisk: 0, avgResponseTime: 0, successRate: 0 };
 
   return {
     totalAnalyzed,
-    highRisk,
-    mediumRisk,
-    lowRisk,
-    avgResponseTime,
-    successRate,
+    highRisk: metrics.filter((m) => (m.riskScore ?? 0) >= 70).length,
+    mediumRisk: metrics.filter((m) => (m.riskScore ?? 0) >= 45 && (m.riskScore ?? 0) < 70).length,
+    lowRisk: metrics.filter((m) => (m.riskScore ?? 0) < 45).length,
+    avgResponseTime: metrics.reduce((sum, m) => sum + (m.duration ?? 0), 0) / totalAnalyzed,
+    successRate: (metrics.filter((m) => m.status === "complete" || m.status === "success").length / totalAnalyzed) * 100,
   };
 });
 
@@ -175,7 +178,7 @@ export const fraudAnalysisTerms = [
   "identity verification",
   "account takeover detection",
   "payment fraud screening",
-  "behavioral analysis",
+  "behavioural analysis",
   "velocity checks",
   "device fingerprinting",
   "geolocation analysis",
@@ -186,16 +189,16 @@ export const fraudAnalysisTerms = [
 export const quickTemplates = signal<QuickTemplate[]>([
   {
     id: "1",
-    title: "Analyze for Anomalies",
+    title: "Analyse for Anomalies",
     prompt:
-      "Please analyze the uploaded dataset for anomalies, unusual patterns, and potential fraud indicators. Provide a detailed risk assessment.",
+      "Please analyse the uploaded dataset for anomalies, unusual patterns and potential fraud indicators. Provide a detailed risk assessment.",
     category: "analysis",
   },
   {
     id: "2",
     title: "Generate Fraud Report",
     prompt:
-      "Generate a comprehensive fraud report based on the data, including risk scores, fraud patterns, and recommendations.",
+      "Generate a comprehensive fraud report based on the data, including risk scores, fraud patterns and recommendations.",
     category: "report",
   },
   {
@@ -209,49 +212,49 @@ export const quickTemplates = signal<QuickTemplate[]>([
     id: "4",
     title: "Deep Investigation",
     prompt:
-      "Conduct a deep investigation into suspicious activities, trace transaction patterns, and identify potential fraud networks.",
+      "Conduct a deep investigation into suspicious activities, trace transaction patterns and identify potential fraud networks.",
     category: "investigation",
   },
   {
     id: "5",
     title: "Evaluate Performance",
     prompt:
-      "Evaluate the fraud detection performance metrics including accuracy, false positives, false negatives, and provide optimization recommendations.",
+      "Evaluate the fraud detection performance metrics including accuracy, false positives, false negatives and provide optimization recommendations.",
     category: "analysis",
   },
   {
     id: "6",
     title: "Compare Datasets",
     prompt:
-      "Compare the uploaded datasets and identify differences in fraud patterns, transaction volumes, and risk profiles between them.",
+      "Compare the uploaded datasets and identify differences in fraud patterns, transaction volumes and risk profiles between them.",
     category: "analysis",
   },
   {
     id: "7",
     title: "Identify Trends",
     prompt:
-      "Analyze temporal trends in the fraud data, identify seasonal patterns, emerging fraud types, and predict future risks.",
+      "Analyse temporal trends in the fraud data, identify seasonal patterns, emerging fraud types and predict future risks.",
     category: "analysis",
   },
   {
     id: "8",
     title: "Compliance Check",
     prompt:
-      "Review the transactions for compliance with AML/KYC regulations, flag suspicious transactions, and generate compliance reports.",
+      "Review the transactions for compliance with AML/KYC regulations, flag suspicious transactions and generate compliance reports.",
     category: "report",
   },
   {
     id: "9",
     title: "Customer Segmentation",
     prompt:
-      "Segment customers based on transaction behavior, risk profiles, and fraud likelihood. Provide detailed profiles for each segment.",
+      "Segment customers based on transaction behaviour, risk profiles and fraud likelihood. Provide detailed profiles for each segment.",
     category: "analysis",
   },
   {
     id: "10",
     title: "Network Analysis",
     prompt:
-      "Perform network analysis to identify fraud rings, connected suspicious accounts, and money laundering schemes.",
+      "Perform network analysis to identify fraud rings, connected suspicious accounts and money laundering schemes.",
     category: "investigation",
   },
 ]);

@@ -2,7 +2,7 @@
 
 PolyForm Noncommercial License 1.0.0
 
-Copyright (c) 2025 Oluwakemi Obadeyi
+Copyright (c) 2026 Oluwakemi Obadeyi
 
 This project is licensed under the PolyForm Noncommercial License.
 

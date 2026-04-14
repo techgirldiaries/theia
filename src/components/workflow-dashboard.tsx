@@ -15,7 +15,7 @@ import {
   ImageIcon,
   TrendingUp,
 } from "lucide-react";
-import { PhasePipeline } from "./phase-pipeline";
+import { LivePhasePipeline, PhasePipeline } from "./phase-pipeline";
 import { RealTimeStatusTracker } from "./real-time-status-tracker";
 import { EnhancedCaseManagement } from "./enhanced-case-management";
 import { AdvancedErrorRecovery } from "./advanced-error-recovery";
@@ -24,6 +24,7 @@ import { FraudDatasetManager } from "./fraud-dataset-manager";
 import { MARAGStatusPanel } from "./marag-status-panel";
 import { VisualizationGallery } from "./visualisation-gallery";
 import { BenchmarkComparison } from "./benchmark-comparison";
+import { EvaluationDashboard } from "./evaluation-dashboard";
 
 // Signal for managing active workflows
 export const activeWorkflowView = signal<string | null>(null);
@@ -63,8 +64,8 @@ export function WorkflowDashboard({
       label: "Phase Pipeline",
       icon: GitBranch,
       component: (
-        <PhasePipeline
-          caseProgress={caseProgress}
+        <LivePhasePipeline
+          fallbackCaseProgress={caseProgress}
           showDetails={!compact}
           compact={compact}
         />
@@ -99,6 +100,12 @@ export function WorkflowDashboard({
       label: "Benchmarking",
       icon: TrendingUp,
       component: <BenchmarkComparison compact={compact} />,
+    },
+    {
+      id: "evaluation",
+      label: "Evaluation",
+      icon: BarChart3,
+      component: <EvaluationDashboard compact={compact} />,
     },
     {
       id: "cases",

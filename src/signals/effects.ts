@@ -7,26 +7,45 @@ import {
   saveMessagesToStorage,
   saveMetricsToStorage,
 } from "./storage";
-import { endPerformanceTracking, showToast } from "./actions";
+import {
+  derivePerDatasetEvaluations,
+  deriveQualitativeEvaluation,
+  endPerformanceTracking,
+  showToast,
+} from "./actions";
 import {
   agent,
   agentMode,
+  benchmarkResults,
   client,
   compactView,
   connectionRetryCount,
+  evaluationStreamState,
   isDarkMode,
   isAgentTyping,
   isInitialized,
+  latestEnhancedReport,
+  liveCaseProgress,
   loadingError,
+  maragConsensus,
   messageDraft,
   messages,
   performanceMetrics,
+  perDatasetEvaluations,
+  qualitativeEvaluation,
   showScrollToBottom,
   task,
   taskStatus,
   uploadedDatasets,
   workforce,
 } from "./state";
+import {
+  hasBenchmarkingData,
+  hasMaragData,
+  isEnhancedFraudReport,
+  parseEnhancedFraudReport,
+} from "@/utils/parse-fraud-report";
+import type { LivePhaseStatus } from "@/types/evaluation";
 
 // ── Dark mode ─────────────────────────────────────────────────────────────────
 effect(() => {
@@ -38,7 +57,7 @@ effect(() => {
   }
 });
 
-// ── Message persistence + auto-scroll ────────────────────────────────────────
+// ── Message persistence and auto-scroll ────────────────────────────────────────
 effect(() => {
   if (messages.value.length > 0) {
     saveMessagesToStorage(messages.value);
@@ -56,7 +75,7 @@ effect(() => {
   }
 });
 
-// ── Auto-save session on tab/window close ───────────────────────────────────
+// ── Auto-save session on tab or window close ───────────────────────────────────
 if (typeof window !== "undefined") {
   window.addEventListener("beforeunload", () => {
     if (messages.value.length > 0) {
@@ -98,7 +117,7 @@ if (typeof window !== "undefined") {
   if (savedDraft) messageDraft.value = savedDraft;
 }
 
-// ── Dataset + metrics persistence ────────────────────────────────────────────
+// ── Dataset and metrics persistence ────────────────────────────────────────────
 effect(() => {
   if (uploadedDatasets.value.length > 0) {
     saveDatasetsToStorage(uploadedDatasets.value);
@@ -299,6 +318,154 @@ effect(() => {
         isAgentTyping.value = false;
       }
     }
+
+    // ── Enhanced report extraction ───────────────────────────────────────────
+    // Run after the messages array is updated so UI reflects streaming text
+    // while we attempt to parse the full JSON payload in the background.
+    if (message.type === "agent-message" || message.isAgent?.()) {
+      const text: string = message.text ?? "";
+
+      // Fast guard — avoids expensive JSON.parse on every intermediate chunk
+      if (isEnhancedFraudReport(text)) {
+        evaluationStreamState.value = {
+          ...evaluationStreamState.value,
+          isStreaming: true,
+          lastParseError: null,
+        };
+
+        const report = parseEnhancedFraudReport(text);
+
+        if (report) {
+          // 1. Persist the raw report
+          latestEnhancedReport.value = report;
+
+          // 2. Populate benchmarkResults signal (snake_case → camelCase adapter)
+          if (hasBenchmarkingData(report)) {
+            const br  = report.benchmarking_results!;
+            const dc  = br.dataset_comparison;
+            const pm: Record<string, any> = {};
+            const pt: Record<string, string> = {};
+            const qs: Record<string, number> = {};
+            for (const [ds, m] of Object.entries(dc.performance_metrics)) {
+              pm[ds] = {
+                precision: m.precision,
+                recall:    m.recall,
+                f1Score:   m.f1_score,
+                aucRoc:    m.auc_roc,
+              };
+            }
+            for (const [ds, t] of Object.entries(dc.processing_time_comparison)) {
+              pt[ds] = t;
+            }
+            for (const [ds, s] of Object.entries(dc.data_quality_scores)) {
+              qs[ds] = s;
+            }
+            benchmarkResults.value = {
+              datasetsAnalyzed:      dc.datasets_analyzed,
+              performanceMetrics:    pm,
+              processingTimes:       pt,
+              qualityScores:         qs,
+              statisticalSignificance: Object.entries(
+                br.statistical_significance?.accuracy_differences ?? {},
+              ).map(([comparison, d]) => ({
+                comparison,
+                pValue:      d.p_value,
+                significant: d.significant,
+                effectSize:  d.effect_size,
+              })),
+              bestPerformingDataset: br.best_performing_dataset,
+              recommendations:       br.recommendations,
+            };
+          }
+
+          // 3. Populate maragConsensus signal
+          if (hasMaragData(report)) {
+            const ac = report.marag_results!.agent_consensus;
+            maragConsensus.value = {
+              consensusScore: ac.consensus_score,
+              agentScores:    ac.agent_confidence_scores as Record<string, number>,
+              correlations:   Object.entries(
+                ac.evidence_triangulation.cross_agent_correlations,
+              ).map(([key, strength]) => {
+                const agents = key.split("_");
+                return { agents, finding: key, strength: strength as number };
+              }),
+              conflicts: ac.evidence_triangulation.conflict_resolution
+                ? [
+                    {
+                      agents: [],
+                      issue: `${ac.evidence_triangulation.conflict_resolution.conflicts_detected} conflict(s) via ${ac.evidence_triangulation.conflict_resolution.resolution_method}`,
+                    },
+                  ]
+                : [],
+              finalScore:        ac.collaborative_risk_assessment.weighted_final_score,
+              uncertaintySources:
+                ac.collaborative_risk_assessment.uncertainty_quantification
+                  .uncertainty_sources,
+            };
+          }
+
+          // 4. Populate liveCaseProgress from phase_results
+          const phaseResults = report.phase_results;
+          if (phaseResults && Object.keys(phaseResults).length > 0) {
+            const livePhases: Record<string, LivePhaseStatus> = {};
+            let completedCount = 0;
+            let currentPhase   = Object.keys(phaseResults)[0] ?? "phase-0";
+
+            for (const [key, pr] of Object.entries(phaseResults)) {
+              const status: LivePhaseStatus["status"] =
+                pr.status === "completed" ? "completed"
+                : pr.status === "failed"  ? "failed"
+                : pr.status === "skipped" ? "skipped"
+                : "pending";
+              if (status === "completed") completedCount++;
+              else if (status !== "failed" && status !== "skipped") currentPhase = key;
+              livePhases[key] = {
+                phaseId:   key,
+                status,
+                progress:  status === "completed" ? 100 : status === "failed" ? 0 : 50,
+                duration:  pr.duration,
+                confidence: pr.confidence !== undefined ? pr.confidence * 100 : undefined,
+                riskScore: pr.risk_score,
+                toolsUsed: pr.tools_used,
+              };
+            }
+            liveCaseProgress.value = {
+              caseId:          report.case_id,
+              overallProgress: Math.round(
+                (completedCount / Object.keys(phaseResults).length) * 100,
+              ),
+              currentPhase,
+              phases:      livePhases,
+              completedAt:
+                completedCount === Object.keys(phaseResults).length
+                  ? new Date()
+                  : null,
+            };
+          }
+
+          // 5. Derive qualitative evaluation (aggregate + per-dataset)
+          qualitativeEvaluation.value  = deriveQualitativeEvaluation(report);
+          perDatasetEvaluations.value  = derivePerDatasetEvaluations(report);
+
+          // 6. Update stream state
+          evaluationStreamState.value = {
+            isStreaming:          false,
+            lastParsedAt:         new Date(),
+            successfulParseCount: evaluationStreamState.value.successfulParseCount + 1,
+            lastParseError:       null,
+          };
+        } else {
+          // JSON is partial / still streaming — mark as streaming, not failed
+          evaluationStreamState.value = {
+            ...evaluationStreamState.value,
+            isStreaming:    true,
+            lastParseError: "Partial JSON (streaming in progress)",
+          };
+        }
+      }
+    }
+    // ── End enhanced report extraction ───────────────────────────────────────
   });
 
   return () => {

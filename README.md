@@ -2,7 +2,7 @@
 
 ## Multi-Agent RAG (MARAG) Financial Fraud Detection System
 
-A production-ready fraud intelligence platform using 5 specialised multi-agents with collaborative retrieval-augmented generation (MARAG). Features a 15-phase detection pipeline, multi-dataset benchmarking and comprehensive visualisation system.
+A production-ready fraud intelligence application using 5 specialised multi-agent collaboration and retrieval-augmented generation (MARAG). Features a 15-phase detection pipeline, multi-dataset benchmarking and comprehensive visualisation system.
 
 ## Project Overview
 
@@ -16,7 +16,7 @@ THEIA is an advanced fraud detection system that combines:
 
 ### Key Innovation: MARAG Architecture
 
-Unlike traditional single-agent systems, THEIA uses 5 specialised agents that work together by cross-checking evidence from multiple sources. Each agent retrieves relevant information and adds its own analysis (Retrieval-Augmented Generation or RAG):
+Unlike traditional single-agent systems, THEIA uses five specialised agents that work together by cross-checking evidence from multiple sources. Each agent retrieves relevant information and adds its own analysis using Retrieval-Augmented Generation (RAG):
 
 1. **TIRA** - Threat Intelligence Retrieval Agent (Red `#EF4444`)
 2. **RCRA** - Regulatory Compliance Retrieval Agent (Blue `#3B82F6`)
@@ -269,7 +269,7 @@ Biome is configured via `biome.json` and replaces both ESLint and Prettier.
 | Problem                      | Likely Cause                    | Fix                                                             |
 | ---------------------------- | ------------------------------- | --------------------------------------------------------------- |
 | `npm install` fails          | Node.js version too old         | Upgrade to Node.js 18+                                          |
-| Blank page on `npm run dev`  | `.env` missing or malformed     | Re-check all three `VITE_*` variables                            |
+| Blank page on `npm run dev`  | `.env` missing or malformed     | Re-check all three `VITE_*` variables                           |
 | Agents not responding        | Invalid API key or region       | Verify credentials in Relevance AI dashboard                    |
 | TypeScript errors on install | Stale `node_modules`            | Delete `node_modules/` and re-run `npm install`                 |
 | Port 5173 already in use     | Another Vite dev server running | Kill the other process or run `npm run dev -- --port 5174`      |

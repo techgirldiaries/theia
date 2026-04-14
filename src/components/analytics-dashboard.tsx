@@ -8,7 +8,6 @@ import {
   TrendingUp,
   X,
 } from "lucide-react";
-// ...existing code...
 import { BarChart } from "@/components/bar-chart";
 import { LineChart } from "@/components/line-chart";
 import { StatsCard } from "@/components/stats-card";

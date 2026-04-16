@@ -16,9 +16,16 @@ Required for deployment (set in CI/CD or server):
 ```env
 VITE_REGION=your-region
 VITE_PROJECT=your-project-id
-VITE_AGENT_ID=your-agent-id
-VITE_WORKFORCE_ID=optional-workforce-id (if using workforce mode)
+# Use ONE of the following:
+VITE_AGENT_ID=your-agent-id              # For single-agent mode
+VITE_WORKFORCE_ID=your-workforce-id      # For multi-agent MARAG mode (recommended)
 ```
+
+**Configuration Notes:**
+
+- **VITE_WORKFORCE_ID** (Recommended): Enables MARAG with 5 specialist agents (TIRA, RCRA, HPRA, ERRA, BARA)
+- **VITE_AGENT_ID**: Alternative for single-agent deployments
+- Provide only ONE of `VITE_AGENT_ID` or `VITE_WORKFORCE_ID`
 
 **NEVER commit `.env` to repository**. Use `.env.example` as template.
 

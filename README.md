@@ -47,7 +47,8 @@ Agents reach agreement through weighted voting, where each agent's contribution 
 ### User Experience
 
 - **Modern Chat Interface** - AI-powered conversations
-- **Mode Selection** - Auto/Fast/Expert/Heavy modes
+- **Agent Mode Selection** - Auto/Fast/Expert/Heavy modes for analysis depth
+- **Interface Complexity Modes** - Easy/Focus/Balanced/Expert for UI complexity
 - **File Attachments** - Upload fraud datasets
 - **Responsive Design** - Mobile/tablet/desktop optimised
 - **Keyboard Shortcuts** - Power user features
@@ -164,7 +165,7 @@ Then open `.env` and fill in your Relevance AI credentials:
 VITE_REGION=your-region
 
 # Your Relevance AI project ID
-VITE_PROJECT_ID=your-project-id
+VITE_PROJECT=your-project-id
 
 # The MARAG Workforce / Agent ID to invoke
 VITE_WORKFORCE_ID=your-workforce-id
@@ -198,18 +199,9 @@ Once the browser loads, confirm:
 
 If agents fail to respond, double-check your `.env` credentials and ensure the project is active.
 
-The app hot-reloads automatically on any file change — no restart needed.
+### Getting Started Quickly
 
-### 5. Verify the System is Running
-
-Once the browser loads, confirm:
-
-- [ ] The THEIA header and chat interface are visible
-- [ ] The MARAG status panel shows 5 agents (TIRA, RCRA, HPRA, ERRA, BARA)
-- [ ] Typing a message triggers the 16-phase pipeline
-- [ ] The connection status indicator shows **Connected**
-
-If agents fail to respond, double-check your `.env` credentials and ensure the project is active.
+For detailed onboarding instructions, including a complete quick-start guide, keyboard shortcuts, and troubleshooting tips, see [**GETTING_STARTED.md**](GETTING_STARTED.md).
 
 ### Testing
 

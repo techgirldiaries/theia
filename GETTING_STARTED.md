@@ -161,7 +161,7 @@ Choose the complexity level that suits you:
 
 - **Easy** - Simplified view, core features only
 - **Focus** - Essential features, minimal distractions
-- **Balanced** (default) - Full feature set, organized layout
+- **Balanced** (default) - Full feature set, organised layout
 - **Expert** - All advanced features, detailed controls
 
 Switch modes in **Settings** (gear icon, top right).
@@ -190,7 +190,7 @@ Switch modes in **Settings** (gear icon, top right).
 - Review browser console for errors
 - Try a different prompt or template
 
-### No Visualizations Generated
+### No Visualisations Generated
 
 - Ensure analysis completed successfully
 - Check that fraud data is present in dataset
@@ -244,4 +244,4 @@ Switch modes in **Settings** (gear icon, top right).
 
 ---
 
-**Ready to analyze fraud?** Start by uploading your first dataset and selecting an analysis template! 🚀
+**Ready to analyse and detect fraud?** Start by uploading your first dataset and selecting a template!

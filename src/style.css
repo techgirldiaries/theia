@@ -1,0 +1,116 @@
+@import "tailwindcss";
+
+/* Custom breakpoint matching the large-screen sidebar threshold */
+@theme {
+  --breakpoint-1440: 1440px;
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@keyframes bounce {
+
+  0%,
+  50%,
+  100% {
+    transform: translateY(0);
+  }
+
+  20% {
+    transform: translateY(-1rem);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes thinking-dot {
+
+  0%,
+  60%,
+  100% {
+    opacity: 0.2;
+    transform: scale(0.85);
+  }
+
+  30% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+.thinking-dot {
+  animation: thinking-dot 1.2s ease-in-out infinite;
+}
+
+.thinking-dot-1 {
+  animation-delay: 0ms;
+}
+
+.thinking-dot-2 {
+  animation-delay: 200ms;
+}
+
+.thinking-dot-3 {
+  animation-delay: 400ms;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+.typing-dot {
+  @apply text-2xl leading-0 py-2;
+  animation: bounce 1s infinite ease-in-out;
+}
+
+.typing-dot-delay-1 {
+  animation-delay: 0.15s;
+}
+
+.typing-dot-delay-2 {
+  animation-delay: 0.3s;
+}
+
+/* Chat Container Styles */
+.chat-container {
+  overflow-x: hidden;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+.chat-messages {
+  scroll-behavior: smooth;
+}
+
+/* Ensure proper word wrapping in chat messages */
+.chat-container * {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+/* Responsive chat layout */
+@media (max-width: 768px) {
+  .chat-container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    max-width: calc(100vw - 2rem);
+  }
+}
+
+/* Markdown content styling */
+.chat-container .prose code {
+  @apply bg-zinc-100 dark:bg-zinc-700 px-1 py-0.5 rounded text-sm font-mono;
+}
+
+.chat-container .prose strong {
+  @apply font-semibold text-zinc-900 dark:text-white;
+}
+
+.chat-container .prose em {
+  @apply italic text-zinc-800 dark:text-zinc-200;
+}

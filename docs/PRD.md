@@ -2,7 +2,7 @@
 
 ## Product Overview
 
-**Vision:** THEIA is an AI-powered fraud detection and reporting platform that enables organizations to identify, analyse and respond to fraud threats in real-time using multi-agent workflows and advanced analytics.
+**Vision:** THEIA is an AI-powered fraud detection and reporting platform that enables organisations to identify, analyse and respond to fraud threats in real-time using multi-agent workflows and advanced analytics.
 
 **Target Users:** Fraud analysts, compliance officers, security teams, enterprise risk managers
 

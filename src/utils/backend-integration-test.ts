@@ -171,9 +171,9 @@ export function validateWorkforceOutput(json: string): ValidationResult {
 
       if (meta.phases_completed === undefined) {
         errors.push("Missing phases_completed in processing_metadata");
-      } else if (meta.phases_completed < 15) {
+      } else if (meta.phases_completed < 16) {
         warnings.push(
-          `Only ${meta.phases_completed}/15 phases completed (expected 15 for full pipeline)`,
+          `Only ${meta.phases_completed}/16 phases completed (expected 16 for full pipeline)`,
         );
       }
 
@@ -203,8 +203,8 @@ export function validateWorkforceOutput(json: string): ValidationResult {
         errors.push(`${failedPhases} phases failed`);
       }
 
-      if (completedPhases < 15) {
-        warnings.push(`Only ${completedPhases}/15 phases completed`);
+      if (completedPhases < 16) {
+        warnings.push(`Only ${completedPhases}/16 phases completed`);
       }
     }
 
@@ -309,7 +309,7 @@ export function generateIntegrationReport(json: string): string {
     report += `  Case ID: ${validationResult.report.case_id}\n`;
     report += `  Risk Score: ${validationResult.report.overall_risk_score}\n`;
     report += `  Risk Category: ${validationResult.report.risk_category}\n`;
-    report += `  Phases Completed: ${meta.phases_completed}/15\n`;
+    report += `  Phases Completed: ${meta.phases_completed}/16\n`;
     report += `  MARAG Agents: ${meta.marag_agents_deployed || 0}/5\n`;
     report += `  Datasets Compared: ${meta.datasets_compared || 0}\n`;
     report += `  Processing Time: ${meta.total_processing_time}\n`;

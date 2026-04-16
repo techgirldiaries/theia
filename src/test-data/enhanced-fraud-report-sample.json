@@ -193,7 +193,7 @@
             "Focus investigation on payment processing anomalies",
             "Cross-reference with entity relationship data"
           ],
-          "technical_details": "Heatmap generated using risk scores from all 15 phases, normalized to 0-100 scale"
+          "technical_details": "Heatmap generated using risk scores from all 16 phases, normalized to 0-100 scale"
         }
       }
     ],
@@ -358,7 +358,7 @@
   ],
   "processing_metadata": {
     "total_processing_time": "3.2 minutes",
-    "phases_completed": 15,
+    "phases_completed": 16,
     "phases_failed": 0,
     "data_quality_score": 92,
     "error_log": [],

@@ -15,7 +15,7 @@ import {
   ImageIcon,
   TrendingUp,
 } from "lucide-react";
-import { PhasePipeline } from "./phase-pipeline";
+import { LivePhasePipeline, PhasePipeline } from "./phase-pipeline";
 import { RealTimeStatusTracker } from "./real-time-status-tracker";
 import { EnhancedCaseManagement } from "./enhanced-case-management";
 import { AdvancedErrorRecovery } from "./advanced-error-recovery";
@@ -24,6 +24,7 @@ import { FraudDatasetManager } from "./fraud-dataset-manager";
 import { MARAGStatusPanel } from "./marag-status-panel";
 import { VisualizationGallery } from "./visualisation-gallery";
 import { BenchmarkComparison } from "./benchmark-comparison";
+import { EvaluationDashboard } from "./evaluation-dashboard";
 
 // Signal for managing active workflows
 export const activeWorkflowView = signal<string | null>(null);
@@ -44,7 +45,7 @@ export function WorkflowDashboard({
   // Mock case progress for demonstration
   const caseProgress = {
     caseId,
-    phases: Array.from({ length: 15 }, (_, i) => ({
+    phases: Array.from({ length: 16 }, (_, i) => ({
       phaseId: `phase-${i + 1}`,
       phaseName: `Phase ${i + 1}: ${["Data Acquisition", "Initial Screening", "Pattern Analysis", "Risk Assessment", "Deep Learning Analysis", "Behavioral Analysis", "Network Analysis", "Rule-Based Validation", "Ensemble Scoring", "Alert Generation", "Human Review", "Investigation", "Decision Making", "Action Execution", "Monitoring & Feedback"][i]}`,
       status: (i < 3 ? "completed" : i === 3 ? "in-progress" : "pending") as
@@ -63,8 +64,8 @@ export function WorkflowDashboard({
       label: "Phase Pipeline",
       icon: GitBranch,
       component: (
-        <PhasePipeline
-          caseProgress={caseProgress}
+        <LivePhasePipeline
+          fallbackCaseProgress={caseProgress}
           showDetails={!compact}
           compact={compact}
         />
@@ -99,6 +100,12 @@ export function WorkflowDashboard({
       label: "Benchmarking",
       icon: TrendingUp,
       component: <BenchmarkComparison compact={compact} />,
+    },
+    {
+      id: "evaluation",
+      label: "Evaluation",
+      icon: BarChart3,
+      component: <EvaluationDashboard compact={compact} />,
     },
     {
       id: "cases",
@@ -148,7 +155,7 @@ export function WorkflowDashboard({
             <h2
               className={`font-bold text-zinc-900 dark:text-white ${compact ? "text-xl" : "text-2xl"}`}
             >
-              THEIA 15-Phase Workflow Dashboard
+              THEIA 16-Phase Workflow Dashboard
             </h2>
             <p
               className={`text-zinc-600 dark:text-zinc-400 ${compact ? "text-sm" : ""}`}
@@ -318,7 +325,7 @@ export function EnhancedAgentWorkflow() {
       <div className="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg p-6 text-center">
         <Settings size={48} className="mx-auto mb-4 text-zinc-400" />
         <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">
-          15-Phase Workflow Dashboard
+          16-Phase Workflow Dashboard
         </h3>
         <p className="text-zinc-600 dark:text-zinc-400 mb-4">
           Monitor and control the comprehensive fraud detection pipeline

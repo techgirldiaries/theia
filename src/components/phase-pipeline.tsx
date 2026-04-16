@@ -63,6 +63,66 @@ interface PhasePipelineProps {
   compact?: boolean;
 }
 
+// ── LivePhasePipeline — reads from liveCaseProgress signal ────────────────────
+import { liveCaseProgress } from "@/signals";
+
+interface LivePhasePipelineProps {
+  /** Shown when no live signal data is available yet */
+  fallbackCaseProgress: CaseProgress;
+  showDetails?: boolean;
+  compact?: boolean;
+}
+
+/**
+ * LivePhasePipeline bridges the liveCaseProgress signal (populated by
+ * effects.ts when a full report arrives) to the existing pure PhasePipeline
+ * component. Falls back to props when no live data is present.
+ */
+export function LivePhasePipeline({
+  fallbackCaseProgress,
+  showDetails,
+  compact,
+}: LivePhasePipelineProps) {
+  const live = liveCaseProgress.value;
+
+  if (!live) {
+    return (
+      <PhasePipeline
+        caseProgress={fallbackCaseProgress}
+        showDetails={showDetails}
+        compact={compact}
+      />
+    );
+  }
+
+  // Map LiveCaseProgress → CaseProgress
+  const phases: PhaseStatus[] = Object.values(live.phases).map((lp) => ({
+    phaseId:   lp.phaseId,
+    phaseName: lp.phaseId,
+    status:    lp.status,
+    progress:  lp.progress,
+    duration:  lp.duration,
+    confidence: lp.confidence,
+    riskScore: lp.riskScore,
+    toolsUsed: lp.toolsUsed,
+  }));
+
+  const caseProgress: CaseProgress = {
+    caseId:          live.caseId,
+    overallProgress: live.overallProgress,
+    currentPhase:    live.currentPhase,
+    phases,
+  };
+
+  return (
+    <PhasePipeline
+      caseProgress={caseProgress}
+      showDetails={showDetails}
+      compact={compact}
+    />
+  );
+}
+
 const PHASE_DEFINITIONS = [
   {
     id: "phase-0",

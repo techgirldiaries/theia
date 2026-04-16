@@ -2,21 +2,21 @@
 
 ## Multi-Agent RAG (MARAG) Financial Fraud Detection System
 
-A production-ready fraud intelligence platform using 5 specialised multi-agents with collaborative retrieval-augmented generation (MARAG). Features a 15-phase detection pipeline, multi-dataset benchmarking and comprehensive visualisation system.
+A production-ready fraud intelligence application using 5 specialised multi-agent collaboration and retrieval-augmented generation (MARAG). Features a 16-phase detection pipeline, multi-dataset benchmarking and comprehensive visualisation system.
 
 ## Project Overview
 
 THEIA is an advanced fraud detection system that combines:
 
 - **5 Specialised MARAG Agents** working collaboratively
-- **15-Phase Detection Pipeline** with quality gates
+- **16-Phase Detection Pipeline** with quality gates
 - **Multi-Dataset Benchmarking** with statistical analysis
 - **Real-time visualisation** of fraud patterns
 - **Production-Quality UI/UX** with responsive design
 
 ### Key Innovation: MARAG Architecture
 
-Unlike traditional single-agent systems, THEIA uses 5 specialised agents that work together by cross-checking evidence from multiple sources. Each agent retrieves relevant information and adds its own analysis (Retrieval-Augmented Generation or RAG):
+Unlike traditional single-agent systems, THEIA uses five specialised agents that work together by cross-checking evidence from multiple sources. Each agent retrieves relevant information and adds its own analysis using Retrieval-Augmented Generation (RAG):
 
 1. **TIRA** - Threat Intelligence Retrieval Agent (Red `#EF4444`)
 2. **RCRA** - Regulatory Compliance Retrieval Agent (Blue `#3B82F6`)
@@ -31,7 +31,7 @@ Agents reach agreement through weighted voting, where each agent's contribution 
 ### Core Fraud Detection
 
 - **MARAG Multi-Agent System** - 5 collaborative AI agents
-- **15-Phase Detection Pipeline** - Sequential/parallel/convergent execution
+- **16-Phase Detection Pipeline** - Sequential/parallel/convergent execution
 - **Enhanced Fraud Reports** - Comprehensive analysis with 6 tabbed sections
 - **Risk Scoring** - 0-100 scale with 5-levels of categorisation
 - **Real-time Status Tracking** - Live pipeline updates
@@ -47,7 +47,8 @@ Agents reach agreement through weighted voting, where each agent's contribution 
 ### User Experience
 
 - **Modern Chat Interface** - AI-powered conversations
-- **Mode Selection** - Auto/Fast/Expert/Heavy modes
+- **Agent Mode Selection** - Auto/Fast/Expert/Heavy modes for analysis depth
+- **Interface Complexity Modes** - Easy/Focus/Balanced/Expert for UI complexity
 - **File Attachments** - Upload fraud datasets
 - **Responsive Design** - Mobile/tablet/desktop optimised
 - **Keyboard Shortcuts** - Power user features
@@ -164,7 +165,7 @@ Then open `.env` and fill in your Relevance AI credentials:
 VITE_REGION=your-region
 
 # Your Relevance AI project ID
-VITE_PROJECT_ID=your-project-id
+VITE_PROJECT=your-project-id
 
 # The MARAG Workforce / Agent ID to invoke
 VITE_WORKFORCE_ID=your-workforce-id
@@ -181,7 +182,7 @@ npm run dev
 
 Vite will start a local server. Open your browser to:
 
-```
+```sh
 http://localhost:5173
 ```
 
@@ -193,23 +194,14 @@ Once the browser loads, confirm:
 
 - [ ] The THEIA header and chat interface are visible
 - [ ] The MARAG status panel shows 5 agents (TIRA, RCRA, HPRA, ERRA, BARA)
-- [ ] Typing a message triggers the 15-phase pipeline
+- [ ] Typing a message triggers the 16-phase pipeline
 - [ ] The connection status indicator shows **Connected**
 
 If agents fail to respond, double-check your `.env` credentials and ensure the project is active.
 
-The app hot-reloads automatically on any file change — no restart needed.
+### Getting Started Quickly
 
-### 5. Verify the System is Running
-
-Once the browser loads, confirm:
-
-- [ ] The THEIA header and chat interface are visible
-- [ ] The MARAG status panel shows 5 agents (TIRA, RCRA, HPRA, ERRA, BARA)
-- [ ] Typing a message triggers the 15-phase pipeline
-- [ ] The connection status indicator shows **Connected**
-
-If agents fail to respond, double-check your `.env` credentials and ensure the project is active.
+For detailed onboarding instructions, including a complete quick-start guide, keyboard shortcuts, and troubleshooting tips, see [**GETTING_STARTED.md**](GETTING_STARTED.md).
 
 ### Testing
 
@@ -269,7 +261,7 @@ Biome is configured via `biome.json` and replaces both ESLint and Prettier.
 | Problem                      | Likely Cause                    | Fix                                                             |
 | ---------------------------- | ------------------------------- | --------------------------------------------------------------- |
 | `npm install` fails          | Node.js version too old         | Upgrade to Node.js 18+                                          |
-| Blank page on `npm run dev`  | `.env` missing or malformed     | Re-check all three `VITE_*` variables                            |
+| Blank page on `npm run dev`  | `.env` missing or malformed     | Re-check all three `VITE_*` variables                           |
 | Agents not responding        | Invalid API key or region       | Verify credentials in Relevance AI dashboard                    |
 | TypeScript errors on install | Stale `node_modules`            | Delete `node_modules/` and re-run `npm install`                 |
 | Port 5173 already in use     | Another Vite dev server running | Kill the other process or run `npm run dev -- --port 5174`      |

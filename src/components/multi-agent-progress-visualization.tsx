@@ -741,7 +741,7 @@ export function MultiAgentProgressVisualization({
         status: "active",
         progress: 45,
         startTime: new Date(Date.now() - 800000),
-        currentTask: "Managing 15-phase fraud detection pipeline",
+        currentTask: "Managing 16-phase fraud detection pipeline",
         performance: {
           tasksCompleted: 2,
           avgExecutionTime: 600,
@@ -853,7 +853,7 @@ export function MultiAgentProgressVisualization({
             <p
               className={`text-zinc-600 dark:text-zinc-400 ${compact ? "text-sm" : ""}`}
             >
-              Real-time coordination of 15-phase fraud detection agents
+              Real-time coordination of 16-phase fraud detection agents
             </p>
           </div>
           <div

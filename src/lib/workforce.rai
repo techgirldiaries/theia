@@ -2,7 +2,7 @@
   "workforce_metadata": {
     "name": "Theia Fraud Intelligence",
     "type": "default",
-    "last_run_date": "2026-03-05T13:55:20.727Z",
+    "last_run_date": "2026-03-15T00:33:15.624Z",
     "active_version_id": "8b76df9a-9b5a-49a0-a4e1-b7e3e364b59d",
     "public": true,
     "embeddable": true,
@@ -39,7 +39,7 @@
           },
           "entity_information": {
             "name": "Theia Fraud Intelligence",
-            "description": "Advanced AI fraud detection specialist that processes financial transactions through a comprehensive 15-phase analytical pipeline. Combines machine learning precision, regulatory compliance, and evidence-based reasoning to detect financial fraud with high accuracy and complete audit trails.",
+            "description": "Advanced AI fraud detection specialist that processes financial transactions through a comprehensive 16-phase analytical pipeline. Combines machine learning precision, regulatory compliance, and evidence-based reasoning to detect financial fraud with high accuracy and complete audit trails.",
             "emoji": "https://cdn.jsdelivr.net/gh/RelevanceAI/content-cdn@latest/agents/agent_avatars/agent_avatar_11.svg",
             "copied_at": "2026-03-03T22:51:31.581Z"
           }

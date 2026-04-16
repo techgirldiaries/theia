@@ -12,14 +12,14 @@
 
 | Feature                            | Priority    | Description                                                                                                                                                                                                                |
 | ---------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- | ------ | --- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| **16-Phase Pipeline**              | Must-have   | Sequential (0-3: Data Acq→Ingestion→Monitoring→Pattern) → Parallel (4-6: Intelligence                                                                                                                                      |     | Threat |     | Entity) → Convergent (7-9: Behavioral→KYC→Merchant) → Decision (10-15: Classification→Verification→Compliance→Monitoring→Case Mgmt→Oversight) |
-| **5 Specialist MARAG Agents**      | Must-have   | TIRA (Threat Intelligence), RCRA (Regulatory Compliance), HPRA (Historical Patterns), ERRA (Entity Relationships), BARA (Behavioral Analysis) with distributed retrieval, agent-to-agent communication, weighted consensus |
+| **16-Phase Pipeline**              | Must-have   | Sequential (0-3: Data Acq→Ingestion→Monitoring→Pattern) → Parallel (4-6: Intelligence                                                                                                                                      |     | Threat |     | Entity) → Convergent (7-9: Behavioural→KYC→Merchant) → Decision (10-15: Classification→Verification→Compliance→Monitoring→Case Management→Oversight) |
+| **5 Specialist MARAG Agents**      | Must-have   | TIRA (Threat Intelligence), RCRA (Regulatory Compliance), HPRA (Historical Patterns), ERRA (Entity Relationships), BARA (Behavioural Analysis) with distributed retrieval, agent-to-agent communication, weighted consensus |
 | **Weighted Multi-Agent Consensus** | Must-have   | Evidence triangulation, conflict resolution, confidence scoring (0-100), uncertainty quantification with confidence intervals, cross-agent correlation analysis                                                            |
 | **Fraud Report Analysis**          | Must-have   | Case creation (FRAUD-YYYYMMDD-Type-Priority), automated multi-phase report generation, comprehensive agent reasoning, severity scoring, typology classification                                                            |
-| **Interactive Dashboards**         | Must-have   | Phase-by-phase progress visualization, agent performance metrics, consensus accuracy tracking, ROC curves, confusion matrices, evidence heatmaps, network graphs                                                           |
+| **Interactive Dashboards**         | Must-have   | Phase-by-phase progress visualisation, agent performance metrics, consensus accuracy tracking, ROC curves, confusion matrices, evidence heatmaps, network graphs                                                           |
 | **Dataset Management**             | Should-have | Upload/manage fraud datasets, multi-dataset benchmarking, comparative performance analysis, data preprocessing, version control, phase tracking                                                                            |
 | **Audit Logging**                  | Should-have | Complete pipeline audit trail, agent decision logging, phase-level activity tracking, compliance documentation (SAR-ready, GDPR, DORA), evidence attribution                                                               |
-| **Real-time Monitoring**           | Should-have | Live case progression through 16 phases, agent health monitoring, consensus convergence metrics, performance benchmarking, system optimization                                                                             |
+| **Real-time Monitoring**           | Should-have | Live case progression through 16 phases, agent health monitoring, consensus convergence metrics, performance benchmarking, system optimisation                                                                             |
 
 ## Key User Flows
 
@@ -37,9 +37,9 @@
   - **RCRA:** Regulatory Compliance (OFAC, UN, EU, HMT sanctions; GDPR, DORA, FinCEN)
   - **HPRA:** Historical Pattern matching (fraud typologies, case studies, pattern evolution)
   - **ERRA:** Entity Relationship analysis (network graphs, fraud rings, synthetic identities)
-  - **BARA:** Behavioral Analysis (biometrics, device fingerprints, ATO indicators)
+  - **BARA:** Behavioural Analysis (biometrics, device fingerprints, ATO indicators)
 - **Consensus Engine:** Weighted voting with confidence scoring, evidence triangulation, uncertainty quantification (confidence intervals), cross-agent correlation, conflict resolution
-- **Frontend:** Preact/React with real-time streaming, phase progression visualization, agent status panels, consensus radar charts
+- **Frontend:** Preact/React with real-time streaming, phase progression visualisation, agent status panels, consensus radar charts
 - **Performance:** <2s load time, <5 min case processing through 16 phases, sub-second phase transitions, support 100+ concurrent cases
 - **Accessibility:** WCAG 2.1 AA compliance
 - **Security:** Authentication required, encrypted data transmission, agent decision audit trails, regulatory compliance logging, immutable audit records
@@ -50,7 +50,7 @@
 - **Detection Performance:** Fraud detection accuracy >95% with false positive rate <5%; precision >90%, recall >88%, AUC-ROC >0.93
 - **Processing Efficiency:** Average case processing time <5 minutes through 16-phase pipeline; sub-second phase transitions; support 100+ concurrent cases
 - **Multi-Agent Consensus:** Weighted consensus accuracy tracking per specialist agent (TIRA, RCRA, HPRA, ERRA, BARA); agent agreement rates >85%; consensus confidence intervals within ±5%
-- **Phase Performance:** Phase-by-phase throughput optimization; <60 seconds per phase; all 16 phases completed per case
+- **Phase Performance:** Phase-by-phase throughput optimisation; <60 seconds per phase; all 16 phases completed per case
 - **Evidence Quality:** Evidence triangulation success >90%; conflict resolution accuracy >92%; source attribution completeness 100%; "No Citation → No Verdict" compliance
 - **Compliance Validation:** Compliance documentation pass rate >99%; SAR-ready reports 100%; GDPR explanation quality score >90%; regulatory audit pass rate 100%
 - **System Reliability:** System uptime >99.5%; error recovery success rate >95%; audit trail integrity 100%

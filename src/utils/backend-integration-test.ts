@@ -274,13 +274,13 @@ export function generateIntegrationReport(json: string): string {
   let report = "=== THEIA BACKEND INTEGRATION TEST REPORT ===\n\n";
 
   // Validation status
-  report += `Status: ${validationResult.valid ? "✅ VALID" : "❌ INVALID"}\n\n`;
+  report += `Status: ${validationResult.valid ? "[VALID]" : "[INVALID]"}\n\n`;
 
   // Errors
   if (validationResult.errors.length > 0) {
     report += "ERRORS:\n";
     for (const error of validationResult.errors) {
-      report += `  ❌ ${error}\n`;
+      report += `  [ERROR] ${error}\n`;
     }
     report += "\n";
   }
@@ -289,17 +289,17 @@ export function generateIntegrationReport(json: string): string {
   if (validationResult.warnings.length > 0) {
     report += "WARNINGS:\n";
     for (const warning of validationResult.warnings) {
-      report += `  ⚠️  ${warning}\n`;
+      report += `  [WARNING] ${warning}\n`;
     }
     report += "\n";
   }
 
   // Parser tests
   report += "UI PARSER TESTS:\n";
-  report += `  ${parserTests.isEnhanced ? "✅" : "❌"} isEnhancedFraudReport()\n`;
-  report += `  ${parserTests.parsed ? "✅" : "❌"} parseEnhancedFraudReport()\n`;
-  report += `  ${parserTests.hasMarag ? "✅" : "❌"} hasMaragData()\n`;
-  report += `  ${parserTests.hasBenchmarking ? "✅" : "❌"} hasBenchmarkingData()\n`;
+  report += `  ${parserTests.isEnhanced ? "[OK]" : "[FAIL]"} isEnhancedFraudReport()\n`;
+  report += `  ${parserTests.parsed ? "[OK]" : "[FAIL]"} parseEnhancedFraudReport()\n`;
+  report += `  ${parserTests.hasMarag ? "[OK]" : "[FAIL]"} hasMaragData()\n`;
+  report += `  ${parserTests.hasBenchmarking ? "[OK]" : "[FAIL]"} hasBenchmarkingData()\n`;
   report += "\n";
 
   // Summary
@@ -342,7 +342,7 @@ const result = testUIIntegration(JSON.stringify(workforceOutput));
 if (result.validationResult.valid) {
   console.log('✅ Backend output is valid and ready for UI');
 } else {
-  console.error('❌ Validation errors:', result.validationResult.errors);
+  console.error('[ERROR] Validation errors:', result.validationResult.errors);
 }
 `;
 

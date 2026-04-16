@@ -412,7 +412,7 @@ export function EnhancedFraudReportDisplay({
                 SAR Ready
               </h4>
               <p class="text-2xl font-bold text-green-600">
-                {report.compliance_status.sar_ready ? "✓" : "✗"}
+                {report.compliance_status.sar_ready ? "[OK]" : "[X]"}
               </p>
             </div>
             <div class="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
@@ -420,7 +420,7 @@ export function EnhancedFraudReportDisplay({
                 GDPR Compliant
               </h4>
               <p class="text-2xl font-bold text-blue-600">
-                {report.compliance_status.gdpr_compliant ? "✓" : "✗"}
+                {report.compliance_status.gdpr_compliant ? "[OK]" : "[X]"}
               </p>
             </div>
             <div class="bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-700 rounded-lg p-4">
@@ -428,7 +428,7 @@ export function EnhancedFraudReportDisplay({
                 DORA Compliant
               </h4>
               <p class="text-2xl font-bold text-purple-600">
-                {report.compliance_status.dora_compliant ? "✓" : "✗"}
+                {report.compliance_status.dora_compliant ? "[OK]" : "[X]"}
               </p>
             </div>
           </div>

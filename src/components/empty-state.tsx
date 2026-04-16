@@ -128,7 +128,7 @@ export function EmptyState() {
     },
     {
       text: "Generate AML compliance report for suspicious activities",
-      icon: "📊",
+      icon: "[CHART]",
     },
     {
       text: "Detect unusual payment behaviors in recent transactions",

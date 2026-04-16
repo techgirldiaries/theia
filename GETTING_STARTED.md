@@ -124,6 +124,40 @@ THEIA processes fraud cases through a sophisticated 16-phase workflow:
 - Compliance documentation (SAR-ready, GDPR)
 - Export audit records for regulatory review
 
+## System Prompts & AI Configuration
+
+### Theia Fraud Intelligence System Prompt
+
+The core AI instructions that govern the entire fraud detection system are defined in `src/prompts/system-prompts.ts`. This comprehensive prompt includes:
+
+- **15-Phase Fraud Detection Pipeline** — Detailed instructions for each analysis phase from data acquisition to final oversight
+- **MARAG Framework Specifications** — Definitions of the 5 specialised RAG agents (TIRA, RCRA, HPRA, ERRA, BARA) and their collaboration protocols
+- **Benchmarking Framework** — Multi-dataset comparison methodology with statistical significance testing
+- **Visualisation Requirements** — Professional chart generation specifications with downloadable export formats
+- **Operational Principles** — Reliability, error handling, audit trails, and regulatory compliance guidelines
+- **Risk Scoring Framework** — Standardised 0-100 risk scale with confidence levels and quality gates
+- **Error Recovery Strategies** — Tool failure recovery, data quality issues handling, and critical error escalation
+
+### Key System Prompt Features
+
+- **Evidence-Based Analysis** — "No Citation → No Verdict" principle with source attribution
+- **Comprehensive Quality Gates** — Phase-specific completeness thresholds (>90% data completeness, >75% quality scores)
+- **Professional Visualisations** — Publication-ready charts with detailed explanations and downloadable assets
+- **Regulatory Compliance** — GDPR, AML, DORA compliance documentation automation
+- **Human Oversight Integration** — Mandatory review checkpoints for high-risk cases (>75 score)
+- **Audit Trail Maintenance** — Complete immutable processing history for compliance
+
+### Customising System Prompts
+
+To modify AI behaviour or add custom instructions:
+
+1. Open `src/prompts/system-prompts.ts`
+2. Edit `THEIA_FRAUD_INTELLIGENCE_SYSTEM_PROMPT` constant
+3. Restart the development server (`npm run dev`)
+4. Changes take effect immediately
+
+**Note:** Do not modify the system prompt in production without thorough testing and compliance review.
+
 ## Common Tasks
 
 ### Analyse Multiple Datasets

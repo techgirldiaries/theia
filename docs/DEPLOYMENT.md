@@ -1,5 +1,7 @@
 # Deployment Guide for THEIA
 
+**See also:** [PROJECT_STRUCTURE_GUIDE.md](../PROJECT_STRUCTURE_GUIDE.md) for codebase organisation, [CODEBASE_QUALITY.md](../CODEBASE_QUALITY.md) for code standards
+
 ## Pre-Deployment Checklist
 
 - [ ] All tests passing: `npm test`

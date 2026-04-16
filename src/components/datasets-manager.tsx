@@ -154,7 +154,7 @@ export function DatasetsManager() {
       {/* Tips */}
       <div class="mt-4 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg p-4">
         <h4 class="text-sm font-semibold text-indigo-900 dark:text-indigo-300 mb-2">
-          💡 Tips for Dataset Management
+          [TIP] Tips for Dataset Management
         </h4>
         <ul class="text-xs text-indigo-700 dark:text-indigo-400 space-y-1">
           <li>

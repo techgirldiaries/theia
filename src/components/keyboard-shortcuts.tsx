@@ -166,14 +166,14 @@ export function KeyboardShortcutsPanel() {
             ).map(([category, categoryShortcuts]) => (
               <div key={category} class="mb-6 last:mb-0">
                 <h3 class="text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-3 flex items-center gap-2">
-                  {category === "Analysis" && "🔍"}
-                  {category === "Navigation" && "🧭"}
-                  {category === "Data" && "📊"}
-                  {category === "Analytics" && "📈"}
-                  {category === "Templates" && "📝"}
-                  {category === "Session" && "💼"}
-                  {category === "Interface" && "⚙️"}
-                  {category === "Help" && "❓"}
+                  {category === "Analysis" && "[SEARCH]"}
+                  {category === "Navigation" && "[NAV]"}
+                  {category === "Data" && "[DATA]"}
+                  {category === "Analytics" && "[ANALYTICS]"}
+                  {category === "Templates" && "[TEMPLATE]"}
+                  {category === "Session" && "[SESSION]"}
+                  {category === "Interface" && "[SETTINGS]"}
+                  {category === "Help" && "[?]"}
                   {category}
                 </h3>
                 <div class="space-y-2">
@@ -197,7 +197,7 @@ export function KeyboardShortcutsPanel() {
             {/* Financial Industry Tips */}
             <div class="mt-8 p-4 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800 rounded-lg">
               <h3 class="text-sm font-semibold text-indigo-900 dark:text-indigo-300 mb-3 flex items-center gap-2">
-                💡 Financial Analysis Pro Tips
+                [TIP] Financial Analysis Pro Tips
               </h3>
               <ul class="text-sm text-indigo-800 dark:text-indigo-300 space-y-2">
                 <li class="flex items-start gap-2">

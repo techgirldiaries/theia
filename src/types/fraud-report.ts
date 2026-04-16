@@ -5,6 +5,10 @@
 
 import type { MaragResults } from "./marag";
 import type { BenchmarkingResults } from "./benchmarking";
+import type {
+  ComplianceCheckResult,
+  ComplianceVerification,
+} from "./compliance";
 
 // Re-export types for convenience
 export type { MaragResults, BenchmarkingResults };
@@ -15,6 +19,10 @@ export type {
   EvidenceTriangulation,
   CollaborativeRiskAssessment,
 } from "./marag";
+export type {
+  ComplianceCheckResult,
+  ComplianceVerification,
+} from "./compliance";
 
 export interface Visualization {
   chart_type: string;

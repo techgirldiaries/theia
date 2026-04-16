@@ -266,7 +266,7 @@ export function MARAGStatusPanel({ compact = false }: MARAGStatusPanelProps) {
               <ul className="text-xs text-zinc-600 dark:text-zinc-400 space-y-1">
                 {maragConsensus.value.uncertaintySources.map((source, idx) => (
                   <li key={idx} className="flex items-start gap-1">
-                    <span className="text-amber-600">⚠</span>
+                    <span className="text-amber-600">[WARNING]</span>
                     <span>{source}</span>
                   </li>
                 ))}

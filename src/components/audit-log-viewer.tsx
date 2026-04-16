@@ -1,3 +1,22 @@
+/**
+ * Audit Log Viewer Component
+ *
+ * This component provides comprehensive evidence trail visibility for compliance
+ * verification and regulatory reporting. It displays all user actions, data
+ * access, exports, and system events that support compliance documentation.
+ *
+ * COMPLIANCE REFERENCE:
+ * - Each audit entry links to ComplianceCheckResult for KYC & Sanctions checks
+ * - Provides complete traceability for SAR (Suspicious Activity Report) filing
+ * - Supports GDPR audit requirements and DORA resilience documentation
+ * - Evidence sources for regulatory review and remediation verification
+ *
+ * Integration Points:
+ * - AuditLogEntry type (signals/types.ts) - Core audit data structure
+ * - ComplianceCheckResult type (types/compliance.ts) - Compliance evidence linking
+ * - EnhancedCaseManagement - Shows case compliance verification chain
+ */
+
 import {
   Download,
   Eye,

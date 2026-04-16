@@ -1,3 +1,25 @@
+/**
+ * Enhanced Case Management Component
+ *
+ * Comprehensive case lifecycle management with built-in compliance tracking.
+ * Manages investigation status, assignments, SLA tracking, and provides
+ * evidence trail access for compliance verification and regulatory reporting.
+ *
+ * COMPLIANCE INTEGRATION:
+ * - CaseMetadata tracks investigation phases required for SAR documentation
+ * - Case status progression supports compliance checkpoint verification
+ * - Maintains audit trail reference linking to ComplianceCheckResult evidence
+ * - SLA tracking ensures regulatory deadline compliance (14-30 day SAR filing)
+ * - Integration with AuditLogViewer for evidence trail verification
+ *
+ * Compliance Workflow:
+ * 1. Case creation with metadata → Initiates compliance check queue
+ * 2. Investigation phase → Compliance checks logged with evidence (Phase 8)
+ * 3. Analysis phase → Compliance aggregation (Phase 12)
+ * 4. Review phase → Compliance verification checkpoint (human approval required)
+ * 5. Resolved/Escalated → SAR documentation with audit trail references
+ */
+
 import { useState, useEffect } from "preact/hooks";
 import { signal, computed } from "@preact/signals";
 import {

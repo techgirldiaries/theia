@@ -1,14 +1,14 @@
 # Quick Templates Guide for THEIA
 
-This guide provides all the prompts that trigger real-time analysis and live dashboard visualization in THEIA. Use these templates to quickly start powerful fraud detection analyses.
+This guide provides all the prompts that trigger real-time analysis and live dashboard visualisation in THEIA. Use these templates to quickly start powerful fraud detection analyses.
 
 ## Quick Templates (Built-in)
 
-These are pre-configured prompts available in the UI that trigger full analysis pipelines with real-time visualization.
+These are pre-configured prompts available in the UI that trigger full analysis pipelines with real-time visualisation.
 
 ### 1. Analyse for Anomalies
 
-**Purpose:** Triggers anomaly detection and risk assessment visualization
+**Purpose:** Triggers anomaly detection and risk assessment visualisation
 
 **Prompt:**
 
@@ -16,7 +16,7 @@ These are pre-configured prompts available in the UI that trigger full analysis 
 Please analyse the uploaded dataset for anomalies, unusual patterns and potential fraud indicators. Provide a detailed risk assessment.
 ```
 
-**Visualizations Generated:**
+**Visualisations Generated:**
 
 - Risk distribution charts
 - Anomaly heatmaps
@@ -35,12 +35,12 @@ Please analyse the uploaded dataset for anomalies, unusual patterns and potentia
 Generate a comprehensive fraud report based on the data, including risk scores, fraud patterns and recommendations.
 ```
 
-**Visualizations Generated:**
+**Visualisations Generated:**
 
-- Phase-by-phase pipeline visualization
+- Phase-by-phase pipeline visualisation
 - Detailed fraud report with 6 tabbed sections
 - Agent reasoning and evidence attribution
-- Risk categorization breakdown
+- Risk categorisation breakdown
 
 ---
 
@@ -54,10 +54,10 @@ Generate a comprehensive fraud report based on the data, including risk scores, 
 Perform a risk assessment on the transactions and categorize them by risk level (low, medium, high).
 ```
 
-**Visualizations Generated:**
+**Visualisations Generated:**
 
 - Risk level distribution chart
-- Transaction categorization by risk
+- Transaction categorisation by risk
 - Real-time progress tracker
 - Risk score statistics
 
@@ -65,7 +65,7 @@ Perform a risk assessment on the transactions and categorize them by risk level 
 
 ### 4. Deep Investigation
 
-**Purpose:** Activates network and transaction pattern visualization
+**Purpose:** Activates network and transaction pattern visualisation
 
 **Prompt:**
 
@@ -73,7 +73,7 @@ Perform a risk assessment on the transactions and categorize them by risk level 
 Conduct a deep investigation into suspicious activities, trace transaction patterns and identify potential fraud networks.
 ```
 
-**Visualizations Generated:**
+**Visualisations Generated:**
 
 - Network graphs showing fraud rings
 - Transaction pattern analysis
@@ -92,7 +92,7 @@ Conduct a deep investigation into suspicious activities, trace transaction patte
 Evaluate the fraud detection performance metrics including accuracy, false positives, false negatives and provide optimization recommendations.
 ```
 
-**Visualizations Generated:**
+**Visualisations Generated:**
 
 - ROC curves
 - Confusion matrices
@@ -104,7 +104,7 @@ Evaluate the fraud detection performance metrics including accuracy, false posit
 
 ### 6. Identify Trends
 
-**Purpose:** Shows temporal visualizations and emerging patterns
+**Purpose:** Shows temporal visualisations and emerging patterns
 
 **Prompt:**
 
@@ -112,12 +112,12 @@ Evaluate the fraud detection performance metrics including accuracy, false posit
 Analyse temporal trends in the fraud data, identify seasonal patterns, emerging fraud types and predict future risks.
 ```
 
-**Visualizations Generated:**
+**Visualisations Generated:**
 
 - Temporal trend charts
 - Seasonal pattern analysis
 - Emerging fraud type detection
-- Time-series visualizations
+- Time-series visualisations
 - Predictive risk indicators
 
 ---
@@ -158,17 +158,17 @@ Analyze this transaction using all 5 specialist agents (TIRA, RCRA, HPRA, ERRA, 
 - Weighted consensus scoring (0-100)
 - Agent agreement rates
 - Confidence intervals
-- Evidence triangulation visualization
+- Evidence triangulation visualisation
 - Conflict resolution results
 
 ---
 
-### For Comprehensive Visualizations
+### For Comprehensive visualisations
 
 **Prompt:**
 
 ```text
-Generate comprehensive fraud detection visualizations including ROC curves, confusion matrices, and heatmaps
+Generate comprehensive fraud detection visualisations including ROC curves, confusion matrices and heatmaps
 ```
 
 **Expected Output:**
@@ -178,11 +178,11 @@ Generate comprehensive fraud detection visualizations including ROC curves, conf
 - Heatmaps showing fraud pattern distributions
 - Risk distribution charts
 - Performance metrics dashboard
-- Multiple chart types from visualization gallery
+- Multiple chart types from visualisation gallery
 
 ---
 
-## How to Trigger Live Dashboard Visualization
+## How to Trigger Live Dashboard Visualisation
 
 ### Step 1: Upload a Dataset
 
@@ -208,7 +208,7 @@ Or type a custom prompt in the message input field.
 
 The **Workflow Dashboard** will automatically activate with:
 
-- **16-Phase Pipeline Visualization** - Sequential, parallel, and convergent phases
+- **16-Phase Pipeline visualisation** - Sequential, parallel and convergent phases
 - **Real-Time Status Tracker** - Live metrics showing:
   - Current phase status
   - Average phase duration
@@ -216,7 +216,7 @@ The **Workflow Dashboard** will automatically activate with:
   - Phase completion progress
   - Live phase updates
 
-- **Multi-Agent Progress Visualization** - Shows MARAG agents (TIRA, RCRA, HPRA, ERRA, BARA):
+- **Multi-Agent Progress visualisation** - Shows Theia MARAG agents (TIRA, RCRA, HPRA, ERRA, BARA):
   - Individual agent status
   - Consensus convergence
   - Agreement rates
@@ -228,7 +228,7 @@ The **Workflow Dashboard** will automatically activate with:
   - Response time analysis
   - Success rate tracking
 
-- **Visualization Gallery** - AI-generated charts:
+- **Visualisation Gallery** - AI-generated charts:
   - ROC curves
   - Confusion matrices
   - Statistical distributions
@@ -259,14 +259,14 @@ Displays MARAG agent collaboration:
 
 Performance monitoring dashboard showing:
 
-- Total cases analyzed
+- Total cases analysed
 - High/Medium/Low risk breakdown
 - Average response time
 - Success rate percentage
 - Chat session count
 - Datasets uploaded
 
-### Visualization Gallery
+### Visualisation Gallery
 
 Collection of analysis charts with explanations:
 
@@ -274,21 +274,21 @@ Collection of analysis charts with explanations:
 - Phase attribution
 - Key insights preview
 - Download functionality
-- Phase-specific visualizations
+- Phase-specific visualisations
 
 ---
 
 ## Tips for Best Results
 
-✅ **Do:**
+**Do:**
 
 - Start with sample datasets to learn the interface
 - Use quick templates before creating custom prompts
 - Be specific with dataset descriptions
 - Allow full analysis completion before requesting new analyses
-- Review generated visualizations for insights
+- Review generated visualisations for insights
 
-❌ **Avoid:**
+**Avoid:**
 
 - Interrupting analysis mid-process
 - Using extremely large datasets initially
@@ -312,7 +312,7 @@ Collection of analysis charts with explanations:
 
 ## Troubleshooting
 
-### No Visualizations Appearing
+### No visualisations Appearing
 
 - Ensure analysis completed successfully (check status tracker)
 - Verify dataset contains valid fraud data
@@ -341,11 +341,11 @@ All prompts trigger these core components:
 
 - **[RealTimeStatusTracker](../src/components/real-time-status-tracker.tsx)** - Live phase progression and metrics
 - **[WorkflowDashboard](../src/components/workflow-dashboard.tsx)** - Main orchestration panel
-- **[MultiAgentProgressVisualization](../src/components/multi-agent-progress-visualization.tsx)** - MARAG agent collaboration
+- **[MultiAgentProgressVisualisation](../src/components/multi-agent-progress-visualisation.tsx)** - MARAG agent collaboration
 - **[AnalyticsDashboard](../src/components/analytics-dashboard.tsx)** - Performance metrics
-- **[VisualizationGallery](../src/components/visualisation-gallery.tsx)** - Chart collection
+- **[VisualisationGallery](../src/components/visualisation-gallery.tsx)** - Chart collection
 - **[EnhancedFraudReportDisplay](../src/components/enhanced-fraud-report-display.tsx)** - Detailed case analysis
 
 ---
 
-**Ready to analyze?** Start with a quick template and watch your fraud detection in action! 🚀
+**Ready to analyse?** Start with a quick template and watch your fraud detection in action!

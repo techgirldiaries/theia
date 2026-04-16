@@ -88,38 +88,75 @@ Agents reach agreement through weighted voting, where each agent's contribution 
 
 ## Project Structure
 
+The project follows a professional, scalable architecture organised by feature and concern:
+
 ```text
 theia-fraud-intelligence/
 ├── src/
-│   ├── components/          # UI components
-│   │   ├── marag-status-panel.tsx
-│   │   ├── marag-consensus-radar.tsx
-│   │   ├── enhanced-fraud-report-display.tsx
-│   │   ├── benchmark-comparison.tsx
-│   │   ├── visualisation-gallery.tsx
-│   │   ├── phase-pipeline.tsx
-│   │   └── ... 42 more components
-│   ├── types/               # Type definitions
-│   │   ├── marag.ts
-│   │   ├── benchmarking.ts
-│   │   └── fraud-report.ts
-│   ├── utils/               # Utilities
-│   │   ├── parse-fraud-report.ts
-│   │   └── backend-integration-test.ts
-│   ├── hooks/               # Custom hooks
-│   │   ├── useMediaQuery.ts
-│   │   └── useMediaQuery.test.ts
-│   ├── test/                # Test files
-│   │   ├── setup.ts
-│   │   └── responsive-layout.test.tsx
-│   └── test-data/           # Sample data
-│       └── enhanced-fraud-report-sample.json
-├── datasets/                # Fraud datasets
+│   ├── ui/                          # Presentation Layer
+│   │   ├── layouts/                 # Page layouts & containers
+│   │   ├── dashboards/              # Dashboard views (analytics, workflow)
+│   │   ├── visualisations/          # Charts & graph components
+│   │   ├── analysis/                # Fraud analysis components
+│   │   ├── common/                  # Reusable UI components
+│   │   └── dialogs/                 # Modal & dialog components
+│   │
+│   ├── core/                        # Business Logic Layer
+│   │   ├── services/                # API services & integrations
+│   │   └── utils/                   # Utility functions
+│   │
+│   ├── state/                       # State Management
+│   │   ├── actions.ts               # State mutations
+│   │   ├── effects.ts               # Side effects
+│   │   ├── state.ts                 # Signal definitions
+│   │   └── types.ts                 # State types
+│   │
+│   ├── config/                      # Configuration
+│   │   ├── constants.ts             # Application constants
+│   │   ├── system-prompts.ts        # AI system prompts
+│   │   └── types.ts                 # Global type definitions
+│   │
+│   ├── components/                  # Components
+│   ├── prompts/                     # AI prompts
+│   ├── types/                       # Type definitions
+│   ├── hooks/                       # Custom hooks
+│   ├── test/                        # Test files
+│   └── test-data/                   # Sample test data
+│
+├── docs/                            # Documentation
+│   ├── PRD.md                       # Product requirements
+│   ├── DEPLOYMENT.md                # Deployment guide
+│   ├── TESTING.md                   # Testing guide
+│   ├── UPDATES.md                   # Maintenance guide
+│   ├── QUICK_TEMPLATES.md           # Quick-start templates
+│   └── PROJECT_STRUCTURE_GUIDE.md   # Detailed file organisation guide
+│
+├── datasets/                        # Fraud datasets
 │   ├── creditcard.csv
 │   ├── paysim.csv
 │   └── momtsim.csv
-└── README.md                # This file
+└── README.md                        # This file
 ```
+
+### Recommended File Organisation
+
+For detailed file mappings and migration strategy, see **[PROJECT_STRUCTURE_GUIDE.md](PROJECT_STRUCTURE_GUIDE.md)** which includes:
+
+- Complete directory tree
+- 60+ file mappings (current → recommended)
+- Implementation strategy
+- Naming conventions
+- Migration checklist
+
+### Current Key Directories
+
+- **`src/components/`**: All 47 UI components (primary interaction layer)
+- **`src/prompts/`**: System prompts and AI instructions
+  - `system-prompts.ts` — 15-phase pipeline, MARAG framework, benchmarking specifications
+- **`src/types/`**: TypeScript type definitions
+- **`src/utils/`**: Utility functions and backend integration
+- **`src/hooks/`**: Custom React/Preact hooks
+- **`src/test/`**: Unit and integration tests
 
 ## Getting Started
 
@@ -169,10 +206,11 @@ VITE_PROJECT=your-project-id
 
 # The MARAG Workforce / Agent ID to invoke
 VITE_WORKFORCE_ID=your-workforce-id
-
+OR
+VITE_AGENT_ID=your-agent-id
 ```
 
-> **Note for assessment:** A pre-configured `.env` file with working credentials is included in the submission zip file. No manual setup is required to evaluate the system.
+> **Note for assessment:** A pre-configured file with working credentials is included in the submission zip file. No manual setup is required to evaluate the system.
 
 ### 4. Start the Development Server
 
@@ -192,16 +230,26 @@ The app hot-reloads automatically on any file change — no restart needed.
 
 Once the browser loads, confirm:
 
-- [ ] The THEIA header and chat interface are visible
-- [ ] The MARAG status panel shows 5 agents (TIRA, RCRA, HPRA, ERRA, BARA)
+- [ ] The Theia header and chat interface are visible
+- [ ] The Theia MARAG status panel shows 5 agents (TIRA, RCRA, HPRA, ERRA, BARA)
 - [ ] Typing a message triggers the 16-phase pipeline
 - [ ] The connection status indicator shows **Connected**
 
-If agents fail to respond, double-check your `.env` credentials and ensure the project is active.
+If agents fail to respond, double-check the credentials in `.env` and ensure the project is active.
 
 ### Getting Started Quickly
 
-For detailed onboarding instructions, including a complete quick-start guide, keyboard shortcuts, and troubleshooting tips, see [**GETTING_STARTED.md**](GETTING_STARTED.md).
+For detailed onboarding instructions, including a complete quick-start guide, keyboard shortcuts and troubleshooting tips, see [**GETTING_STARTED.md**](GETTING_STARTED.md).
+
+### Project Documentation
+
+Comprehensive project documentation is available:
+
+- **[Project Structure Guide](PROJECT_STRUCTURE_GUIDE.md)** - Recommended directory structure and file organisation (60+ file mappings)
+- **[PRD](docs/PRD.md)** - Product requirements and technical specifications
+- **[Quick Templates](docs/QUICK_TEMPLATES.md)** - Quick-start prompts and template examples
+- **[Testing](docs/TESTING.md)** - Testing guide and strategies
+- **[Deployment](docs/DEPLOYMENT.md)** - Deployment options and configuration
 
 ### Testing
 
@@ -261,7 +309,7 @@ Biome is configured via `biome.json` and replaces both ESLint and Prettier.
 | Problem                      | Likely Cause                    | Fix                                                             |
 | ---------------------------- | ------------------------------- | --------------------------------------------------------------- |
 | `npm install` fails          | Node.js version too old         | Upgrade to Node.js 18+                                          |
-| Blank page on `npm run dev`  | `.env` missing or malformed     | Re-check all three `VITE_*` variables                           |
+| Blank page on `npm run dev`  | `.env` missing or mismatched    | Re-check all three `VITE_*` variables                           |
 | Agents not responding        | Invalid API key or region       | Verify credentials in Relevance AI dashboard                    |
 | TypeScript errors on install | Stale `node_modules`            | Delete `node_modules/` and re-run `npm install`                 |
 | Port 5173 already in use     | Another Vite dev server running | Kill the other process or run `npm run dev -- --port 5174`      |
@@ -274,6 +322,7 @@ Biome is configured via `biome.json` and replaces both ESLint and Prettier.
 ```env
 VITE_REGION=...
 VITE_PROJECT_ID=...
+VITE_AGENT_ID=...
 VITE_WORKFORCE_ID=...
 ```
 
@@ -281,7 +330,7 @@ VITE_WORKFORCE_ID=...
 
 - `tsconfig.json` - Strict mode enabled
 - Full type coverage across codebase
-- 249 lines of custom type definitions
+- Custom type definitions
 
 ### Build Configuration
 
@@ -372,4 +421,4 @@ See [LICENSE.md](LICENSE.md) for details
 - **Relevance AI** - Multi-agent workforce platform
 - **Preact Team** - Lightweight React alternative
 - **Radix UI** - Accessible component primitives
-- **Datasets:** Credit card fraud, PaySim, MomtSim (Kaggle)
+- **Datasets:** Credit card fraud by MLG-ULB, PaySim, MomtSim (Kaggle)

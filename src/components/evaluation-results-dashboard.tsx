@@ -179,7 +179,7 @@ export function EvaluationResultsDashboard({
   const syntheticClassBalance = generateSyntheticClassBalance();
 
   return (
-    <div class="w-full space-y-6 p-6 bg-gradient-to-b from-zinc-50 to-white dark:from-zinc-900 dark:to-zinc-800">
+    <div class="w-full space-y-6 p-6 bg-linear-to-b from-zinc-50 to-white dark:from-zinc-900 dark:to-zinc-800">
       {/* Header */}
       <div class="border-b-2 border-indigo-500 pb-4">
         <h1 class="text-3xl font-bold text-zinc-900 dark:text-white mb-2">

@@ -146,11 +146,11 @@ export function MannWhitneyResultsTable({
                   <td class="text-center py-3 px-4">
                     {isSignificant ? (
                       <span class="inline-block bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">
-                        ✓ Yes
+                        [OK] Yes
                       </span>
                     ) : (
                       <span class="inline-block bg-zinc-300 dark:bg-zinc-600 text-zinc-900 dark:text-white text-xs font-bold px-3 py-1 rounded-full">
-                        ✗ No
+                        [X] No
                       </span>
                     )}
                   </td>
@@ -165,7 +165,7 @@ export function MannWhitneyResultsTable({
       <div class="space-y-3">
         <div class="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded p-4">
           <p class="text-sm font-semibold text-amber-900 dark:text-amber-100 mb-2">
-            📊 How to Read These Results:
+            [CHART] How to Read These Results:
           </p>
           <ul class="text-xs text-amber-800 dark:text-amber-200 space-y-1">
             <li>
@@ -193,7 +193,7 @@ export function MannWhitneyResultsTable({
 
         <div class="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded p-4">
           <p class="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">
-            💡 Viva Talking Points:
+            [TIP] Viva Talking Points:
           </p>
           <ul class="text-xs text-blue-800 dark:text-blue-200 space-y-1">
             <li>

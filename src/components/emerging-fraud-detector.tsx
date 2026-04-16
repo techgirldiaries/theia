@@ -155,7 +155,7 @@ export function EmergingFraudDetector({
         {/* EMERGING Fraud Types */}
         {emergingFraudTypes.length > 0 && (
           <CategorySection
-            label="📈 EMERGING Fraud Types"
+            label="[TRENDING] EMERGING Fraud Types"
             types={emergingFraudTypes}
             colour="border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/10"
             expandedType={expandedType}
@@ -177,7 +177,7 @@ export function EmergingFraudDetector({
         {/* STABLE Fraud Types */}
         {stableFraudTypes.length > 0 && (
           <CategorySection
-            label="✓ STABLE Fraud Types"
+            label="[OK] STABLE Fraud Types"
             types={stableFraudTypes}
             colour="border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/10"
             expandedType={expandedType}

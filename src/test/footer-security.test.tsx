@@ -124,7 +124,7 @@ describe("Footer Security & Robustness", () => {
     render(<Footer />);
     const textarea = screen.getByPlaceholderText(/ask anything/i);
     fireEvent.input(textarea, {
-      target: { value: '<a href="javascript:alert(\'xss\')">click</a>' },
+      target: { value: "<a href=\"javascript:alert('xss')\">click</a>" },
     });
     fireEvent.keyDown(textarea, { key: "Enter" });
     expect(document.body.innerHTML).not.toMatch(/href=["']javascript:/i);
@@ -203,11 +203,9 @@ describe("Footer Security & Robustness", () => {
   test("rejects .html file upload", async () => {
     render(<Footer />);
     const fileInput = screen.getByLabelText(/file input/i);
-    const file = new File(
-      ["<script>alert(1)</script>"],
-      "phishing.html",
-      { type: "text/html" },
-    );
+    const file = new File(["<script>alert(1)</script>"], "phishing.html", {
+      type: "text/html",
+    });
     fireEvent.change(fileInput, { target: { files: [file] } });
     await waitFor(() => {
       expect(
@@ -236,15 +234,18 @@ describe("Footer Security & Robustness", () => {
     const file = new File(["data"], "", { type: "text/csv" });
     fireEvent.change(fileInput, { target: { files: [file] } });
     await waitFor(() => {
-      expect(screen.queryByText(/not an accepted file type/i)).not.toBeInTheDocument();
+      expect(
+        screen.queryByText(/not an accepted file type/i),
+      ).not.toBeInTheDocument();
     });
   });
 
   test("enforces MAX_FILES limit — calls showToast with maximum warning", async () => {
     render(<Footer />);
     const fileInput = screen.getByLabelText(/file input/i);
-    const files = Array.from({ length: 6 }, (_, i) =>
-      new File(["data"], `file${i}.csv`, { type: "text/csv" }),
+    const files = Array.from(
+      { length: 6 },
+      (_, i) => new File(["data"], `file${i}.csv`, { type: "text/csv" }),
     );
     fireEvent.change(fileInput, { target: { files } });
     await waitFor(() => {
@@ -307,7 +308,9 @@ describe("Footer Security & Robustness", () => {
 
   test("Shift+Enter inserts newline instead of submitting", () => {
     render(<Footer />);
-    const textarea = screen.getByPlaceholderText(/ask anything/i) as HTMLTextAreaElement;
+    const textarea = screen.getByPlaceholderText(
+      /ask anything/i,
+    ) as HTMLTextAreaElement;
     fireEvent.input(textarea, { target: { value: "line one" } });
     fireEvent.keyDown(textarea, { key: "Enter", shiftKey: true });
     expect(screen.queryByText(/character limit/i)).not.toBeInTheDocument();
@@ -342,7 +345,7 @@ describe("Footer Security & Robustness", () => {
     render(<Footer />);
     const textarea = screen.getByPlaceholderText(/ask anything/i);
     fireEvent.input(textarea, {
-      target: { value: "مرحبا 你好 こんにちは 🔥💀🤖 \u200B\u202E\uFEFF" },
+      target: { value: "مرحبا 你好 こんにちは ™©®✓ \u200B\u202E\uFEFF" },
     });
     fireEvent.keyDown(textarea, { key: "Enter" });
     expect(screen.queryByText(/character limit/i)).not.toBeInTheDocument();

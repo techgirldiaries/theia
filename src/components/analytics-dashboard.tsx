@@ -44,9 +44,9 @@ export function AnalyticsDashboard() {
 
   // Risk distribution for bar chart
   const riskDistributionData = [
-    { label: "Low Risk",    value: stats.lowRisk,    color: "bg-green-500" },
+    { label: "Low Risk", value: stats.lowRisk, color: "bg-green-500" },
     { label: "Medium Risk", value: stats.mediumRisk, color: "bg-yellow-500" },
-    { label: "High Risk",   value: stats.highRisk,   color: "bg-red-500" },
+    { label: "High Risk", value: stats.highRisk, color: "bg-red-500" },
   ];
 
   // Dataset quality scores for bar chart
@@ -59,7 +59,7 @@ export function AnalyticsDashboard() {
   const handleClearHistory = () => {
     if (
       confirm(
-        "Are you sure you want to clear all chat history, datasets, and performance metrics? This action cannot be undone.",
+        "Are you sure you want to clear all chat history, datasets and performance metrics? This action cannot be undone.",
       )
     ) {
       clearChatHistory();
@@ -68,9 +68,9 @@ export function AnalyticsDashboard() {
   };
 
   // Live evaluation state
-  const evalStream  = evaluationStreamState.value;
-  const benchmark   = benchmarkResults.value;
-  const qualEval    = qualitativeEvaluation.value;
+  const evalStream = evaluationStreamState.value;
+  const benchmark = benchmarkResults.value;
+  const qualEval = qualitativeEvaluation.value;
 
   return (
     <div class="space-y-4 animate-fade-in">
@@ -88,9 +88,15 @@ export function AnalyticsDashboard() {
           <button
             class="ml-4 p-2 rounded hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
             title="Close Analytics Dashboard"
-            onClick={() => { showAnalytics.value = false; }}
+            onClick={() => {
+              showAnalytics.value = false;
+            }}
           >
-            <X size={22} strokeWidth={2} class="text-zinc-500 dark:text-zinc-300" />
+            <X
+              size={22}
+              strokeWidth={2}
+              class="text-zinc-500 dark:text-zinc-300"
+            />
           </button>
         </div>
       </div>
@@ -140,7 +146,10 @@ export function AnalyticsDashboard() {
             height={180}
           />
         ) : (
-          <div class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg p-4 flex items-center justify-center text-sm text-zinc-400 dark:text-zinc-500" style="height:180px">
+          <div
+            class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg p-4 flex items-center justify-center text-sm text-zinc-400 dark:text-zinc-500"
+            style="height:180px"
+          >
             No response time data yet
           </div>
         )}
@@ -155,10 +164,7 @@ export function AnalyticsDashboard() {
           </h3>
           <div class="space-y-2">
             {datasets.slice(0, 5).map((d) => (
-              <div
-                key={d.id}
-                class="flex items-center justify-between text-sm"
-              >
+              <div key={d.id} class="flex items-center justify-between text-sm">
                 <span class="text-zinc-700 dark:text-zinc-300 font-mono truncate max-w-xs">
                   {d.fileName}
                 </span>
@@ -196,7 +202,9 @@ export function AnalyticsDashboard() {
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Stream state */}
           <div class="border border-zinc-200 dark:border-zinc-700 rounded-lg p-3">
-            <p class="text-xs text-zinc-500 dark:text-zinc-400 mb-1">Report Stream</p>
+            <p class="text-xs text-zinc-500 dark:text-zinc-400 mb-1">
+              Report Stream
+            </p>
             {evalStream.isStreaming ? (
               <span class="flex items-center gap-1.5 text-blue-600 dark:text-blue-400 text-sm font-medium">
                 <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse inline-block" />
@@ -205,7 +213,8 @@ export function AnalyticsDashboard() {
             ) : evalStream.lastParsedAt ? (
               <span class="flex items-center gap-1.5 text-green-600 dark:text-green-400 text-sm font-medium">
                 <span class="w-2 h-2 rounded-full bg-green-500 inline-block" />
-                Live · {evalStream.successfulParseCount} report{evalStream.successfulParseCount !== 1 ? "s" : ""} parsed
+                Live · {evalStream.successfulParseCount} report
+                {evalStream.successfulParseCount !== 1 ? "s" : ""} parsed
               </span>
             ) : (
               <span class="flex items-center gap-1.5 text-zinc-400 dark:text-zinc-500 text-sm">
@@ -214,7 +223,9 @@ export function AnalyticsDashboard() {
               </span>
             )}
             {evalStream.lastParseError && !evalStream.isStreaming && (
-              <p class="text-xs text-red-500 mt-1 truncate">{evalStream.lastParseError}</p>
+              <p class="text-xs text-red-500 mt-1 truncate">
+                {evalStream.lastParseError}
+              </p>
             )}
           </div>
 
@@ -226,20 +237,40 @@ export function AnalyticsDashboard() {
             {benchmark ? (
               <div class="space-y-1">
                 <p class="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
-                  {benchmark.datasetsAnalyzed.length} dataset{benchmark.datasetsAnalyzed.length !== 1 ? "s" : ""} compared
+                  {benchmark.datasetsAnalyzed.length} dataset
+                  {benchmark.datasetsAnalyzed.length !== 1 ? "s" : ""} compared
                 </p>
                 <p class="text-xs text-zinc-500 dark:text-zinc-400">
-                  Best: <span class="font-medium text-zinc-700 dark:text-zinc-300">{benchmark.bestPerformingDataset}</span>
+                  Best:{" "}
+                  <span class="font-medium text-zinc-700 dark:text-zinc-300">
+                    {benchmark.bestPerformingDataset}
+                  </span>
                 </p>
-                {benchmark.bestPerformingDataset && benchmark.performanceMetrics[benchmark.bestPerformingDataset] && (
-                  <p class="text-xs text-zinc-400 dark:text-zinc-500">
-                    F1 {(benchmark.performanceMetrics[benchmark.bestPerformingDataset].f1Score * 100).toFixed(1)}%
-                    · AUC {(benchmark.performanceMetrics[benchmark.bestPerformingDataset].aucRoc * 100).toFixed(1)}%
-                  </p>
-                )}
+                {benchmark.bestPerformingDataset &&
+                  benchmark.performanceMetrics[
+                    benchmark.bestPerformingDataset
+                  ] && (
+                    <p class="text-xs text-zinc-400 dark:text-zinc-500">
+                      F1{" "}
+                      {(
+                        benchmark.performanceMetrics[
+                          benchmark.bestPerformingDataset
+                        ].f1Score * 100
+                      ).toFixed(1)}
+                      % · AUC{" "}
+                      {(
+                        benchmark.performanceMetrics[
+                          benchmark.bestPerformingDataset
+                        ].aucRoc * 100
+                      ).toFixed(1)}
+                      %
+                    </p>
+                  )}
               </div>
             ) : (
-              <p class="text-sm text-zinc-400 dark:text-zinc-500">No benchmark data</p>
+              <p class="text-sm text-zinc-400 dark:text-zinc-500">
+                No benchmark data
+              </p>
             )}
           </div>
 
@@ -267,11 +298,14 @@ export function AnalyticsDashboard() {
                   </span>
                 </div>
                 <p class="text-xs text-zinc-400 dark:text-zinc-500">
-                  {qualEval.dimensions.filter((d) => d.grade === "PASS").length} of {qualEval.dimensions.length} dimensions passed
+                  {qualEval.dimensions.filter((d) => d.grade === "PASS").length}{" "}
+                  of {qualEval.dimensions.length} dimensions passed
                 </p>
               </div>
             ) : (
-              <p class="text-sm text-zinc-400 dark:text-zinc-500">No evaluation yet</p>
+              <p class="text-sm text-zinc-400 dark:text-zinc-500">
+                No evaluation yet
+              </p>
             )}
           </div>
         </div>
@@ -293,7 +327,8 @@ export function AnalyticsDashboard() {
                 <div class="flex items-center gap-2">
                   <MessageSquare size={14} class="text-zinc-400" />
                   <span class="text-zinc-700 dark:text-zinc-300">
-                    {session.messageCount} message{session.messageCount !== 1 ? "s" : ""}
+                    {session.messageCount} message
+                    {session.messageCount !== 1 ? "s" : ""}
                   </span>
                 </div>
                 <span class="text-zinc-400 dark:text-zinc-500 text-xs">
@@ -309,9 +344,12 @@ export function AnalyticsDashboard() {
       <div class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg p-4">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-semibold text-zinc-800 dark:text-zinc-200">Clear All Data</p>
+            <p class="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
+              Clear All Data
+            </p>
             <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-              Permanently removes all chat history, datasets, and performance metrics.
+              Permanently removes all chat history, datasets, and performance
+              metrics.
             </p>
           </div>
           <button

@@ -653,12 +653,12 @@ export function Footer() {
             "• **Access**: Files are accessible at the URL(s) above. Use the preview excerpt to understand schema, then sample or stream rows from the URL.";
         } else if (hasLargeFile) {
           instructions =
-            "✅ Instructions: The file(s) are accessible at the URL(s) above. These datasets are large — use the preview excerpt to understand the schema and column layout, then sample or stream rows from the URL rather than loading the entire file at once.";
+            "[OK] Instructions: The file(s) are accessible at the URL(s) above. These datasets are large — use the preview excerpt to understand the schema and column layout, then sample or stream rows from the URL rather than loading the entire file at once.";
         } else {
           instructions =
-            "✅ Instructions: The file(s) are uploaded and accessible at the URL(s) above. Please fetch and analyse the dataset from the provided URL(s). The preview shows the structure (column names and sample rows).";
+            "[OK] Instructions: The file(s) are uploaded and accessible at the URL(s) above. Please fetch and analyse the dataset from the provided URL(s). The preview shows the structure (column names and sample rows).";
         }
-        messageText = `${messageText}\n\n📎 Dataset Files:\n${fileList}\n\n${instructions}`;
+        messageText = `${messageText}\n\n[FILES] Dataset Files:\n${fileList}\n\n${instructions}`;
       }
 
       messages.value = [

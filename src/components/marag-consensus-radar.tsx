@@ -325,7 +325,7 @@ export function MaragConsensusRadar({
                       key={idx}
                       className="text-xs text-amber-800 dark:text-amber-300 flex items-start gap-1"
                     >
-                      <span>⚠</span>
+                      <span>[WARNING]</span>
                       <span>{source}</span>
                     </li>
                   ),

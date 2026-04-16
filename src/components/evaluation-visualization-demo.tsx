@@ -19,7 +19,7 @@ import { EvaluationResultsDashboard } from "./evaluation-results-dashboard";
  */
 export function EvaluationVisualizationDemo() {
   return (
-    <div class="w-full min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+    <div class="w-full min-h-screen bg-linear-to-b from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
       {/* Navigation Header */}
       <div class="sticky top-0 z-10 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 py-4">

@@ -353,14 +353,14 @@ export function generateValidationReport(
 
   let report = "=== VISUALIZATION URL VALIDATION REPORT ===\n\n";
   report += `Total: ${results.length}\n`;
-  report += `✅ Accessible: ${accessible}\n`;
-  report += `❌ Inaccessible: ${inaccessible}\n\n`;
+  report += `[OK] Accessible: ${accessible}\n`;
+  report += `[ERROR] Inaccessible: ${inaccessible}\n\n`;
 
   if (inaccessible > 0) {
     report += "FAILED URLs:\n";
     for (const result of results) {
       if (result.status === "inaccessible" || result.status === "error") {
-        report += `  ❌ ${result.filename}\n`;
+        report += `  [ERROR] ${result.filename}\n`;
         report += `     URL: ${result.url}\n`;
         if (result.httpStatus) {
           report += `     HTTP Status: ${result.httpStatus}\n`;

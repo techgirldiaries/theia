@@ -22,19 +22,19 @@ Comprehensive Visual Analytics Across All Phases
 
 Core Visualization Principles:
 
-Professional Quality: Generate publication-ready charts with clear legends, annotations, and branding
+Professional Quality: Generate publication-ready charts with clear legends and annotations with branding
 
-Downloadable Formats: Export all visualisations as permanent downloadable files (PNG, JPG, JPEG, SVG, PDF)
+2. **Downloadable Formats**: Export all visualisations as permanent downloadable files (PNG, JPG, JPEG, SVG, PDF)
 
-Detailed Explanations: Provide comprehensive written explanations for each visualization
+3. **Detailed Explanations**: Provide comprehensive written explanations for each visualisation
 
-Interactive Elements: Include hover tooltips, zoom capabilities, and interactive legends where applicable
+4. **Interactive Elements**: Include hover tooltips, zoom capabilities and interactive legends where applicable
 
-Consistent Styling: Use professional colour schemes, fonts, and layouts across all visualizations
+5. **Consistent Styling**: Use professional colour schemes, fonts and layouts across all visualisations
 
 Multi-Agent Retrieval-Augmented Generation (MARAG) Framework
 
-Core MARAG Architecture: Deploy 5 specialized RAG agents that collaborate across fraud intelligence domains with distributed retrieval, agent-to-agent communication, and consensus mechanisms.
+Core MARAG Architecture: Deploy 5 specialised RAG agents that collaborate across fraud intelligence domains with distributed retrieval, agent-to-agent communication and consensus mechanisms.
 
 Specialised MARAG Agents:
 
@@ -140,7 +140,7 @@ Performance Benchmarking & Multi-Dataset Comparison Framework
 
 Core Benchmarking Capabilities:
 
-Dataset Performance Evaluation: Comprehensive testing and analysis of dataset quality, fraud detection accuracy, and model performance
+Dataset Performance Evaluation: Comprehensive testing and analysis of dataset quality, fraud detection accuracy and model performance
 
 Multi-Dataset Comparison: Side-by-side analysis of multiple datasets through all 15 specialised phases
 
@@ -236,7 +236,7 @@ For Each Visualisation:
 
 Generate Chart: Create high-quality visualisation using appropriate tool
 
-Add Annotations: Include detailed labels, legends, and explanatory text
+Add Annotations: Include detailed labels, legends and explanatory text
 
 Export Image: Save as permanent downloadable file with descriptive filename
 
@@ -285,7 +285,7 @@ Benchmarking Metrics: Dataset size comparison, schema similarity analysis, quali
 Comparative Visualisations: Dataset profile comparison charts, quality score radar plots, schema alignment matrices
 
 Quality Gate: >90% data completeness required to proceed
-Error Handling: On failure, try Python code fallback, log errors, and request alternative data source if both methods fail
+Error Handling: On failure, try Python code fallback, log errors and request alternative data source if both methods fail
 
 Phase 1: Data Ingestion & Validation
 
@@ -293,20 +293,20 @@ Objective: Clean and standardise transaction data
 
 Process:
 
-Schema discovery - automatically detect column names, data types, and field purposes
+Schema discovery - automatically detect column names, data types and field purposes
 
 Adaptive validation - validate based on discovered structure (minimum: one ID field + one numeric field)
 
 Intelligent cleaning - apply appropriate cleaning strategy per column type (mode for categorical, median for numeric, forward-fill for temporal)
 
-Dynamic standardisation - normalise dates (ISO 8601), currencies, and categorical values based on detected patterns
+Dynamic standardisation - normalise dates (ISO 8601), currencies and categorical values based on detected patterns
 
 Quality scoring - calculate completeness, validity, consistency adapted to dataset characteristics
 
 Dataset profiling - document field mapping and generate quality scorecard
 
 Quality Gate: >75% quality score (adaptive threshold)
-Error Handling: If <75%, attempt targeted data repair based on specific issues identified, flag problematic fields, and continue with available clean data
+Error Handling: If <75%, attempt targeted data repair based on specific issues identified, flag problematic fields and continue with available clean data
 
 Phase 2: Transaction Monitoring
 
@@ -349,7 +349,7 @@ Establish baselines - calculate statistical baselines (mean, std, percentiles)
 
 Anomaly detection - apply isolation forest, multivariate analysis
 
-HPRA Activation - Historical Pattern RAG Agent retrieves fraud typologies, pattern libraries, and historical case studies
+HPRA Activation - Historical Pattern RAG Agent retrieves fraud typologies, pattern libraries and historical case studies
 
 Fraud classification - identify ATO, Payment Fraud, Identity Fraud using HPRA pattern matching
 
@@ -504,7 +504,7 @@ Audit Trail Integration:
   • Complete traceability for regulatory review and remediation
 
 Output: ComplianceVerification object aggregating all checks, regulatory 
-requirements, and audit trail references for comprehensive compliance evidence.
+requirements and audit trail references for comprehensive compliance evidence.
 
 ──────────────────────────────────────────────────────────────────────────────
 
@@ -531,7 +531,7 @@ Error Handling: If screening fails, flag for manual compliance review
 
 Phase 9: Merchant Verification
 
-Objective: Business legitimacy, location verification, and merchant risk analysis
+Objective: Business legitimacy, location verification and merchant risk analysis
 
 Process:
 
@@ -624,7 +624,7 @@ Error Handling: If compliance tool fails, generate basic structured report for m
 
 Phase 13: Performance Monitoring
 
-Objective: System health, model governance, and comprehensive benchmarking
+Objective: System health, model governance and comprehensive benchmarking
 
 Multi-Dataset Performance Benchmarking: Execute comprehensive performance evaluation across all datasets and phases
 
@@ -642,7 +642,7 @@ Performance reporting - create executive summaries with trends and comparative a
 
 Benchmarking visualisations - generate performance comparison charts, statistical test results, confidence intervals
 
-Data export - produce CSV/JSON with metrics, recommendations, and benchmarking results
+Data export - produce CSV/JSON with metrics, recommendations and benchmarking results
 
 System health maintenance - monitor bottlenecks and optimisation across all datasets
 
@@ -817,7 +817,7 @@ Downloadable Assets: Provide temporary or permanent downloadable images and repo
 
 Comprehensive Documentation: Include detailed written explanations for every visualisation and chart generated
 
-Ready to execute comprehensive fraud detection analysis through the 15-phase pipeline with robust error handling, consistent risk scoring, advanced visualisations, and regulatory compliance.`;
+Ready to execute comprehensive fraud detection analysis through the 15-phase pipeline with robust error handling, consistent risk scoring, advanced visualisations and regulatory compliance.`;
 
 /**
  * Export the system prompt for use throughout the application

@@ -139,13 +139,13 @@ export function DatasetImbalanceComparison({
               <div class="text-xs text-zinc-700 dark:text-zinc-300 bg-white/50 dark:bg-zinc-900/50 p-2 rounded border border-zinc-200 dark:border-zinc-700">
                 {isHighlyImbalanced ? (
                   <p>
-                    ⚠️ <strong>Highly imbalanced:</strong> Standard k-fold could
-                    create folds without minority class. Stratified k-fold is
-                    required.
+                    [WARNING] <strong>Highly imbalanced:</strong> Standard
+                    k-fold could create folds without minority class. Stratified
+                    k-fold is required.
                   </p>
                 ) : (
                   <p>
-                    ✓ <strong>Well-balanced:</strong> Both standard and
+                    [OK] <strong>Well-balanced:</strong> Both standard and
                     stratified k-fold suitable.
                   </p>
                 )}

@@ -11,7 +11,7 @@
  * 4. evaluation-results-dashboard.tsx - Complete dashboard combining all 3
  * 5. evaluation-visualization-demo.tsx - Full page demo with instructions
  * 
- * Status: ✓ All components build successfully (1749 modules, zero errors)
+ * Status: [OK] All components build successfully (1749 modules, zero errors)
  */
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -380,11 +380,11 @@ export async function CompareDatasets(
 // ──────────────────────────────────────────────────────────────────────────────
 
 /**
- * ✓ Build successful with all components
- * ✓ 1749 modules transformed
- * ✓ Zero TypeScript errors
- * ✓ No breaking changes to existing codebase
- * ✓ Production-ready
+ * [OK] Build successful with all components
+ * [OK] 1749 modules transformed
+ * [OK] Zero TypeScript errors
+ * [OK] No breaking changes to existing codebase
+ * [OK] Production-ready
  * 
  * Files created:
  * - src/components/kfold-metrics-chart.tsx (200 lines)

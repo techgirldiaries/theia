@@ -1,5 +1,7 @@
 # Testing Guide for THEIA
 
+**See also:** [PROJECT_STRUCTURE_GUIDE.md](../PROJECT_STRUCTURE_GUIDE.md) for test file organisation, [CODEBASE_QUALITY.md](../CODEBASE_QUALITY.md) for quality standards
+
 ## Test Structure
 
 Tests are organised in the `src/test/` and `src/hooks/` directories using Vitest framework.

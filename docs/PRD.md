@@ -1,4 +1,4 @@
-# Product Requirements Document: THEIA Fraud Intelligence Platform
+# Product Requirements Document: THEIA/Theia Fraud Intelligence Platform
 
 ## Product Overview
 

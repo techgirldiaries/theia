@@ -182,7 +182,7 @@ npm run dev
 
 Vite will start a local server. Open your browser to:
 
-```
+```sh
 http://localhost:5173
 ```
 

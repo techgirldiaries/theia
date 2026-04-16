@@ -12,7 +12,7 @@ These are pre-configured prompts available in the UI that trigger full analysis 
 
 **Prompt:**
 
-```
+```text
 Please analyse the uploaded dataset for anomalies, unusual patterns and potential fraud indicators. Provide a detailed risk assessment.
 ```
 
@@ -31,7 +31,7 @@ Please analyse the uploaded dataset for anomalies, unusual patterns and potentia
 
 **Prompt:**
 
-```
+```text
 Generate a comprehensive fraud report based on the data, including risk scores, fraud patterns and recommendations.
 ```
 
@@ -50,7 +50,7 @@ Generate a comprehensive fraud report based on the data, including risk scores, 
 
 **Prompt:**
 
-```
+```text
 Perform a risk assessment on the transactions and categorize them by risk level (low, medium, high).
 ```
 
@@ -69,7 +69,7 @@ Perform a risk assessment on the transactions and categorize them by risk level 
 
 **Prompt:**
 
-```
+```text
 Conduct a deep investigation into suspicious activities, trace transaction patterns and identify potential fraud networks.
 ```
 
@@ -88,7 +88,7 @@ Conduct a deep investigation into suspicious activities, trace transaction patte
 
 **Prompt:**
 
-```
+```text
 Evaluate the fraud detection performance metrics including accuracy, false positives, false negatives and provide optimization recommendations.
 ```
 
@@ -108,7 +108,7 @@ Evaluate the fraud detection performance metrics including accuracy, false posit
 
 **Prompt:**
 
-```
+```text
 Analyse temporal trends in the fraud data, identify seasonal patterns, emerging fraud types and predict future risks.
 ```
 
@@ -130,7 +130,7 @@ Try these custom prompts to test specific dashboard features and capabilities:
 
 **Prompt:**
 
-```
+```text
 Run a complete 16-phase fraud analysis on the dataset and show me live progress through each phase
 ```
 
@@ -148,7 +148,7 @@ Run a complete 16-phase fraud analysis on the dataset and show me live progress 
 
 **Prompt:**
 
-```
+```text
 Analyze this transaction using all 5 specialist agents (TIRA, RCRA, HPRA, ERRA, BARA) and show consensus scoring
 ```
 
@@ -167,7 +167,7 @@ Analyze this transaction using all 5 specialist agents (TIRA, RCRA, HPRA, ERRA, 
 
 **Prompt:**
 
-```
+```text
 Generate comprehensive fraud detection visualizations including ROC curves, confusion matrices, and heatmaps
 ```
 

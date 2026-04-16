@@ -172,7 +172,7 @@ export function EnhancedFraudReportDisplay({
                   Phases Completed
                 </p>
                 <p class="text-lg font-bold text-zinc-900 dark:text-white">
-                  {report.processing_metadata?.phases_completed ?? 0}/15
+                  {report.processing_metadata?.phases_completed ?? 0}/16
                 </p>
               </div>
               <div>

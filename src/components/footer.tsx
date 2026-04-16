@@ -65,7 +65,8 @@ function trimPreviewText(
 function formatFileSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  if (bytes < 1024 * 1024 * 1024)
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
 }
 
@@ -648,7 +649,7 @@ export function Footer() {
           instructions =
             "⚠️ Instructions: Very large dataset detected (>300MB). For optimal performance and timeout management:\n\n" +
             "• **Recommended**: Request 'stratified sample analysis' (10-20% representative sample) for faster results\n" +
-            "• **Alternative**: Specify 'complete analysis' if you need full depth — this will execute all 15 phases but may require extended processing time\n" +
+            "• **Alternative**: Specify 'complete analysis' if you need full depth — this will execute all 16 phases but may require extended processing time\n" +
             "• **Access**: Files are accessible at the URL(s) above. Use the preview excerpt to understand schema, then sample or stream rows from the URL.";
         } else if (hasLargeFile) {
           instructions =

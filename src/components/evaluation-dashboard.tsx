@@ -43,10 +43,7 @@ import {
   StatisticalSignificanceHeatmap,
 } from "./heatmap";
 import { RocCurve, buildRocSeriesFromBenchmark } from "./roc-curve";
-import {
-  ConfusionMatrix,
-  estimateConfusionMatrix,
-} from "./confusion-matrix";
+import { ConfusionMatrix, estimateConfusionMatrix } from "./confusion-matrix";
 import {
   StatisticalDistribution,
   buildComparisonSeriesFromBenchmark,
@@ -58,21 +55,21 @@ import type { CaseProgress } from "./phase-pipeline";
 // ── Empty fallback for LivePhasePipeline ──────────────────────────────────────
 
 const EMPTY_PROGRESS: CaseProgress = {
-  caseId:          "—",
+  caseId: "—",
   overallProgress: 0,
-  currentPhase:    "phase-0",
-  phases:          [],
+  currentPhase: "phase-0",
+  phases: [],
 };
 
 // ── Tab definitions ────────────────────────────────────────────────────────────
 
 const TABS = [
-  { id: "overview",     label: "Overview",      icon: Activity  },
-  { id: "quantitative", label: "Quantitative",  icon: BarChart3 },
-  { id: "marag",        label: "MARAG",         icon: Users     },
-  { id: "qualitative",  label: "Qualitative",   icon: ShieldCheck },
-  { id: "pipeline",     label: "Pipeline",      icon: GitBranch },
-  { id: "compliance",   label: "Compliance",    icon: Scale     },
+  { id: "overview", label: "Overview", icon: Activity },
+  { id: "quantitative", label: "Quantitative", icon: BarChart3 },
+  { id: "marag", label: "MARAG", icon: Users },
+  { id: "qualitative", label: "Qualitative", icon: ShieldCheck },
+  { id: "pipeline", label: "Pipeline", icon: GitBranch },
+  { id: "compliance", label: "Compliance", icon: Scale },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -112,7 +109,11 @@ function MetricPill({
   label,
   value,
   color,
-}: { label: string; value: string; color: string }) {
+}: {
+  label: string;
+  value: string;
+  color: string;
+}) {
   return (
     <div class={`border ${color} rounded-lg p-3 text-center`}>
       <div class="text-lg font-bold text-zinc-900 dark:text-white">{value}</div>
@@ -125,15 +126,16 @@ function MetricPill({
 
 function OverviewTab() {
   const report = latestEnhancedReport.value;
-  const qual   = qualitativeEvaluation.value;
-  const br     = benchmarkResults.value;
+  const qual = qualitativeEvaluation.value;
+  const br = benchmarkResults.value;
 
   if (!report) {
     return (
       <div class="text-center py-12">
         <Zap size={40} class="mx-auto mb-3 text-zinc-300 dark:text-zinc-600" />
         <p class="text-zinc-500 dark:text-zinc-400 text-sm">
-          No analysis results yet. Start a fraud detection analysis to populate this dashboard.
+          No analysis results yet. Start a fraud detection analysis to populate
+          this dashboard.
         </p>
       </div>
     );
@@ -152,28 +154,40 @@ function OverviewTab() {
   return (
     <div class="space-y-4">
       {/* Risk hero */}
-      <div class={`border ${riskColor} rounded-lg p-4 bg-white dark:bg-zinc-800`}>
+      <div
+        class={`border ${riskColor} rounded-lg p-4 bg-white dark:bg-zinc-800`}
+      >
         <div class="flex items-start justify-between gap-3 flex-wrap">
           <div>
-            <p class="text-xs text-zinc-500 dark:text-zinc-400 mb-0.5">Case ID</p>
+            <p class="text-xs text-zinc-500 dark:text-zinc-400 mb-0.5">
+              Case ID
+            </p>
             <p class="font-mono text-sm text-zinc-900 dark:text-white font-semibold">
               {report.case_id}
             </p>
           </div>
           <div class="text-right">
-            <p class="text-xs text-zinc-500 dark:text-zinc-400 mb-0.5">Risk Score</p>
+            <p class="text-xs text-zinc-500 dark:text-zinc-400 mb-0.5">
+              Risk Score
+            </p>
             <p class="text-3xl font-bold text-zinc-900 dark:text-white">
               {report.overall_risk_score}
               <span class="text-sm font-normal text-zinc-400">/100</span>
             </p>
           </div>
           <div class="text-right">
-            <p class="text-xs text-zinc-500 dark:text-zinc-400 mb-0.5">Category</p>
-            <span class={`px-2 py-1 rounded font-bold text-sm ${
-              report.risk_category === "CRITICAL" ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
-              : report.risk_category === "HIGH" ? "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300"
-              : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
-            }`}>
+            <p class="text-xs text-zinc-500 dark:text-zinc-400 mb-0.5">
+              Category
+            </p>
+            <span
+              class={`px-2 py-1 rounded font-bold text-sm ${
+                report.risk_category === "CRITICAL"
+                  ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
+                  : report.risk_category === "HIGH"
+                    ? "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300"
+                    : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
+              }`}
+            >
               {report.risk_category}
             </span>
           </div>
@@ -182,7 +196,10 @@ function OverviewTab() {
         {report.fraud_types_detected?.length > 0 && (
           <div class="mt-3 flex flex-wrap gap-1.5">
             {report.fraud_types_detected.map((ft) => (
-              <span key={ft} class="px-2 py-0.5 text-xs bg-zinc-100 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300 rounded">
+              <span
+                key={ft}
+                class="px-2 py-0.5 text-xs bg-zinc-100 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300 rounded"
+              >
                 {ft}
               </span>
             ))}
@@ -192,15 +209,23 @@ function OverviewTab() {
 
       {/* Qualitative grade */}
       {qual && (
-        <div class={`border rounded-lg p-4 ${
-          qual.overallGrade === "PASS" ? "border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/20"
-          : qual.overallGrade === "PARTIAL" ? "border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20"
-          : "border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20"
-        }`}>
+        <div
+          class={`border rounded-lg p-4 ${
+            qual.overallGrade === "PASS"
+              ? "border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/20"
+              : qual.overallGrade === "PARTIAL"
+                ? "border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20"
+                : "border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20"
+          }`}
+        >
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-xs text-zinc-500 dark:text-zinc-400">Qualitative Grade</p>
-              <p class="text-xl font-bold text-zinc-900 dark:text-white">{qual.overallGrade}</p>
+              <p class="text-xs text-zinc-500 dark:text-zinc-400">
+                Qualitative Grade
+              </p>
+              <p class="text-xl font-bold text-zinc-900 dark:text-white">
+                {qual.overallGrade}
+              </p>
             </div>
             <p class="text-4xl font-bold text-zinc-900 dark:text-white">
               {qual.overallScore}
@@ -214,13 +239,32 @@ function OverviewTab() {
       {bestMetrics && bestDataset && (
         <div>
           <p class="text-xs text-zinc-500 dark:text-zinc-400 mb-2">
-            Best Dataset: <span class="font-semibold text-zinc-700 dark:text-zinc-300">{bestDataset}</span>
+            Best Dataset:{" "}
+            <span class="font-semibold text-zinc-700 dark:text-zinc-300">
+              {bestDataset}
+            </span>
           </p>
           <div class="grid grid-cols-4 gap-2">
-            <MetricPill label="Precision" value={`${(bestMetrics.precision * 100).toFixed(1)}%`} color="border-indigo-200 dark:border-indigo-800" />
-            <MetricPill label="Recall"    value={`${(bestMetrics.recall    * 100).toFixed(1)}%`} color="border-emerald-200 dark:border-emerald-800" />
-            <MetricPill label="F1 Score"  value={`${(bestMetrics.f1Score   * 100).toFixed(1)}%`} color="border-amber-200 dark:border-amber-800" />
-            <MetricPill label="AUC-ROC"   value={`${(bestMetrics.aucRoc    * 100).toFixed(1)}%`} color="border-purple-200 dark:border-purple-800" />
+            <MetricPill
+              label="Precision"
+              value={`${(bestMetrics.precision * 100).toFixed(1)}%`}
+              color="border-indigo-200 dark:border-indigo-800"
+            />
+            <MetricPill
+              label="Recall"
+              value={`${(bestMetrics.recall * 100).toFixed(1)}%`}
+              color="border-emerald-200 dark:border-emerald-800"
+            />
+            <MetricPill
+              label="F1 Score"
+              value={`${(bestMetrics.f1Score * 100).toFixed(1)}%`}
+              color="border-amber-200 dark:border-amber-800"
+            />
+            <MetricPill
+              label="AUC-ROC"
+              value={`${(bestMetrics.aucRoc * 100).toFixed(1)}%`}
+              color="border-purple-200 dark:border-purple-800"
+            />
           </div>
         </div>
       )}
@@ -240,7 +284,8 @@ function PerDatasetEvaluationCards() {
         Per-Dataset Qualitative Evaluation
       </h3>
       <p class="text-xs text-zinc-400 dark:text-zinc-500 mb-4">
-        Same 15-phase pipeline applied to every dataset — no per-dataset configuration required.
+        Same 16-phase pipeline applied to every dataset — no per-dataset
+        configuration required.
       </p>
       <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {Object.values(evals).map((ev) => {
@@ -258,13 +303,18 @@ function PerDatasetEvaluationCards() {
                 : "bg-red-100 text-red-700 dark:bg-red-800/40 dark:text-red-200";
 
           return (
-            <div key={ev.datasetName} class={`border rounded-lg p-3 ${gradeColor}`}>
+            <div
+              key={ev.datasetName}
+              class={`border rounded-lg p-3 ${gradeColor}`}
+            >
               {/* Dataset header */}
               <div class="flex items-start justify-between mb-2 gap-2">
                 <p class="text-xs font-mono font-semibold text-zinc-800 dark:text-zinc-200 truncate">
                   {ev.datasetName}
                 </p>
-                <span class={`px-1.5 py-0.5 text-xs font-bold rounded-full shrink-0 ${badgeColor}`}>
+                <span
+                  class={`px-1.5 py-0.5 text-xs font-bold rounded-full shrink-0 ${badgeColor}`}
+                >
                   {ev.overallGrade}
                 </span>
               </div>
@@ -281,9 +331,11 @@ function PerDatasetEvaluationCards() {
                     style={{
                       width: `${ev.overallScore}%`,
                       backgroundColor:
-                        ev.overallGrade === "PASS" ? "#10B981"
-                        : ev.overallGrade === "PARTIAL" ? "#F59E0B"
-                        : "#EF4444",
+                        ev.overallGrade === "PASS"
+                          ? "#10B981"
+                          : ev.overallGrade === "PARTIAL"
+                            ? "#F59E0B"
+                            : "#EF4444",
                     }}
                   />
                 </div>
@@ -295,15 +347,19 @@ function PerDatasetEvaluationCards() {
                   <div key={d.id} class="flex items-center gap-1">
                     <span
                       class={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                        d.grade === "PASS" ? "bg-emerald-500"
-                        : d.grade === "PARTIAL" ? "bg-amber-500"
-                        : "bg-red-500"
+                        d.grade === "PASS"
+                          ? "bg-emerald-500"
+                          : d.grade === "PARTIAL"
+                            ? "bg-amber-500"
+                            : "bg-red-500"
                       }`}
                     />
                     <span class="text-xs text-zinc-600 dark:text-zinc-300 truncate">
                       {d.label}
                     </span>
-                    <span class="text-xs text-zinc-400 ml-auto shrink-0">{d.score}</span>
+                    <span class="text-xs text-zinc-400 ml-auto shrink-0">
+                      {d.score}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -319,7 +375,7 @@ function PerDatasetEvaluationCards() {
 
 function QuantitativeTab() {
   const report = latestEnhancedReport.value;
-  const br     = benchmarkResults.value;
+  const br = benchmarkResults.value;
 
   if (!br || !report?.benchmarking_results) {
     return (
@@ -329,9 +385,10 @@ function QuantitativeTab() {
     );
   }
 
-  const rawMetrics = report.benchmarking_results.dataset_comparison.performance_metrics;
+  const rawMetrics =
+    report.benchmarking_results.dataset_comparison.performance_metrics;
   const { series, metrics } = buildComparisonSeriesFromBenchmark(rawMetrics);
-  const rocSeries           = buildRocSeriesFromBenchmark(rawMetrics);
+  const rocSeries = buildRocSeriesFromBenchmark(rawMetrics);
 
   return (
     <div class="space-y-6">
@@ -354,12 +411,7 @@ function QuantitativeTab() {
       {Object.entries(rawMetrics).map(([ds, m]) => {
         const cm =
           m.confusion_matrix ??
-          estimateConfusionMatrix(
-            100000,
-            0.002,
-            m.precision,
-            m.recall,
-          );
+          estimateConfusionMatrix(100000, 0.002, m.precision, m.recall);
         return (
           <ConfusionMatrix
             key={ds}
@@ -370,10 +422,12 @@ function QuantitativeTab() {
       })}
 
       {/* Statistical significance heatmap */}
-      {report.benchmarking_results.statistical_significance?.accuracy_differences && (
+      {report.benchmarking_results.statistical_significance
+        ?.accuracy_differences && (
         <StatisticalSignificanceHeatmap
           accuracyDifferences={
-            report.benchmarking_results.statistical_significance.accuracy_differences
+            report.benchmarking_results.statistical_significance
+              .accuracy_differences
           }
         />
       )}
@@ -397,12 +451,9 @@ function MaragTab() {
     );
   }
 
-  const agentScores   = consensus.agentScores as Record<string, number>;
-  const correlations  = Object.fromEntries(
-    (consensus.correlations ?? []).map((c) => [
-      c.agents.join("-"),
-      c.strength,
-    ]),
+  const agentScores = consensus.agentScores as Record<string, number>;
+  const correlations = Object.fromEntries(
+    (consensus.correlations ?? []).map((c) => [c.agents.join("-"), c.strength]),
   );
 
   return (
@@ -419,7 +470,9 @@ function MaragTab() {
           {Object.entries(agentScores).map(([agent, score]) => (
             <div key={agent}>
               <div class="flex justify-between text-sm mb-1">
-                <span class="font-medium text-zinc-700 dark:text-zinc-300">{agent}</span>
+                <span class="font-medium text-zinc-700 dark:text-zinc-300">
+                  {agent}
+                </span>
                 <span class="text-zinc-500 dark:text-zinc-400">
                   {(score * 100).toFixed(0)}%
                 </span>
@@ -430,9 +483,11 @@ function MaragTab() {
                   style={{
                     width: `${(score * 100).toFixed(0)}%`,
                     backgroundColor:
-                      score >= 0.8 ? "#10B981"
-                      : score >= 0.6 ? "#6366F1"
-                      : "#F59E0B",
+                      score >= 0.8
+                        ? "#10B981"
+                        : score >= 0.6
+                          ? "#6366F1"
+                          : "#F59E0B",
                   }}
                 />
               </div>
@@ -443,13 +498,17 @@ function MaragTab() {
         {/* Consensus + uncertainty */}
         <div class="mt-4 grid grid-cols-2 gap-3 pt-3 border-t border-zinc-200 dark:border-zinc-700">
           <div>
-            <p class="text-xs text-zinc-500 dark:text-zinc-400">Consensus Score</p>
+            <p class="text-xs text-zinc-500 dark:text-zinc-400">
+              Consensus Score
+            </p>
             <p class="text-2xl font-bold text-zinc-900 dark:text-white">
               {(consensus.consensusScore * 100).toFixed(0)}%
             </p>
           </div>
           <div>
-            <p class="text-xs text-zinc-500 dark:text-zinc-400">Final Risk Score</p>
+            <p class="text-xs text-zinc-500 dark:text-zinc-400">
+              Final Risk Score
+            </p>
             <p class="text-2xl font-bold text-zinc-900 dark:text-white">
               {consensus.finalScore}
             </p>
@@ -458,11 +517,19 @@ function MaragTab() {
 
         {consensus.uncertaintySources?.length > 0 && (
           <div class="mt-3">
-            <p class="text-xs text-zinc-500 dark:text-zinc-400 mb-1">Uncertainty Sources</p>
+            <p class="text-xs text-zinc-500 dark:text-zinc-400 mb-1">
+              Uncertainty Sources
+            </p>
             <ul class="space-y-0.5">
               {consensus.uncertaintySources.map((s, i) => (
-                <li key={i} class="text-xs text-zinc-600 dark:text-zinc-300 flex gap-1.5">
-                  <AlertTriangle size={11} class="text-amber-500 shrink-0 mt-0.5" />
+                <li
+                  key={i}
+                  class="text-xs text-zinc-600 dark:text-zinc-300 flex gap-1.5"
+                >
+                  <AlertTriangle
+                    size={11}
+                    class="text-amber-500 shrink-0 mt-0.5"
+                  />
                   {s}
                 </li>
               ))}
@@ -491,13 +558,18 @@ function PipelineTab() {
         .slice(0, 8)
     : [];
 
-  const maxDuration = timedPhases.length > 0
-    ? Math.max(...timedPhases.map((p) => p.duration ?? 0))
-    : 1;
+  const maxDuration =
+    timedPhases.length > 0
+      ? Math.max(...timedPhases.map((p) => p.duration ?? 0))
+      : 1;
 
   return (
     <div class="space-y-4">
-      <LivePhasePipeline fallbackCaseProgress={EMPTY_PROGRESS} showDetails compact={false} />
+      <LivePhasePipeline
+        fallbackCaseProgress={EMPTY_PROGRESS}
+        showDetails
+        compact={false}
+      />
 
       {timedPhases.length > 0 && (
         <div class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg p-4">
@@ -514,7 +586,9 @@ function PipelineTab() {
                 <div class="w-full bg-zinc-200 dark:bg-zinc-700 rounded-full h-1.5">
                   <div
                     class="h-1.5 rounded-full bg-indigo-500"
-                    style={{ width: `${((p.duration ?? 0) / maxDuration) * 100}%` }}
+                    style={{
+                      width: `${((p.duration ?? 0) / maxDuration) * 100}%`,
+                    }}
                   />
                 </div>
               </div>
@@ -531,7 +605,10 @@ function PipelineTab() {
           </h3>
           <ul class="space-y-1">
             {errorPhases.map((p) => (
-              <li key={p.phaseId} class="text-xs text-red-600 dark:text-red-300 font-mono">
+              <li
+                key={p.phaseId}
+                class="text-xs text-red-600 dark:text-red-300 font-mono"
+              >
                 {p.phaseId}
               </li>
             ))}
@@ -561,29 +638,48 @@ function ComplianceTab() {
     label,
     value,
     description,
-  }: { label: string; value: boolean | undefined; description: string }) {
+  }: {
+    label: string;
+    value: boolean | undefined;
+    description: string;
+  }) {
     const isPass = value === true;
     const isFail = value === false;
     return (
-      <div class={`border rounded-lg p-4 ${
-        isPass ? "border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/20"
-        : isFail ? "border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20"
-        : "border-zinc-300 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-800"
-      }`}>
-        <div class="flex items-center gap-2 mb-1">
-          {isPass
-            ? <CheckCircle size={16} class="text-emerald-600 dark:text-emerald-400" />
+      <div
+        class={`border rounded-lg p-4 ${
+          isPass
+            ? "border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/20"
             : isFail
-              ? <XCircle size={16} class="text-red-600 dark:text-red-400" />
-              : <Clock size={16} class="text-zinc-400" />}
-          <span class="text-sm font-semibold text-zinc-900 dark:text-white">{label}</span>
+              ? "border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20"
+              : "border-zinc-300 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-800"
+        }`}
+      >
+        <div class="flex items-center gap-2 mb-1">
+          {isPass ? (
+            <CheckCircle
+              size={16}
+              class="text-emerald-600 dark:text-emerald-400"
+            />
+          ) : isFail ? (
+            <XCircle size={16} class="text-red-600 dark:text-red-400" />
+          ) : (
+            <Clock size={16} class="text-zinc-400" />
+          )}
+          <span class="text-sm font-semibold text-zinc-900 dark:text-white">
+            {label}
+          </span>
         </div>
         <p class="text-xs text-zinc-500 dark:text-zinc-400">{description}</p>
-        <span class={`mt-2 inline-block px-2 py-0.5 text-xs font-bold rounded ${
-          isPass ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-800 dark:text-emerald-200"
-          : isFail ? "bg-red-100 text-red-700 dark:bg-red-800 dark:text-red-200"
-          : "bg-zinc-200 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-400"
-        }`}>
+        <span
+          class={`mt-2 inline-block px-2 py-0.5 text-xs font-bold rounded ${
+            isPass
+              ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-800 dark:text-emerald-200"
+              : isFail
+                ? "bg-red-100 text-red-700 dark:bg-red-800 dark:text-red-200"
+                : "bg-zinc-200 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-400"
+          }`}
+        >
           {isPass ? "COMPLIANT" : isFail ? "NON-COMPLIANT" : "UNDETERMINED"}
         </span>
       </div>
@@ -613,7 +709,10 @@ function ComplianceTab() {
 
       {cs.jurisdiction && (
         <p class="text-xs text-zinc-500 dark:text-zinc-400">
-          Jurisdiction: <span class="font-semibold text-zinc-700 dark:text-zinc-300">{cs.jurisdiction}</span>
+          Jurisdiction:{" "}
+          <span class="font-semibold text-zinc-700 dark:text-zinc-300">
+            {cs.jurisdiction}
+          </span>
         </p>
       )}
 
@@ -631,7 +730,10 @@ function ComplianceTab() {
               <thead class="bg-zinc-50 dark:bg-zinc-900">
                 <tr>
                   {["Timestamp", "Phase", "Action", "Actor"].map((h) => (
-                    <th key={h} class="px-3 py-2 text-left text-zinc-500 dark:text-zinc-400 font-medium">
+                    <th
+                      key={h}
+                      class="px-3 py-2 text-left text-zinc-500 dark:text-zinc-400 font-medium"
+                    >
                       {h}
                     </th>
                   ))}
@@ -639,13 +741,22 @@ function ComplianceTab() {
               </thead>
               <tbody>
                 {report.audit_trail.slice(0, 15).map((entry, i) => (
-                  <tr key={i} class="border-t border-zinc-100 dark:border-zinc-700">
+                  <tr
+                    key={i}
+                    class="border-t border-zinc-100 dark:border-zinc-700"
+                  >
                     <td class="px-3 py-2 font-mono text-zinc-500 dark:text-zinc-400">
                       {entry.timestamp}
                     </td>
-                    <td class="px-3 py-2 text-zinc-700 dark:text-zinc-300">{entry.phase}</td>
-                    <td class="px-3 py-2 text-zinc-700 dark:text-zinc-300">{entry.action}</td>
-                    <td class="px-3 py-2 text-zinc-600 dark:text-zinc-400">{entry.actor}</td>
+                    <td class="px-3 py-2 text-zinc-700 dark:text-zinc-300">
+                      {entry.phase}
+                    </td>
+                    <td class="px-3 py-2 text-zinc-700 dark:text-zinc-300">
+                      {entry.action}
+                    </td>
+                    <td class="px-3 py-2 text-zinc-600 dark:text-zinc-400">
+                      {entry.actor}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -673,7 +784,9 @@ interface EvaluationDashboardProps {
   compact?: boolean;
 }
 
-export function EvaluationDashboard({ compact = false }: EvaluationDashboardProps) {
+export function EvaluationDashboard({
+  compact = false,
+}: EvaluationDashboardProps) {
   const [activeTab, setActiveTab] = useState<TabId>("overview");
 
   return (
@@ -710,18 +823,18 @@ export function EvaluationDashboard({ compact = false }: EvaluationDashboardProp
 
       {/* Tab content */}
       <div class={`p-4 ${compact ? "max-h-96 overflow-y-auto" : ""}`}>
-        {activeTab === "overview"     && <OverviewTab />}
+        {activeTab === "overview" && <OverviewTab />}
         {activeTab === "quantitative" && <QuantitativeTab />}
-        {activeTab === "marag"        && <MaragTab />}
-        {activeTab === "qualitative"  && (
+        {activeTab === "marag" && <MaragTab />}
+        {activeTab === "qualitative" && (
           <QualitativeAssessment
             report={latestEnhancedReport.value}
             evaluation={qualitativeEvaluation.value}
             compact={compact}
           />
         )}
-        {activeTab === "pipeline"     && <PipelineTab />}
-        {activeTab === "compliance"   && <ComplianceTab />}
+        {activeTab === "pipeline" && <PipelineTab />}
+        {activeTab === "compliance" && <ComplianceTab />}
       </div>
     </div>
   );

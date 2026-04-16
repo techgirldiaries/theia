@@ -215,6 +215,72 @@ export function chiSquareTest(
   return { chi2, df, pValue };
 }
 
+/**
+ * Mann-Whitney U test (non-parametric alternative to t-test)
+ * Tests whether two independent samples come from the same distribution
+ * Better for non-normal distributions, especially with small sample sizes
+ * Returns { u: U-statistic, n1, n2, pValue: two-tailed p-value }
+ */
+export function mannWhitneyU(
+  sample1: number[],
+  sample2: number[],
+): { u: number; n1: number; n2: number; pValue: number } {
+  const n1 = sample1.length;
+  const n2 = sample2.length;
+
+  // Combine and rank all values
+  const combined = [
+    ...sample1.map((v, i) => ({ value: v, group: 1, originalIndex: i })),
+    ...sample2.map((v, i) => ({ value: v, group: 2, originalIndex: i })),
+  ];
+
+  combined.sort((a, b) => a.value - b.value);
+
+  // Handle ties by assigning average rank
+  const ranks: number[] = new Array(combined.length);
+  let i = 0;
+  while (i < combined.length) {
+    const value = combined[i].value;
+    const startI = i;
+
+    // Find all values equal to current value (ties)
+    while (i < combined.length && combined[i].value === value) {
+      i++;
+    }
+
+    // Assign average rank to tied values
+    const avgRank = (startI + i - 1) / 2 + 1;
+    for (let j = startI; j < i; j++) {
+      ranks[j] = avgRank;
+    }
+  }
+
+  // Calculate rank sum for group 1
+  let r1 = 0;
+  for (let j = 0; j < combined.length; j++) {
+    if (combined[j].group === 1) {
+      r1 += ranks[j];
+    }
+  }
+
+  // Calculate U statistic
+  const u1 = n1 * n2 + (n1 * (n1 + 1)) / 2 - r1;
+  const u2 = n1 * n2 - u1;
+  const u = Math.min(u1, u2);
+
+  // Calculate mean and std of U under null hypothesis
+  const mean = (n1 * n2) / 2;
+  const std = Math.sqrt((n1 * n2 * (n1 + n2 + 1)) / 12);
+
+  // Continuity correction: small sample adjustment
+  const z = Math.abs(u - mean - 0.5) / (std || 1);
+
+  // Approximate p-value using normal distribution (valid for n > 20)
+  const pValue = 2 * (1 - normalCDF(z));
+
+  return { u, n1, n2, pValue };
+}
+
 // ── Bonferroni Correction ──────────────────────────────────────────────────────
 
 /**
@@ -371,4 +437,155 @@ export function statisticalSummary(values: number[]): {
   const kurtosis = m4 / (std ** 4 || 1) - 3;
 
   return { mean, median, std, min, max, q1, q3, iqr, skewness, kurtosis };
+}
+
+// ── K-Fold Cross-Validation ───────────────────────────────────────────────────
+
+export interface KFoldSplit {
+  trainIndices: number[];
+  testIndices: number[];
+  foldNumber: number;
+}
+
+/**
+ * Stratified K-Fold Cross-Validation
+ * Maintains class distribution in each fold (essential for imbalanced datasets)
+ * Returns array of splits with train/test indices for each fold
+ */
+export function stratifiedKFold(
+  labels: (number | boolean | string)[],
+  k: number = 5,
+  randomSeed: number = 42,
+): KFoldSplit[] {
+  if (k < 2 || k > labels.length) {
+    throw new Error(`k must be between 2 and ${labels.length}`);
+  }
+
+  const n = labels.length;
+  const indices = Array.from({ length: n }, (_, i) => i);
+
+  // Simple deterministic shuffle using seed
+  const shuffled = shuffle(indices, randomSeed);
+
+  // Group indices by class label
+  const classGroups: Map<string | number | boolean, number[]> = new Map();
+  for (const idx of shuffled) {
+    const label = String(labels[idx]);
+    if (!classGroups.has(label)) {
+      classGroups.set(label, []);
+    }
+    classGroups.get(label)!.push(idx);
+  }
+
+  // Distribute each class across folds
+  const folds: number[][] = Array.from({ length: k }, () => []);
+  for (const classIndices of classGroups.values()) {
+    for (let i = 0; i < classIndices.length; i++) {
+      const foldIdx = i % k;
+      folds[foldIdx].push(classIndices[i]);
+    }
+  }
+
+  // Create splits
+  const splits: KFoldSplit[] = [];
+  for (let i = 0; i < k; i++) {
+    const testIndices = folds[i];
+    const trainIndices = folds
+      .filter((_, idx) => idx !== i)
+      .flatMap((fold) => fold);
+
+    splits.push({
+      trainIndices: trainIndices.sort((a, b) => a - b),
+      testIndices: testIndices.sort((a, b) => a - b),
+      foldNumber: i + 1,
+    });
+  }
+
+  return splits;
+}
+
+/**
+ * Standard K-Fold Cross-Validation (without stratification)
+ * Use stratifiedKFold for imbalanced datasets
+ */
+export function kFold(
+  n: number,
+  k: number = 5,
+  randomSeed: number = 42,
+): KFoldSplit[] {
+  if (k < 2 || k > n) {
+    throw new Error(`k must be between 2 and ${n}`);
+  }
+
+  const indices = Array.from({ length: n }, (_, i) => i);
+  const shuffled = shuffle(indices, randomSeed);
+
+  const folds: number[][] = Array.from({ length: k }, () => []);
+  for (let i = 0; i < shuffled.length; i++) {
+    folds[i % k].push(shuffled[i]);
+  }
+
+  const splits: KFoldSplit[] = [];
+  for (let i = 0; i < k; i++) {
+    const testIndices = folds[i];
+    const trainIndices = folds
+      .filter((_, idx) => idx !== i)
+      .flatMap((fold) => fold);
+
+    splits.push({
+      trainIndices: trainIndices.sort((a, b) => a - b),
+      testIndices: testIndices.sort((a, b) => a - b),
+      foldNumber: i + 1,
+    });
+  }
+
+  return splits;
+}
+
+/**
+ * Calculate class balance metrics for imbalanced dataset analysis
+ */
+export function classBalanceMetrics(labels: (number | boolean | string)[]): {
+  classDistribution: Record<string, number>;
+  imbalanceRatio: number;
+  dominantClass: string;
+  minorityClass: string;
+  isHighlyImbalanced: boolean; // ratio > 10:1
+} {
+  const distribution: Record<string, number> = {};
+  for (const label of labels) {
+    const key = String(label);
+    distribution[key] = (distribution[key] || 0) + 1;
+  }
+
+  const counts = Object.values(distribution).sort((a, b) => b - a);
+  const imbalanceRatio = counts[0] / (counts[counts.length - 1] || 1);
+  const sortedEntries = Object.entries(distribution).sort(
+    (a, b) => b[1] - a[1],
+  );
+
+  return {
+    classDistribution: distribution,
+    imbalanceRatio,
+    dominantClass: sortedEntries[0]?.[0] || "",
+    minorityClass: sortedEntries[sortedEntries.length - 1]?.[0] || "",
+    isHighlyImbalanced: imbalanceRatio > 10,
+  };
+}
+
+/**
+ * Deterministic shuffle using seeded pseudo-random number generator
+ */
+function shuffle(arr: number[], seed: number): number[] {
+  const array = [...arr];
+  let random = seed;
+
+  for (let i = array.length - 1; i > 0; i--) {
+    // Seeded pseudo-random: linear congruential generator
+    random = (random * 1103515245 + 12345) % 2147483648;
+    const j = Math.abs(random) % (i + 1);
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+
+  return array;
 }

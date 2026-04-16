@@ -20,7 +20,7 @@ VITE_AGENT_ID=your-agent-id
 VITE_WORKFORCE_ID=optional-workforce-id (if using workforce mode)
 ```
 
-⚠️ **NEVER commit `.env` to repository**. Use `.env.example` as template.
+**NEVER commit `.env` to repository**. Use `.env.example` as template.
 
 ## Build Process
 

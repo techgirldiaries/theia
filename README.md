@@ -1,4 +1,4 @@
-# THEIA Fraud Intelligence
+# THEIA/Theia Fraud Intelligence
 
 ## Multi-Agent RAG (MARAG) Financial Fraud Detection System
 
@@ -16,7 +16,7 @@ THEIA is an advanced fraud detection system that combines:
 
 ### Key Innovation: MARAG Architecture
 
-Unlike traditional single-agent systems, THEIA uses five specialised agents that work together by cross-checking evidence from multiple sources. Each agent retrieves relevant information and adds its own analysis using Retrieval-Augmented Generation (RAG):
+Unlike traditional single-agent systems, Theia uses five specialised agents that work together by cross-checking evidence from multiple sources. Each agent retrieves relevant information and adds its own analysis using Retrieval-Augmented Generation (RAG):
 
 1. **TIRA** - Threat Intelligence Retrieval Agent (Red `#EF4444`)
 2. **RCRA** - Regulatory Compliance Retrieval Agent (Blue `#3B82F6`)
@@ -90,7 +90,7 @@ Agents reach agreement through weighted voting, where each agent's contribution 
 
 The project follows a professional, scalable architecture organised by feature and concern:
 
-```text
+```dir
 theia-fraud-intelligence/
 ├── src/
 │   ├── ui/                          # Presentation Layer
@@ -407,7 +407,7 @@ All limitations are academically justified, well-documented and represent common
 
 ### Project Resources
 
-- **Repository:** [github.com/techgirldiaries/theia](https://github.com/techgirldiaries/theia)
+- **Repository:** [Theia Fraud Intelligence](https://github.com/techgirldiaries/theia)
 - **Issues:** GitHub Issues
 - **Discussions:** GitHub Discussions
 

@@ -39,7 +39,7 @@ type Message = {
 
 const MAX_MESSAGE_LENGTH = 20_000;
 const MAX_FILES = 5;
-const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
+const MAX_FILE_SIZE_BYTES = 1 * 1024 * 1024 * 1024; // 1 GB
 const ALLOWED_MIME_TYPES = new Set([
   "text/csv",
   "application/json",
@@ -231,7 +231,7 @@ export function Footer() {
 
   const validateFile = useCallback((file: File): string | null => {
     if (file.size > MAX_FILE_SIZE_BYTES)
-      return `"${file.name}" exceeds the 10 MB limit.`;
+      return `"${file.name}" exceeds the 1 GB limit.`;
     const mimeOk = ALLOWED_MIME_TYPES.has(file.type);
     const extOk = ALLOWED_EXTENSIONS.test(file.name);
     if (!mimeOk && !extOk)
@@ -631,8 +631,8 @@ export function Footer() {
       if (uploadedAttachments.length > 0) {
         const fileList = fileDetailsWithPreviews.join("\n\n");
         const allFiles = [...selectedFiles, ...selectedRecentFiles];
-        const LARGE_FILE_THRESHOLD = 50 * 1024 * 1024; // 50 MB
-        const VERY_LARGE_FILE_THRESHOLD = 300 * 1024 * 1024; // 300 MB
+        const LARGE_FILE_THRESHOLD = 200 * 1024 * 1024; // 200 MB
+        const VERY_LARGE_FILE_THRESHOLD = 500 * 1024 * 1024; // 500 MB
         const hasLargeFile = allFiles.some(
           (f) =>
             ((f as File).size ?? (f as RecentFile).size ?? 0) >
@@ -647,7 +647,7 @@ export function Footer() {
         let instructions: string;
         if (hasVeryLargeFile) {
           instructions =
-            "⚠️ Instructions: Very large dataset detected (>300MB). For optimal performance and timeout management:\n\n" +
+            "⚠️ Instructions: Very large dataset detected (>500MB). For optimal performance and timeout management:\n\n" +
             "• **Recommended**: Request 'stratified sample analysis' (10-20% representative sample) for faster results\n" +
             "• **Alternative**: Specify 'complete analysis' if you need full depth — this will execute all 16 phases but may require extended processing time\n" +
             "• **Access**: Files are accessible at the URL(s) above. Use the preview excerpt to understand schema, then sample or stream rows from the URL.";

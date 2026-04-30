@@ -3,7 +3,7 @@
  *
  * This module contains the comprehensive system prompt for Theia Fraud Intelligence,
  * an advanced Agentic AI and Multi-Agent RAG fraud detection specialist.
- * It defines the 15-phase analytical pipeline, MARAG framework, and operational principles.
+ * It defines the 15-phase analytical pipeline, MARAG framework and operational principles.
  *
  * @module prompts/system-prompts
  */

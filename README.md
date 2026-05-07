@@ -152,7 +152,7 @@ For detailed file mappings and migration strategy, see **[PROJECT_STRUCTURE_GUID
 
 - **`src/components/`**: All 47 UI components (primary interaction layer)
 - **`src/prompts/`**: System prompts and AI instructions
-  - `system-prompts.ts` — 15-phase pipeline, MARAG framework, benchmarking specifications
+  - `system-prompts.ts` — 16-phase pipeline, MARAG framework, benchmarking specifications
 - **`src/types/`**: TypeScript type definitions
 - **`src/utils/`**: Utility functions and backend integration
 - **`src/hooks/`**: Custom React/Preact hooks

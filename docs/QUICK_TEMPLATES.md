@@ -1,23 +1,24 @@
-# Quick Templates Guide for THEIA
+# Quick Templates Guide
 
-This guide provides all the prompts that trigger real-time analysis and live dashboard visualisation in THEIA. Use these templates to quickly start powerful fraud detection analyses.
+This guide covers all the prompts that trigger real-time analysis and live dashboard visualisation in Theia. Each template is designed to activate a specific part of the fraud detection pipeline, so the right template for the task at hand can be selected quickly. Custom prompts for more advanced testing are also included, along with a step-by-step walkthrough of how the dashboard is used.
 
-## Quick Templates (Built-in)
+---
 
-These are pre-configured prompts available in the UI that trigger full analysis pipelines with real-time visualisation.
+## Built-in Quick Templates
+
+Six templates are pre-configured in the interface. Each one triggers a full analysis pipeline and generates a set of visualisations automatically.
+
+---
 
 ### 1. Analyse for Anomalies
 
-**Purpose:** Triggers anomaly detection and risk assessment visualisation
-
-**Prompt:**
+**Purpose:** Triggers anomaly detection and risk assessment visualisation.
 
 ```text
 Please analyse the uploaded dataset for anomalies, unusual patterns and potential fraud indicators. Provide a detailed risk assessment.
 ```
 
-**Visualisations Generated:**
-
+**Visualisations generated:**
 - Risk distribution charts
 - Anomaly heatmaps
 - Pattern identification graphs
@@ -27,18 +28,15 @@ Please analyse the uploaded dataset for anomalies, unusual patterns and potentia
 
 ### 2. Generate Fraud Report
 
-**Purpose:** Generates comprehensive reports with phase-by-phase breakdown
-
-**Prompt:**
+**Purpose:** Generates a comprehensive report with a phase-by-phase breakdown.
 
 ```text
 Generate a comprehensive fraud report based on the data, including risk scores, fraud patterns and recommendations.
 ```
 
-**Visualisations Generated:**
-
+**Visualisations generated:**
 - Phase-by-phase pipeline visualisation
-- Detailed fraud report with 6 tabbed sections
+- Detailed fraud report with six tabbed sections
 - Agent reasoning and evidence attribution
 - Risk categorisation breakdown
 
@@ -46,16 +44,13 @@ Generate a comprehensive fraud report based on the data, including risk scores, 
 
 ### 3. Risk Assessment
 
-**Purpose:** Shows real-time risk categorization (low/medium/high)
-
-**Prompt:**
+**Purpose:** Displays real-time risk categorisation across low, medium and high levels.
 
 ```text
 Perform a risk assessment on the transactions and categorize them by risk level (low, medium, high).
 ```
 
-**Visualisations Generated:**
-
+**Visualisations generated:**
 - Risk level distribution chart
 - Transaction categorisation by risk
 - Real-time progress tracker
@@ -65,16 +60,13 @@ Perform a risk assessment on the transactions and categorize them by risk level 
 
 ### 4. Deep Investigation
 
-**Purpose:** Activates network and transaction pattern visualisation
-
-**Prompt:**
+**Purpose:** Activates network and transaction pattern visualisation.
 
 ```text
 Conduct a deep investigation into suspicious activities, trace transaction patterns and identify potential fraud networks.
 ```
 
-**Visualisations Generated:**
-
+**Visualisations generated:**
 - Network graphs showing fraud rings
 - Transaction pattern analysis
 - Entity relationship maps
@@ -84,78 +76,71 @@ Conduct a deep investigation into suspicious activities, trace transaction patte
 
 ### 5. Evaluate Performance
 
-**Purpose:** Displays analytics dashboard with ROC curves and confusion matrices
-
-**Prompt:**
+**Purpose:** Displays the analytics dashboard with ROC curves and confusion matrices.
 
 ```text
 Evaluate the fraud detection performance metrics including accuracy, false positives, false negatives and provide optimization recommendations.
 ```
 
-**Visualisations Generated:**
-
+**Visualisations generated:**
 - ROC curves
 - Confusion matrices
 - Performance metrics dashboard
-- Precision/Recall/F1-Score charts
+- Precision, Recall and F1-Score charts
 - AUC-ROC analysis
+- AUC-PR analysis
 
 ---
 
 ### 6. Identify Trends
 
-**Purpose:** Shows temporal visualisations and emerging patterns
-
-**Prompt:**
+**Purpose:** Displays temporal visualisations and emerging fraud patterns.
 
 ```text
 Analyse temporal trends in the fraud data, identify seasonal patterns, emerging fraud types and predict future risks.
 ```
 
-**Visualisations Generated:**
-
+**Visualisations generated:**
 - Temporal trend charts
 - Seasonal pattern analysis
 - Emerging fraud type detection
 - Time-series visualisations
 - Predictive risk indicators
 
+Beyond these built-in templates, custom prompts can be used to test specific dashboard features in more depth.
+
 ---
 
 ## Custom Prompts for Advanced Testing
 
-Try these custom prompts to test specific dashboard features and capabilities:
+The prompts below are designed to test particular capabilities of the dashboard directly.
 
-### For Real-Time Phase Tracking
+---
 
-**Prompt:**
+### Real-Time Phase Tracking
 
 ```text
 Run a complete 16-phase fraud analysis on the dataset and show me live progress through each phase
 ```
 
-**Expected Output:**
-
+**Expected output:**
 - 16-phase pipeline with live status updates
 - Real-time phase completion indicators
-- Throughput metrics (phases/minute)
+- Throughput metrics (phases per minute)
 - Average phase duration tracking
 - Phase-by-phase performance metrics
 
 ---
 
-### For Multi-Agent Consensus
-
-**Prompt:**
+### Multi-Agent Consensus
 
 ```text
 Analyze this transaction using all 5 specialist agents (TIRA, RCRA, HPRA, ERRA, BARA) and show consensus scoring
 ```
 
-**Expected Output:**
-
+**Expected output:**
 - Individual agent analysis results
-- Weighted consensus scoring (0-100)
+- Weighted consensus scoring (0 to 100)
 - Agent agreement rates
 - Confidence intervals
 - Evidence triangulation visualisation
@@ -163,22 +148,21 @@ Analyze this transaction using all 5 specialist agents (TIRA, RCRA, HPRA, ERRA, 
 
 ---
 
-### For Comprehensive visualisations
-
-**Prompt:**
+### Comprehensive Visualisations
 
 ```text
 Generate comprehensive fraud detection visualisations including ROC curves, confusion matrices and heatmaps
 ```
 
-**Expected Output:**
-
+**Expected output:**
 - ROC curves with AUC-ROC scores
 - Confusion matrices for classification accuracy
 - Heatmaps showing fraud pattern distributions
 - Risk distribution charts
 - Performance metrics dashboard
-- Multiple chart types from visualisation gallery
+- Multiple chart types from the visualisation gallery
+
+With the prompts understood, the section below explains how the dashboard is used from start to finish.
 
 ---
 
@@ -186,53 +170,27 @@ Generate comprehensive fraud detection visualisations including ROC curves, conf
 
 ### Step 1: Upload a Dataset
 
-1. Navigate to **Dataset Management** in the left sidebar
-2. Upload a fraud dataset (CSV, JSON, or XLSX format)
-3. Wait for data quality metrics to populate
-4. Verify the dataset shows as "Ready" status
+Navigate to **Dataset Management** in the left sidebar. A fraud dataset is uploaded in CSV, JSON or XLSX format. Once the upload is complete, data quality metrics are populated and the dataset status changes to **Ready**.
 
 ### Step 2: Select a Quick Template
 
-1. In the main chat area, look for the **Quick Templates** section
-2. Click any template button at the top of the empty state:
-   - "Analyse for Anomalies"
-   - "Generate Fraud Report"
-   - "Risk Assessment"
-   - "Deep Investigation"
-   - "Evaluate Performance"
-   - "Identify Trends"
-
-Or type a custom prompt in the message input field.
+In the main chat area, the **Quick Templates** section appears at the top of the empty state. Any of the six templates can be selected by clicking its button, or a custom prompt can be typed directly into the message input field.
 
 ### Step 3: Monitor Real-Time Progress
 
-The **Workflow Dashboard** will automatically activate with:
+The **Workflow Dashboard** activates automatically and displays the following components.
 
-- **16-Phase Pipeline visualisation** - Sequential, parallel and convergent phases
-- **Real-Time Status Tracker** - Live metrics showing:
-  - Current phase status
-  - Average phase duration
-  - Throughput (phases/minute)
-  - Phase completion progress
-  - Live phase updates
+**16-Phase Pipeline Visualisation** shows sequential, parallel and convergent phases as they are processed.
 
-- **Multi-Agent Progress visualisation** - Shows Theia MARAG agents (TIRA, RCRA, HPRA, ERRA, BARA):
-  - Individual agent status
-  - Consensus convergence
-  - Agreement rates
-  - Weighted scoring
+**Real-Time Status Tracker** displays live metrics including the current phase status, average phase duration, throughput in phases per minute, and phase completion progress.
 
-- **Analytics Dashboard** - Charts and metrics:
-  - Risk distribution (low/medium/high)
-  - Performance metrics
-  - Response time analysis
-  - Success rate tracking
+**Multi-Agent Progress Visualisation** shows the status of each MARAG agent (TIRA, RCRA, HPRA, ERRA and BARA), including consensus convergence, agreement rates and weighted scoring.
 
-- **Visualisation Gallery** - AI-generated charts:
-  - ROC curves
-  - Confusion matrices
-  - Statistical distributions
-  - Performance comparisons
+**Analytics Dashboard** displays risk distribution across low, medium and high categories alongside performance metrics, response time analysis and success rate tracking.
+
+**Visualisation Gallery** presents AI-generated charts including ROC curves, confusion matrices, statistical distributions and performance comparisons.
+
+Each of these components is described in more detail below.
 
 ---
 
@@ -240,112 +198,77 @@ The **Workflow Dashboard** will automatically activate with:
 
 ### Real-Time Status Tracker
 
-Shows live fraud analysis progression:
-
-- **Phase Status**: Completed → In Progress → Pending
-- **Performance Metrics**: Average phase time, throughput, error rates
-- **Controls**: Play/Pause, Reset, Progress adjustment
+Live fraud analysis progression is displayed here. Phase status moves through Completed, In Progress and Pending states. Performance metrics include average phase time, throughput and error rates. Controls for Play, Pause and Reset are available alongside a progress adjustment slider.
 
 ### Multi-Agent Consensus Panel
 
-Displays MARAG agent collaboration:
-
-- **Agent Status**: Each agent's current state
-- **Consensus Score**: 0-100 agreement level
-- **Evidence**: Source attribution and reasoning
-- **Confidence Intervals**: Uncertainty quantification
+The MARAG agent collaboration is displayed in this panel. Each agent's current state is shown alongside the consensus score (0 to 100), source attribution and reasoning, and confidence intervals for uncertainty quantification.
 
 ### Analytics Dashboard
 
-Performance monitoring dashboard showing:
-
-- Total cases analysed
-- High/Medium/Low risk breakdown
-- Average response time
-- Success rate percentage
-- Chat session count
-- Datasets uploaded
+This panel provides a performance overview of the full session. Metrics displayed include total cases analysed, risk breakdown across high, medium and low categories, average response time, success rate, chat session count and the number of datasets uploaded.
 
 ### Visualisation Gallery
 
-Collection of analysis charts with explanations:
-
-- Chart type indicators
-- Phase attribution
-- Key insights preview
-- Download functionality
-- Phase-specific visualisations
+Charts generated during analysis are collected here. Each chart includes a type indicator, phase attribution, a key insights preview and a download option. Phase-specific visualisations are grouped together for easy reference.
 
 ---
 
 ## Tips for Best Results
 
 **Do:**
-
-- Start with sample datasets to learn the interface
-- Use quick templates before creating custom prompts
-- Be specific with dataset descriptions
-- Allow full analysis completion before requesting new analyses
-- Review generated visualisations for insights
+- Start with sample datasets to become familiar with the interface
+- Use the built-in quick templates before writing custom prompts
+- Include specific details in dataset descriptions
+- Allow the full analysis to complete before starting a new one
+- Review the generated visualisations for actionable insights
 
 **Avoid:**
-
-- Interrupting analysis mid-process
-- Using extremely large datasets initially
-- Vague or overly generic prompts
-- Running multiple analyses simultaneously
+- Interrupting the analysis mid-process
+- Using very large datasets on the first run
+- Writing vague or overly generic prompts
+- Running multiple analyses at the same time
 - Clearing browser data before exporting results
 
 ---
 
-## Keyboard Shortcuts for Quick Analysis
+## Keyboard Shortcuts
 
-| Shortcut           | Action               |
-| ------------------ | -------------------- |
-| `Ctrl/Cmd + Enter` | Submit analysis      |
-| `Ctrl/Cmd + K`     | Focus analysis input |
-| `Ctrl/Cmd + /`     | Toggle templates     |
-| `Ctrl/Cmd + N`     | Start new session    |
-| `?`                | Show all shortcuts   |
+| Shortcut | Action |
+|---|---|
+| `Ctrl/Cmd + Enter` | Submit analysis |
+| `Ctrl/Cmd + K` | Focus analysis input |
+| `Ctrl/Cmd + /` | Toggle templates |
+| `Ctrl/Cmd + N` | Start new session |
+| `?` | Show all shortcuts |
 
 ---
 
 ## Troubleshooting
 
-### No visualisations Appearing
+**No visualisations appearing**
 
-- Ensure analysis completed successfully (check status tracker)
-- Verify dataset contains valid fraud data
-- Try the "Evaluate Performance" template
-- Check browser console for errors (F12)
+The status tracker is checked first to confirm whether the analysis completed successfully. If the dataset does not contain valid fraud data, the Evaluate Performance template is a reliable way to test the pipeline. Browser console errors can be viewed by pressing F12.
 
-### Dashboard Not Updating
+**Dashboard not updating**
 
-- Refresh the page (F5)
-- Clear browser cache
-- Check network connection
-- Verify dataset is uploaded
+The page is refreshed with F5 and the browser cache is cleared. Network connectivity is verified and the dataset upload status is confirmed.
 
-### Slow Performance
+**Slow performance**
 
-- Use compact view mode (Settings)
-- Close unused browser tabs
-- Try with a smaller dataset
-- Clear localStorage
+Compact view mode is enabled through the Settings panel. Unused browser tabs are closed and a smaller dataset is used for initial testing.
 
 ---
 
 ## Component Reference
 
-All prompts trigger these core components:
+All prompts activate the following core components.
 
-- **[RealTimeStatusTracker](../src/components/real-time-status-tracker.tsx)** - Live phase progression and metrics
-- **[WorkflowDashboard](../src/components/workflow-dashboard.tsx)** - Main orchestration panel
-- **[MultiAgentProgressVisualisation](../src/components/multi-agent-progress-visualisation.tsx)** - MARAG agent collaboration
-- **[AnalyticsDashboard](../src/components/analytics-dashboard.tsx)** - Performance metrics
-- **[VisualisationGallery](../src/components/visualisation-gallery.tsx)** - Chart collection
-- **[EnhancedFraudReportDisplay](../src/components/enhanced-fraud-report-display.tsx)** - Detailed case analysis
-
----
-
-**Ready to analyse?** Start with a quick template and watch your fraud detection in action!
+| Component | Description |
+|---|---|
+| [RealTimeStatusTracker](../src/components/real-time-status-tracker.tsx) | Live phase progression and metrics |
+| [WorkflowDashboard](../src/components/workflow-dashboard.tsx) | Main orchestration panel |
+| [MultiAgentProgressVisualisation](../src/components/multi-agent-progress-visualisation.tsx) | MARAG agent collaboration |
+| [AnalyticsDashboard](../src/components/analytics-dashboard.tsx) | Performance metrics |
+| [VisualisationGallery](../src/components/visualisation-gallery.tsx) | Chart collection |
+| [EnhancedFraudReportDisplay](../src/components/enhanced-fraud-report-display.tsx) | Detailed case analysis |

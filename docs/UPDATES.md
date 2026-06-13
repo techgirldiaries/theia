@@ -2,7 +2,7 @@
 
 **See also:** [PROJECT_STRUCTURE_GUIDE.md](../PROJECT_STRUCTURE_GUIDE.md) for codebase organisation and [CODEBASE_QUALITY.md](../CODEBASE_QUALITY.md) for code standards.
 
-This guide describes how THEIA is maintained over time, covering package updates, release processes, security auditing and incident response. Each section builds on the previous, so the guide can be read top to bottom or used as a reference for a specific task.
+This guide describes how Theia is maintained over time, covering package updates, release processes, security auditing and incident response. Each section builds on the previous, so the guide can be read top to bottom or used as a reference for a specific task.
 
 ---
 

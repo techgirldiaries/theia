@@ -1,266 +1,165 @@
-# THEIA/Theia Fraud Intelligence
+# Theia: Agentic AI Fraud Intelligence Platform
 
-## Multi-Agent RAG (MARAG) Financial Fraud Detection System
+> Detect Risk Early. Act Decisively. Stay Compliant.
 
-A production-ready fraud intelligence application using 5 specialised multi-agent collaboration and retrieval-augmented generation (MARAG). Features a 16-phase detection pipeline, multi-dataset benchmarking and comprehensive visualisation system.
+<!-- Replace the line below with your actual GIF path after screen-recording the demo -->
+![THEIA MARAG Pipeline Demo](./docs/theia-demo.gif)
 
-## Project Overview
+[![Node.js](https://img.shields.io/badge/Node.js-18%2B-green?style=flat-square)](https://nodejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Strict-blue?style=flat-square)](https://www.typescriptlang.org/)
+[![License](https://img.shields.io/badge/License-See%20LICENSE.md-lightgrey?style=flat-square)](LICENSE.md)
+[![Status](https://img.shields.io/badge/Status-Production--Ready-brightgreen?style=flat-square)]()
 
-THEIA is an advanced fraud detection system that combines:
+---
 
-- **5 Specialised MARAG Agents** working collaboratively
-- **16-Phase Detection Pipeline** with quality gates
-- **Multi-Dataset Benchmarking** with statistical analysis
-- **Real-time visualisation** of fraud patterns
-- **Production-Quality UI/UX** with responsive design
+## What is Theia?
 
-### Key Innovation: MARAG Architecture
+Theia is a production-ready fraud detection platform powered by five specialised AI agents that work together to investigate financial transactions, retrieve evidence and reach a consensus risk verdict, all within a structured 16-phase pipeline.
 
-Unlike traditional single-agent systems, Theia uses five specialised agents that work together by cross-checking evidence from multiple sources. Each agent retrieves relevant information and adds its own analysis using Retrieval-Augmented Generation (RAG):
+Most fraud detection tools rely on a single AI model making decisions alone. Theia takes a different approach. Five independent agents each examine a transaction from a distinct angle: threat intelligence, regulatory compliance, historical patterns, entity relationships and behavioural analysis, then cross-validate their findings before producing a final risk score. This is called a **Multi-Agent Retrieval-Augmented Generation (MARAG)** architecture.
 
-1. **TIRA** - Threat Intelligence Retrieval Agent (Red `#EF4444`)
-2. **RCRA** - Regulatory Compliance Retrieval Agent (Blue `#3B82F6`)
-3. **HPRA** - Historical Pattern Retrieval Agent (Purple `#A855F7`)
-4. **ERRA** - Entity Relationship Retrieval Agent (Green `#10B981`)
-5. **BARA** - Behavioural Analysis Retrieval Agent (Orange `#F97316`)
+The result is a system that is more accurate, more explainable, and more auditable than conventional approaches.
 
-Agents reach agreement through weighted voting, where each agent's contribution is evaluated based on its confidence level and past accuracy. If agents disagree, the system uses conflict resolution rules to make a final decision.
+---
 
-## Features
+## Who is this for?
 
-### Core Fraud Detection
+| Audience | What Theia offers |
+|---|---|
+| **Financial institutions** | Real-time fraud scoring with AML/KYC compliance intelligence |
+| **Compliance teams** | Complete audit trails and explainable investigation reports |
+| **Data scientists** | Multi-dataset benchmarking with Precision, Recall, F1, AUC-ROC metrics and advanced machine learning methods |
+| **Developers** | A clean TypeScript codebase with modular architecture and full test coverage |
+| **Recruiters & evaluators** | A working, deployed agentic AI system built on current industry-standard tooling |
 
-- **MARAG Multi-Agent System** - 5 collaborative AI agents
-- **16-Phase Detection Pipeline** - Sequential/parallel/convergent execution
-- **Enhanced Fraud Reports** - Comprehensive analysis with 6 tabbed sections
-- **Risk Scoring** - 0-100 scale with 5-levels of categorisation
-- **Real-time Status Tracking** - Live pipeline updates
+---
 
-### Analytics & Benchmarking
+## How it works
 
-- **Multi-Dataset Comparison** - Test against multiple fraud datasets
-- **Performance Metrics** - Precision, Recall, F1-Score, AUC-ROC
-- **Statistical Significance** - P-values and effect sizes
-- **Visualisation Gallery** - Downloadable charts with explanations
-- **Analytics Dashboard** - Performance monitoring
+Five specialised agents collaborate across a 16-phase pipeline. Each agent contributes an independent assessment based on its area of expertise. Their findings are then aggregated through a weighted consensus mechanism that factors in confidence scores, evidence quality and historical performance. Where agents disagree, a built-in orchestration layer applies predefined conflict-resolution strategies to produce the final verdict.
 
-### User Experience
+| Agent | Role |
+|---|---|
+| **TIRA** | Threat Intelligence Retrieval Agent |
+| **RCRA** | Regulatory Compliance Retrieval Agent |
+| **HPRA** | Historical Pattern Retrieval Agent |
+| **ERRA** | Entity Relationship Retrieval Agent |
+| **BARA** | Behavioural Analysis Retrieval Agent |
 
-- **Modern Chat Interface** - AI-powered conversations
-- **Agent Mode Selection** - Auto/Fast/Expert/Heavy modes for analysis depth
-- **Interface Complexity Modes** - Easy/Focus/Balanced/Expert for UI complexity
-- **File Attachments** - Upload fraud datasets
-- **Responsive Design** - Mobile/tablet/desktop optimised
-- **Keyboard Shortcuts** - Power user features
+The pipeline runs phases sequentially, in parallel and through convergent execution depending on the stage, so no single bottleneck slows the investigation.
 
-### Advanced Features
+---
 
-- **Case Management** - Track investigations from detection to resolution
-- **Audit Trails** - Complete compliance logging
-- **Error Recovery** - Automatic retry with fallback strategies
-- **Dataset Manager** - Upload and manage multiple datasets
-- **Workflow Dashboard** - Visualise agent collaboration
+## Key capabilities
 
-## Technology Stack
+**Fraud detection**
+- Real-time risk scoring on a 0–100 scale across five risk categories
+- Multi-agent reasoning and weighted consensus
+- Explainable investigation reports with six tabbed sections
+- Live pipeline status tracking as each phase completes
 
-### Frontend
+**Compliance and audit**
+- AML/KYC intelligence retrieval via RCRA
+- Full audit trails for every investigation
+- Case management from detection through to resolution
+- Automatic error recovery with fallback strategies
 
-- **Framework:** Preact (React-compatible, lightweight)
-- **Language:** TypeScript
-- **Styling:** Tailwind CSS 4.x
-- **UI Components:** Radix UI (accessible, unstyled)
-- **Icons:** Lucide React
-- **State Management:** Preact Signals
+**Analytics and benchmarking**
+- Performance metrics: Precision, Recall, F1-Score, AUC-ROC
+- Statistical significance testing with p-values and effect sizes
+- Multi-dataset comparison across Credit Card, PaySim and MomtSim fraud datasets
+- Temporaray downloadable visualisation gallery with six chart types
 
-### Build & Testing
+**User experience**
+- AI-powered chat interface with DeepSearch and Quick Templates
+- Agent mode selection: Auto / Fast / Expert / Heavy
+- Interface complexity modes: Easy / Focus / Balanced / Expert
+- Fully responsive across mobile, tablet and desktop
 
-- **Build Tool:** Vite (fast, modern)
-- **Testing:** Vitest and Testing Library
-- **Linter:** Biome (fast linter/formatter)
-- **Type Checking:** TypeScript strict mode
+---
 
-### AI & Backend
+## Technology stack
 
-- **AI Platform:** Relevance AI SDK
-- **Multi-Agent:** Workforce orchestration
-- **RAG:** Retrieval-augmented generation
-- **Datasets:** Credit card, PaySim, MomtSim fraud data (Kaggle)
+| Layer | Technology |
+|---|---|
+| Framework | Preact (React-compatible, lightweight) |
+| Language | TypeScript (strict mode) |
+| Styling | Tailwind CSS 4.x |
+| UI components | Radix UI (accessible, unstyled) |
+| State management | Preact Signals |
+| Build tool | Vite |
+| Testing | Vitest and Testing Library |
+| Linter / formatter | Biome |
+| AI platform | Relevance AI SDK |
+| Multi-agent orchestration | MARAG Workforce |
+| Datasets | Credit Card (MLG-ULB), PaySim, MomtSim via Kaggle |
 
-## Project Structure
+---
 
-The project follows a professional, scalable architecture organised by feature and concern:
-
-```dir
-theia-fraud-intelligence/
-├── src/
-│   ├── ui/                          # Presentation Layer
-│   │   ├── layouts/                 # Page layouts & containers
-│   │   ├── dashboards/              # Dashboard views (analytics, workflow)
-│   │   ├── visualisations/          # Charts & graph components
-│   │   ├── analysis/                # Fraud analysis components
-│   │   ├── common/                  # Reusable UI components
-│   │   └── dialogs/                 # Modal & dialog components
-│   │
-│   ├── core/                        # Business Logic Layer
-│   │   ├── services/                # API services & integrations
-│   │   └── utils/                   # Utility functions
-│   │
-│   ├── state/                       # State Management
-│   │   ├── actions.ts               # State mutations
-│   │   ├── effects.ts               # Side effects
-│   │   ├── state.ts                 # Signal definitions
-│   │   └── types.ts                 # State types
-│   │
-│   ├── config/                      # Configuration
-│   │   ├── constants.ts             # Application constants
-│   │   ├── system-prompts.ts        # AI system prompts
-│   │   └── types.ts                 # Global type definitions
-│   │
-│   ├── components/                  # Components
-│   ├── prompts/                     # AI prompts
-│   ├── types/                       # Type definitions
-│   ├── hooks/                       # Custom hooks
-│   ├── test/                        # Test files
-│   └── test-data/                   # Sample test data
-│
-├── docs/                            # Documentation
-│   ├── PRD.md                       # Product requirements
-│   ├── DEPLOYMENT.md                # Deployment guide
-│   ├── TESTING.md                   # Testing guide
-│   ├── UPDATES.md                   # Maintenance guide
-│   ├── QUICK_TEMPLATES.md           # Quick-start templates
-│   └── PROJECT_STRUCTURE_GUIDE.md   # Detailed file organisation guide
-│
-├── datasets/                        # Fraud datasets
-│   ├── creditcard.csv
-│   ├── paysim.csv
-│   └── momtsim.csv
-└── README.md                        # This file
-```
-
-### Recommended File Organisation
-
-For detailed file mappings and migration strategy, see **[PROJECT_STRUCTURE_GUIDE.md](PROJECT_STRUCTURE_GUIDE.md)** which includes:
-
-- Complete directory tree
-- 60+ file mappings (current → recommended)
-- Implementation strategy
-- Naming conventions
-- Migration checklist
-
-### Current Key Directories
-
-- **`src/components/`**: All 47 UI components (primary interaction layer)
-- **`src/prompts/`**: System prompts and AI instructions
-  - `system-prompts.ts` — 16-phase pipeline, MARAG framework, benchmarking specifications
-- **`src/types/`**: TypeScript type definitions
-- **`src/utils/`**: Utility functions and backend integration
-- **`src/hooks/`**: Custom React/Preact hooks
-- **`src/test/`**: Unit and integration tests
-
-## Getting Started
+## Getting started
 
 ### Prerequisites
 
-| Requirement                    | Minimum Version | Notes                                                           |
-| ------------------------------ | --------------- | --------------------------------------------------------------- |
-| [Node.js](https://nodejs.org/) | 18.x LTS        | 20.x or 22.x LTS recommended                                    |
-| npm                            | 9.x             | Included with Node.js; upgrade with `npm install -g npm@latest` |
-| Git                            | 2.x             | For cloning the repository                                      |
-| Relevance AI account           | —               | Required for live MARAG agents; API keys needed                 |
+| Requirement | Version |
+|---|---|
+| Node.js | 18.x LTS or higher (20.x / 22.x recommended) |
+| npm | 9.x (included with Node.js) |
+| Git | 2.x |
+| Relevance AI account | Required for live MARAG agents |
 
-> **Tip:** Use [nvm](https://github.com/nvm-sh/nvm) (macOS/Linux) or [nvm-windows](https://github.com/coreybutler/nvm-windows) to manage Node.js versions.
+> **Tip:** Use [nvm](https://github.com/nvm-sh/nvm) (macOS / Linux) or [nvm-windows](https://github.com/coreybutler/nvm-windows) to manage Node.js versions.
 
-### 1. Clone the Repository
+### Installation
 
 ```bash
+# Clone the repository
 git clone https://github.com/techgirldiaries/theia.git
 cd theia
-```
 
-### 2. Install Dependencies
-
-```bash
+# Install all dependencies
 npm install
 ```
 
-This installs all production and development dependencies defined in `package.json`, including Preact, Tailwind CSS 4.x, Radix UI, Lucide, Vitest and the Relevance AI SDK.
+### Environment setup
 
-### 3. Configure Environment Variables
-
-Create a `.env` file in the project root (or populate the existing one):
-
-```bash
-# Copy the example template (if provided)
-cp .env.example .env
-```
-
-Then open `.env` and fill in your Relevance AI credentials:
+Create a `.env` file in the project root and fill in the provided Relevance AI credentials:
 
 ```env
-# Relevance AI region (e.g. "us-east-1" or "au-east-1")
 VITE_REGION=your-region
-
-# Your Relevance AI project ID
 VITE_PROJECT=your-project-id
-
-# The MARAG Workforce / Agent ID to invoke
 VITE_WORKFORCE_ID=your-workforce-id
-OR
-VITE_AGENT_ID=your-agent-id
+# or VITE_AGENT_ID=your-agent-id
 ```
 
-> **Note for assessment:** A pre-configured file with working credentials is included in the submission zip file. No manual setup is required to evaluate the system.
+> **For assessment:** A pre-configured `.env` file with working credentials is included in the submission zip. No manual setup is needed.
 
-### 4. Start the Development Server
+### Run the development server
 
 ```bash
 npm run dev
 ```
 
-Vite will start a local server. Open your browser to:
+Open your browser to `http://localhost:5173`. The app reloads automatically on any file change.
 
-```sh
-http://localhost:5173
-```
+### Verify the system is running
 
-The app hot-reloads automatically on any file change — no restart needed.
+- The Theia header and chat interface are visible
+- The MARAG status panel shows all five agents (TIRA, RCRA, HPRA, ERRA, BARA)
+- Typing a message triggers the 16-phase pipeline
+- The connection status indicator shows **Connected**
 
-### 5. Verify the System is Running
+---
 
-Once the browser loads, confirm:
-
-- [ ] The Theia header and chat interface are visible
-- [ ] The Theia MARAG status panel shows 5 agents (TIRA, RCRA, HPRA, ERRA, BARA)
-- [ ] Typing a message triggers the 16-phase pipeline
-- [ ] The connection status indicator shows **Connected**
-
-If agents fail to respond, double-check the credentials in `.env` and ensure the project is active.
-
-### Getting Started Quickly
-
-For detailed onboarding instructions, including a complete quick-start guide, keyboard shortcuts and troubleshooting tips, see [**GETTING_STARTED.md**](GETTING_STARTED.md).
-
-### Project Documentation
-
-Comprehensive project documentation is available:
-
-- **[Project Structure Guide](PROJECT_STRUCTURE_GUIDE.md)** - Recommended directory structure and file organisation (60+ file mappings)
-- **[PRD](docs/PRD.md)** - Product requirements and technical specifications
-- **[Quick Templates](docs/QUICK_TEMPLATES.md)** - Quick-start prompts and template examples
-- **[Testing](docs/TESTING.md)** - Testing guide and strategies
-- **[Deployment](docs/DEPLOYMENT.md)** - Deployment options and configuration
-
-### Testing
+## Testing
 
 ```bash
-# Run all tests (unit + integration)
+# Run all unit and integration tests
 npm test
 
-# Run tests in watch mode during development
+# Run in watch mode during development
 npm run test -- --watch
 
-# Run tests with the Vitest UI (browser-based reporter)
+# Open the browser-based Vitest UI
 npm run test:ui
 
 # Generate a coverage report
@@ -269,156 +168,114 @@ npm run test:coverage
 
 Test files are located in `src/hooks/` and `src/test/`. Coverage output is written to `coverage/`.
 
-### Building for Production
+---
+
+## Build and deployment
 
 ```bash
 # Compile and bundle for production
 npm run build
-```
 
-The optimised output is written to `dist/`. To preview the production build locally before deployment:
-
-```bash
+# Preview the production build locally
 npm run preview
 # Opens http://localhost:4173
 ```
 
-### Type Checking
+For full deployment options and configuration, see [DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
-```bash
-# Run TypeScript compiler in check-only mode (no output files)
-npx tsc --noEmit
+---
+
+## Project structure
+
+```
+theia-fraud-intelligence/
+├── src/
+│   ├── ui/               # Presentation layer (layouts, dashboards, charts, dialogs)
+│   ├── core/             # Business logic (API services, utilities)
+│   ├── state/            # State management (signals, actions, effects, types)
+│   ├── config/           # Constants, system prompts, global types
+│   ├── components/       # 47 UI components
+│   ├── prompts/          # AI prompts and 16-phase pipeline specifications
+│   ├── types/            # TypeScript type definitions
+│   ├── hooks/            # Custom React/Preact hooks
+│   └── test/             # Unit and integration tests
+├── docs/                 # Full project documentation
+├── datasets/             # creditcard.csv, paysim.csv, momtsim.csv
+└── README.md
 ```
 
-The project uses TypeScript strict mode. All type errors must be resolved before building.
+For the complete 60+ file mapping and migration strategy, see [PROJECT_STRUCTURE_GUIDE.md](PROJECT_STRUCTURE_GUIDE.md).
 
-### Linting & Formatting
+---
 
-```bash
-# Check for lint errors and formatting issues
-npx biome check .
+## Known limitations
 
-# Auto-fix safe issues
-npx biome check --write .
-```
+All limitations below are documented, academically justified and represent common constraints in real-world fraud systems not implementation failures.
 
-Biome is configured via `biome.json` and replaces both ESLint and Prettier.
+| Area | Status | Note |
+|---|---|---|
+| Live classification metrics | Types defined; live tracking requires verified fraud data | Validated data typically takes 3–7 days to emerge in production systems |
+| Confusion matrix | Available in benchmarking; not yet in live dashboard | Visualisation gap only — no algorithmic impact |
+| Advanced V2 charts | Planned as future enhancements | Core gallery with six chart types is fully operational |
 
-### Troubleshooting
-
-| Problem                      | Likely Cause                    | Fix                                                             |
-| ---------------------------- | ------------------------------- | --------------------------------------------------------------- |
-| `npm install` fails          | Node.js version too old         | Upgrade to Node.js 18+                                          |
-| Blank page on `npm run dev`  | `.env` missing or mismatched    | Re-check all three `VITE_*` variables                           |
-| Agents not responding        | Invalid API key or region       | Verify credentials in Relevance AI dashboard                    |
-| TypeScript errors on install | Stale `node_modules`            | Delete `node_modules/` and re-run `npm install`                 |
-| Port 5173 already in use     | Another Vite dev server running | Kill the other process or run `npm run dev -- --port 5174`      |
-| `crypto` shim errors         | Node version mismatch           | Ensure Node.js 18+ and clear Vite cache with `npx vite --force` |
-
-## Configuration
-
-### Environment Variables
-
-```env
-VITE_REGION=...
-VITE_PROJECT_ID=...
-VITE_AGENT_ID=...
-VITE_WORKFORCE_ID=...
-```
-
-### TypeScript Configuration
-
-- `tsconfig.json` - Strict mode enabled
-- Full type coverage across codebase
-- Custom type definitions
-
-### Build Configuration
-
-- `vite.config.ts` - Vite build settings
-- `biome.json` - Linter or formatter configuration
-- `vitest.config.ts` - Test configuration
-
-## Limitations & Minor Gaps (Research-backed)
-
-### 1. Live Classification Metrics (Minor Gap)
-
-**Status:** Types defined, calculations require verified fraud data for comparison  
-**Impact:** Low - this is a common limitation in real-world fraud systems  
-**Missing Components:**
-
-| Metric              | Status                     | Impact                                                 | Academic Justification                                      |
-| ------------------- | -------------------------- | ------------------------------------------------------ | ----------------------------------------------------------- |
-| **Accuracy**        | Missing                    | Cannot measure correctness without verified fraud data | Common in deployed systems without labelled validation data |
-| **Precision**       | Live tracking missing      | Cannot assess false positive rate in real-time         | Requires manual fraud validation (3-7 days)                 |
-| **Recall**          | Live tracking missing      | Cannot measure fraud catch rate dynamically            | Verified data emerges after investigation                   |
-| **F1 Score**        | Live calculation missing   | Cannot optimise threshold in real-time                 | Requires retrospective analysis                             |
-| **False Positives** | Real-time tracking missing | Unknown investigation waste initially                  | Validated through case resolution                           |
-| **False Negatives** | Real-time tracking missing | Unknown fraud leakage initially                        | Discovered through customer reports/audits                  |
-
-**Justification:** Fully implemented in benchmarking context (see test data with 92-97% precision). Production systems require manual validation loops that take 3-7 days to establish verified fraud data.
-
-### 2. Confusion Matrix Tracking (Minor Gap)
-
-**Status:** Documented but not implemented in live metrics  
-**Impact:** Low - visualisation gap, not algorithmic limitation  
-**Alternative:** Static confusion matrix can be generated from benchmarking results  
-**Academic Value:** Demonstrates understanding through benchmarking implementation
-
-### 3. Advanced V2 visualisations (Minor Gap)
-
-**Status:** Core visualisations present, advanced charts as future work  
-**Impact:** None - documented as optional enhancements  
-**Missing Components:**
-
-- Evidence Network Graph (3D agent correlation visualisation)
-- Performance Radar Chart (multi-dimensional comparison)
-- Statistical Heatmap (p-value significance matrix)
-
-**Justification:** Shows project scoping and prioritisation. Core visualisation gallery operational with 6 chart types implemented.
-
-### Summary of Gaps
-
-**Critical:** None  
-**Major:** None  
-**Minor:** 3 gaps (all academically justified and documented)  
+**Critical gaps:** None  
+**Major gaps:** None  
 **Blockers:** None
 
-All limitations are academically justified, well-documented and represent common industry constraints rather than implementation failures.
+---
 
-## Future Enhancements
+## Future enhancements
 
-1. **Evidence Network Graph**
-   - Interactive agent correlation visualisation
-   - Conflict resolution indicators
+- **Evidence Network Graph:** Interactive 3D agent correlation visualisation with conflict resolution indicators
+- **Performance Radar Chart:** Multi-dimensional dataset comparison with overlaid metrics
+- **Statistical Heatmap:** P-value significance matrix and effect size visualisation
+- **Advanced MARAG Panel:** Expandable agent findings with evidence drill-down
 
-2. **Performance Radar Chart**
-   - Multi-dimensional dataset comparison
-   - Overlaid performance metrics
+---
 
-3. **Statistical Heatmap**
-   - P-value significance matrix
-   - Effect size visualisation
+## Documentation
 
-4. **Advanced MARAG Panel**
-   - Expandable agent findings
-   - Evidence drill-down
+| Document | Description |
+|---|---|
+| [Project Structure Guide](PROJECT_STRUCTURE_GUIDE.md) | Full directory tree |
+| [PRD](docs/PRD.md) | Product requirements and technical specifications |
+| [Quick Templates](docs/QUICK_TEMPLATES.md) | Ready-to-use prompts and template examples |
+| [Testing Guide](docs/TESTING.md) | Testing strategies and coverage guidance |
+| [Deployment Guide](docs/DEPLOYMENT.md) | Deployment options and environment configuration |
 
-## Support & Contact
+---
 
-### Project Resources
+## Troubleshooting
 
-- **Repository:** [Theia Fraud Intelligence](https://github.com/techgirldiaries/theia)
-- **Issues:** GitHub Issues
-- **Discussions:** GitHub Discussions
+| Problem | Likely cause | Fix |
+|---|---|---|
+| `npm install` fails | Node.js version too old | Upgrade to Node.js 18+ |
+| Blank page on `npm run dev` | `.env` missing or misconfigured | Re-check all three `VITE_*` variables |
+| Agents not responding | Invalid API key or region | Verify credentials in the Relevance AI dashboard |
+| TypeScript errors | Stale `node_modules` | Delete `node_modules/` and re-run `npm install` |
+| Port 5173 already in use | Another Vite server running | Run `npm run dev -- --port 5174` |
+| `crypto` shim errors | Node version mismatch | Ensure Node.js 18+ and run `npx vite --force` |
 
-## License
+---
 
-See [LICENSE.md](LICENSE.md) for details
+## Acknowledgements
 
-## Acknowledgments
+- **Project Supervisor:** Department of Computing & Technology, University of Bedfordshire
+- **[Relevance AI](https://relevanceai.com):** Multi-agent workforce platform
+- **[Preact Team](https://preactjs.com):** Lightweight React alternative
+- **[Radix UI](https://www.radix-ui.com):** Accessible component primitives
+- **Datasets:** Credit Card Fraud by MLG-ULB, PaySim, MomtSim (Kaggle)
 
-- **Project Supervisor**
-- **Relevance AI** - Multi-agent workforce platform
-- **Preact Team** - Lightweight React alternative
-- **Radix UI** - Accessible component primitives
-- **Datasets:** Credit card fraud by MLG-ULB, PaySim, MomtSim (Kaggle)
+---
+
+## Repository
+
+**GitHub:** [github.com/techgirldiaries/theia](https://github.com/techgirldiaries/theia)  
+**Issues:** GitHub Issues  
+**Discussions:** GitHub Discussions
+
+---
+
+## Licence
+
+See [LICENSE.md](LICENSE.md) for full terms.

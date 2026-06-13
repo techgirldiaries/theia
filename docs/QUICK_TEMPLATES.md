@@ -182,7 +182,7 @@ The **Workflow Dashboard** activates automatically and displays the following co
 
 **16-Phase Pipeline Visualisation** shows sequential, parallel and convergent phases as they are processed.
 
-**Real-Time Status Tracker** displays live metrics including the current phase status, average phase duration, throughput in phases per minute, and phase completion progress.
+**Real-Time Status Tracker** displays live metrics including the current phase status, average phase duration, throughput in phases per minute and phase completion progress.
 
 **Multi-Agent Progress Visualisation** shows the status of each MARAG agent (TIRA, RCRA, HPRA, ERRA and BARA), including consensus convergence, agreement rates and weighted scoring.
 
@@ -198,11 +198,11 @@ Each of these components is described in more detail below.
 
 ### Real-Time Status Tracker
 
-Live fraud analysis progression is displayed here. Phase status moves through Completed, In Progress and Pending states. Performance metrics include average phase time, throughput and error rates. Controls for Play, Pause and Reset are available alongside a progress adjustment slider.
+Live fraud analysis progression is displayed here. Phase status moves through Completed, In Progress and Pending states. Performance metrics include average phase time, throughput and error rates. Control icons for Play, Pause and Reset are available alongside a progress adjustment slider.
 
 ### Multi-Agent Consensus Panel
 
-The MARAG agent collaboration is displayed in this panel. Each agent's current state is shown alongside the consensus score (0 to 100), source attribution and reasoning, and confidence intervals for uncertainty quantification.
+The MARAG agent collaboration is displayed in this panel. Each agent's current state is shown alongside the consensus score (0 to 100), source attribution and reasoning and confidence intervals for uncertainty quantification.
 
 ### Analytics Dashboard
 

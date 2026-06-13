@@ -122,7 +122,7 @@ npm install
 
 ### Environment setup
 
-Create a `.env` file in the project root and fill in your Relevance AI credentials:
+Create a `.env` file in the project root and fill in the provided Relevance AI credentials:
 
 ```env
 VITE_REGION=your-region

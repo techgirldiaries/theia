@@ -2,57 +2,119 @@
 
 ## Product Overview
 
-**Vision:** Theia Fraud Intelligence is an agentic AI framework for adaptive financial fraud detection. Built on Multi-Agent Retrieval-Augmented Generation (MARAG), it processes transactions through a 16-phase pipeline from data acquisition to final oversight, unifying machine learning, generative AI, regulatory compliance and human decision-making into a single cohesive system. Weighted multi-agent consensus reduces false positive rates while parallel evidence retrieval across 5 specialist agents minimises missed detections.
+Theia Fraud Intelligence is an agentic AI framework built for adaptive financial fraud detection. The system is built on a Multi-Agent Retrieval-Augmented Generation (MARAG) architecture, which processes transactions through a 16-phase pipeline covering everything from initial data acquisition through to final human oversight. Machine learning, generative AI, regulatory compliance and human decision-making are unified into a single cohesive system. False positive rates are reduced through weighted multi-agent consensus, while missed detections are minimised through parallel evidence retrieval across five specialist agents.
 
-**Target Users:** Fraud analysts, compliance officers, security teams, enterprise risk managers
+**Target users:** Fraud analysts, compliance officers, security teams and enterprise risk managers.
 
-**Business Objectives:** Execute comprehensive fraud detection through a unified 16-phase pipeline orchestrated across 5 specialist MARAG agents (TIRA, RCRA, HPRA, ERRA, BARA); reduce false positive rates through weighted multi-agent consensus with evidence triangulation; integrate machine learning, generative AI, regulatory compliance and human oversight; achieve >95% detection accuracy while maintaining <5% false positive rate; accelerate case processing to <5 minutes
+**Business objectives:** The platform is designed to execute comprehensive fraud detection through a unified 16-phase pipeline orchestrated across five specialist MARAG agents (TIRA, RCRA, HPRA, ERRA and BARA). False positive rates are reduced through weighted multi-agent consensus with evidence triangulation. Machine learning, generative AI, regulatory compliance and human oversight are integrated into a single workflow. The system targets a fraud detection accuracy above 95%, a false positive rate below 5% and a case processing time of under five minutes.
+
+These objectives are delivered through the core features described in the section below.
+
+---
 
 ## Core Features
 
-| Feature                            | Priority    | Description                                                                                                                                                                                                                |
-| ---------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- | ------ | --- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| **16-Phase Pipeline**              | Must-have   | Sequential (0-3: Data Acq→Ingestion→Monitoring→Pattern) → Parallel (4-6: Intelligence                                                                                                                                      |     | Threat |     | Entity) → Convergent (7-9: Behavioural→KYC→Merchant) → Decision (10-15: Classification→Verification→Compliance→Monitoring→Case Management→Oversight) |
-| **5 Specialist MARAG Agents**      | Must-have   | TIRA (Threat Intelligence), RCRA (Regulatory Compliance), HPRA (Historical Patterns), ERRA (Entity Relationships), BARA (Behavioural Analysis) with distributed retrieval, agent-to-agent communication, weighted consensus |
-| **Weighted Multi-Agent Consensus** | Must-have   | Evidence triangulation, conflict resolution, confidence scoring (0-100), uncertainty quantification with confidence intervals, cross-agent correlation analysis                                                            |
-| **Fraud Report Analysis**          | Must-have   | Case creation (FRAUD-YYYYMMDD-Type-Priority), automated multi-phase report generation, comprehensive agent reasoning, severity scoring, typology classification                                                            |
-| **Interactive Dashboards**         | Must-have   | Phase-by-phase progress visualisation, agent performance metrics, consensus accuracy tracking, ROC curves, confusion matrices, evidence heatmaps, network graphs                                                           |
-| **Dataset Management**             | Should-have | Upload/manage fraud datasets, multi-dataset benchmarking, comparative performance analysis, data preprocessing, version control, phase tracking                                                                            |
-| **Audit Logging**                  | Should-have | Complete pipeline audit trail, agent decision logging, phase-level activity tracking, compliance documentation (SAR-ready, GDPR, DORA), evidence attribution                                                               |
-| **Real-time Monitoring**           | Should-have | Live case progression through 16 phases, agent health monitoring, consensus convergence metrics, performance benchmarking, system optimisation                                                                             |
+| Feature | Priority | Description |
+|---|---|---|
+| **16-Phase Pipeline** | Must-have | Sequential phases 0 to 3 cover data acquisition, ingestion, monitoring and pattern analysis. Parallel phases 4 to 6 handle intelligence, threat and entity retrieval. Convergent phases 7 to 9 address behavioural analysis, KYC screening and merchant verification. Decision phases 10 to 15 cover classification, verification, compliance, monitoring, case management and oversight. |
+| **5 Specialist MARAG Agents** | Must-have | TIRA (Threat Intelligence), RCRA (Regulatory Compliance), HPRA (Historical Patterns), ERRA (Entity Relationships) and BARA (Behavioural Analysis) operate with distributed retrieval, agent-to-agent communication and weighted consensus. |
+| **Weighted Multi-Agent Consensus** | Must-have | Evidence triangulation, conflict resolution and confidence scoring on a scale of 0 to 100 are applied alongside uncertainty quantification with confidence intervals and cross-agent correlation analysis. |
+| **Fraud Report Analysis** | Must-have | Cases are created using the format FRAUD-YYYYMMDD-Type-Priority. Automated multi-phase report generation, comprehensive agent reasoning, severity scoring and typology classification are all included. |
+| **Interactive Dashboards** | Must-have | Phase-by-phase progress visualisation, agent performance metrics, consensus accuracy tracking, ROC curves, confusion matrices, evidence heatmaps and network graphs are available. |
+| **Dataset Management** | Should-have | Fraud datasets can be uploaded and managed. Multi-dataset benchmarking, comparative performance analysis, data preprocessing, version control and phase tracking are all supported. |
+| **Audit Logging** | Should-have | A complete pipeline audit trail is maintained, covering agent decision logging, phase-level activity tracking, compliance documentation (SAR-ready, GDPR and DORA) and evidence attribution. |
+| **Real-time Monitoring** | Should-have | Live case progression through all 16 phases is visible alongside agent health monitoring, consensus convergence metrics, performance benchmarking and system optimisation. |
+
+The features above are accessed through the key user flows described in the next section.
+
+---
 
 ## Key User Flows
 
-1. **16-Phase Case Processing:** Upload transaction data → Phase 0-3: Sequential data acquisition, ingestion, monitoring, pattern analysis → Phase 4-6: Parallel intelligence retrieval (TIRA threat intel || RCRA compliance || ERRA entity analysis) → Phase 7-9: Convergent behavioural analysis, KYC/sanctions screening, merchant verification → Phase 10-15: Risk classification, evidence verification, compliance documentation, performance monitoring, case management, final oversight → Multi-agent agreement scoring → Risk-based escalation → Report generation
+**16-Phase Case Processing**
 
-2. **Multi-Agent MARAG Analysis:** Submit case → 5 specialist agents activate in parallel (TIRA, RCRA, HPRA, ERRA, BARA) → Distributed knowledge retrieval across domains → Agent-to-agent evidence sharing → Conflict resolution through weighted voting → Evidence triangulation and correlation → Consensus score generation (0-100) with confidence intervals → Uncertainty quantification → Collaborative risk assessment
+Transaction data is uploaded and passed through the pipeline in sequence. Phases 0 to 3 handle data acquisition, ingestion, monitoring and pattern analysis. In phases 4 to 6, TIRA, RCRA and ERRA retrieve intelligence, compliance data and entity analysis in parallel. Phases 7 to 9 carry out convergent behavioural analysis, KYC and sanctions screening, and merchant verification. The final phases, 10 to 15, cover risk classification, evidence verification, compliance documentation, performance monitoring, case management and final oversight. Multi-agent agreement scoring is applied throughout, leading to risk-based escalation and report generation.
 
-3. **Real-time Monitoring & Analytics:** Dashboard access → View all 16 phases with live status → Monitor 5 agent performance metrics → Track multi-agent consensus convergence → Phase-by-phase throughput analysis → Agent agreement rates → Comparative benchmarking across datasets → Export phase-specific insights
+**Multi-Agent MARAG Analysis**
+
+A case is submitted and all five specialist agents (TIRA, RCRA, HPRA, ERRA and BARA) activate in parallel. Distributed knowledge retrieval is carried out across their respective domains and evidence is shared between agents. Conflicts are resolved through weighted voting and evidence is triangulated and correlated before a consensus score between 0 and 100 is generated with confidence intervals. Uncertainty is quantified and a collaborative risk assessment is produced.
+
+**Real-time Monitoring and Analytics**
+
+The dashboard provides a live view of all 16 phases alongside performance metrics for each of the five agents. Multi-agent consensus convergence is tracked in real time and phase-by-phase throughput and agent agreement rates are visible. Comparative benchmarking across datasets is available, and phase-specific insights can be exported.
+
+The technical requirements that support these flows are described in the section below.
+
+---
 
 ## Technical Requirements
 
-- **Architecture:** Agentic AI framework with 16-phase orchestration, 5 specialist MARAG agents, distributed retrieval mechanism, agent-to-agent communication, weighted consensus engine
-- **MARAG System:**
-  - **TIRA:** Threat Intelligence retrieval (CISA, FBI, CVE, threat actor profiles)
-  - **RCRA:** Regulatory Compliance (OFAC, UN, EU, HMT sanctions; GDPR, DORA, FinCEN)
-  - **HPRA:** Historical Pattern matching (fraud typologies, case studies, pattern evolution)
-  - **ERRA:** Entity Relationship analysis (network graphs, fraud rings, synthetic identities)
-  - **BARA:** Behavioural Analysis (biometrics, device fingerprints, ATO indicators)
-- **Consensus Engine:** Weighted voting with confidence scoring, evidence triangulation, uncertainty quantification (confidence intervals), cross-agent correlation, conflict resolution
-- **Frontend:** Preact/React with real-time streaming, phase progression visualisation, agent status panels, consensus radar charts
-- **Performance:** <2s load time, <5 min case processing through 16 phases, sub-second phase transitions, support 100+ concurrent cases
-- **Accessibility:** WCAG 2.1 AA compliance
-- **Security:** Authentication required, encrypted data transmission, agent decision audit trails, regulatory compliance logging, immutable audit records
-- **Browser Support:** Chrome, Firefox, Safari (latest 2 versions)
+**Architecture**
+
+The system is built on an agentic AI framework with 16-phase orchestration, five specialist MARAG agents, a distributed retrieval mechanism, agent-to-agent communication and a weighted consensus engine.
+
+**MARAG System**
+
+Each agent is responsible for a distinct retrieval domain. TIRA retrieves threat intelligence from sources including CISA, FBI, CVE and threat actor profiles. RCRA covers regulatory compliance across OFAC, UN, EU and HMT sanctions as well as GDPR, DORA and FinCEN requirements. HPRA handles historical pattern matching across fraud typologies, case studies and pattern evolution data. ERRA analyses entity relationships through network graphs, fraud rings and synthetic identity detection. BARA focuses on behavioural analysis using biometrics, device fingerprints and account takeover indicators.
+
+**Consensus Engine**
+
+Weighted voting is applied with confidence scoring, evidence triangulation, uncertainty quantification through confidence intervals, cross-agent correlation and conflict resolution.
+
+**Frontend**
+
+The interface is built with Preact and supports real-time streaming. Phase progression visualisation, agent status panels and consensus radar charts are included.
+
+**Performance**
+
+Load time is targeted at under two seconds. Case processing through all 16 phases is targeted at under five minutes, with sub-second phase transitions. The system is designed to support over 100 concurrent cases.
+
+**Accessibility and Security**
+
+WCAG 2.1 AA compliance is required. Authentication is enforced, data transmission is encrypted, agent decisions are logged in an audit trail, compliance logging is maintained and audit records are immutable.
+
+**Browser Support**
+
+Chrome, Firefox and Safari are supported across their two most recent versions.
+
+The success metrics used to evaluate these requirements are outlined in the section below.
+
+---
 
 ## Success Metrics
 
-- **Detection Performance:** Fraud detection accuracy >95% with false positive rate <5%; precision >90%, recall >88%, AUC-ROC >0.93
-- **Processing Efficiency:** Average case processing time <5 minutes through 16-phase pipeline; sub-second phase transitions; support 100+ concurrent cases
-- **Multi-Agent Consensus:** Weighted consensus accuracy tracking per specialist agent (TIRA, RCRA, HPRA, ERRA, BARA); agent agreement rates >85%; consensus confidence intervals within ±5%
-- **Phase Performance:** Phase-by-phase throughput optimisation; <60 seconds per phase; all 16 phases completed per case
-- **Evidence Quality:** Evidence triangulation success >90%; conflict resolution accuracy >92%; source attribution completeness 100%; "No Citation → No Verdict" compliance
-- **Compliance Validation:** Compliance documentation pass rate >99%; SAR-ready reports 100%; GDPR explanation quality score >90%; regulatory audit pass rate 100%
-- **System Reliability:** System uptime >99.5%; error recovery success rate >95%; audit trail integrity 100%
-- **User Experience:** User satisfaction score >4/5; analyst decision accuracy improvement >20%; time-to-insight reduction >40%
-- **Benchmarking:** Multi-dataset performance comparison with statistical significance testing; dataset performance variance <10%; model stability across conditions >90%
+**Detection performance**
+
+Fraud detection accuracy is targeted above 95% with a false positive rate below 5%. Precision is targeted above 90%, recall above 88% and AUC-ROC above 0.93.
+
+**Processing efficiency**
+
+Average case processing time is targeted at under five minutes across the full 16-phase pipeline. Phase transitions are expected to be sub-second, with support for over 100 concurrent cases.
+
+**Multi-agent consensus**
+
+Weighted consensus accuracy is tracked per specialist agent. Agent agreement rates are targeted above 85%, and consensus confidence intervals are expected to remain within plus or minus 5%.
+
+**Phase performance**
+
+Phase-by-phase throughput is optimised with a target of under 60 seconds per phase. All 16 phases are completed for every case.
+
+**Evidence quality**
+
+Evidence triangulation success is targeted above 90% and conflict resolution accuracy above 92%. Source attribution completeness is expected at 100% and full compliance with the "No Citation, No Verdict" principle is required.
+
+**Compliance validation**
+
+Compliance documentation is targeted at a pass rate above 99%. All reports are SAR-ready, GDPR explanation quality is targeted above 90% and regulatory audit pass rate is expected at 100%.
+
+**System reliability**
+
+System uptime is targeted above 99.5%, error recovery success above 95% and audit trail integrity at 100%.
+
+**User experience**
+
+User satisfaction is targeted above 4 out of 5. Analyst decision accuracy is expected to improve by over 20% and time-to-insight to reduce by over 40%.
+
+**Benchmarking**
+
+Multi-dataset performance comparison is conducted with statistical significance testing. Dataset performance variance is targeted below 10% and model stability across conditions above 90%.

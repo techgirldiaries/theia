@@ -1,4 +1,4 @@
-# Theia — Agentic AI Fraud Intelligence Platform
+# Theia: Agentic AI Fraud Intelligence Platform
 
 > Detect Risk Early. Act Decisively. Stay Compliant.
 

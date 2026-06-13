@@ -14,9 +14,9 @@
 
 ## What is Theia?
 
-Theia is a production-ready fraud detection platform powered by five specialised AI agents that work together to investigate financial transactions, retrieve evidence and reach a consensus risk verdict — all within a structured 16-phase pipeline.
+Theia is a production-ready fraud detection platform powered by five specialised AI agents that work together to investigate financial transactions, retrieve evidence and reach a consensus risk verdict, all within a structured 16-phase pipeline.
 
-Most fraud detection tools rely on a single AI model making decisions alone. Theia takes a different approach. Five independent agents each examine a transaction from a distinct angle — threat intelligence, regulatory compliance, historical patterns, entity relationships and behavioural analysis — then cross-validate their findings before producing a final risk score. This is called a **Multi-Agent Retrieval-Augmented Generation (MARAG)** architecture.
+Most fraud detection tools rely on a single AI model making decisions alone. Theia takes a different approach. Five independent agents each examine a transaction from a distinct angle: threat intelligence, regulatory compliance, historical patterns, entity relationships and behavioural analysis, then cross-validate their findings before producing a final risk score. This is called a **Multi-Agent Retrieval-Augmented Generation (MARAG)** architecture.
 
 The result is a system that is more accurate, more explainable, and more auditable than conventional approaches.
 
@@ -28,7 +28,7 @@ The result is a system that is more accurate, more explainable, and more auditab
 |---|---|
 | **Financial institutions** | Real-time fraud scoring with AML/KYC compliance intelligence |
 | **Compliance teams** | Complete audit trails and explainable investigation reports |
-| **Data scientists** | Multi-dataset benchmarking with Precision, Recall, F1, AUC-ROC metrics and advanced ML methods |
+| **Data scientists** | Multi-dataset benchmarking with Precision, Recall, F1, AUC-ROC metrics and advanced machine learning methods |
 | **Developers** | A clean TypeScript codebase with modular architecture and full test coverage |
 | **Recruiters & evaluators** | A working, deployed agentic AI system built on current industry-standard tooling |
 

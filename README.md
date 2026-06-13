@@ -14,9 +14,9 @@
 
 ## What is Theia?
 
-Theia is a production-ready fraud detection platform powered by five specialised AI agents that work together to investigate financial transactions, retrieve evidence, and reach a consensus risk verdict — all within a structured 16-phase pipeline.
+Theia is a production-ready fraud detection platform powered by five specialised AI agents that work together to investigate financial transactions, retrieve evidence and reach a consensus risk verdict — all within a structured 16-phase pipeline.
 
-Most fraud detection tools rely on a single AI model making decisions alone. Theia takes a different approach. Five independent agents each examine a transaction from a distinct angle — threat intelligence, regulatory compliance, historical patterns, entity relationships, and behavioural analysis — then cross-validate their findings before producing a final risk score. This is called a **Multi-Agent Retrieval-Augmented Generation (MARAG)** architecture.
+Most fraud detection tools rely on a single AI model making decisions alone. Theia takes a different approach. Five independent agents each examine a transaction from a distinct angle — threat intelligence, regulatory compliance, historical patterns, entity relationships and behavioural analysis — then cross-validate their findings before producing a final risk score. This is called a **Multi-Agent Retrieval-Augmented Generation (MARAG)** architecture.
 
 The result is a system that is more accurate, more explainable, and more auditable than conventional approaches.
 
@@ -28,7 +28,7 @@ The result is a system that is more accurate, more explainable, and more auditab
 |---|---|
 | **Financial institutions** | Real-time fraud scoring with AML/KYC compliance intelligence |
 | **Compliance teams** | Complete audit trails and explainable investigation reports |
-| **Data scientists** | Multi-dataset benchmarking with Precision, Recall, F1, and AUC-ROC metrics |
+| **Data scientists** | Multi-dataset benchmarking with Precision, Recall, F1, AUC-ROC metrics and advanced ML methods |
 | **Developers** | A clean TypeScript codebase with modular architecture and full test coverage |
 | **Recruiters & evaluators** | A working, deployed agentic AI system built on current industry-standard tooling |
 
@@ -36,7 +36,7 @@ The result is a system that is more accurate, more explainable, and more auditab
 
 ## How it works
 
-Five specialised agents collaborate across a 16-phase pipeline. Each agent contributes an independent assessment based on its area of expertise. Their findings are then aggregated through a weighted consensus mechanism that factors in confidence scores, evidence quality, and historical performance. Where agents disagree, a built-in orchestration layer applies predefined conflict-resolution strategies to produce the final verdict.
+Five specialised agents collaborate across a 16-phase pipeline. Each agent contributes an independent assessment based on its area of expertise. Their findings are then aggregated through a weighted consensus mechanism that factors in confidence scores, evidence quality and historical performance. Where agents disagree, a built-in orchestration layer applies predefined conflict-resolution strategies to produce the final verdict.
 
 | Agent | Role |
 |---|---|
@@ -46,7 +46,7 @@ Five specialised agents collaborate across a 16-phase pipeline. Each agent contr
 | **ERRA** | Entity Relationship Retrieval Agent |
 | **BARA** | Behavioural Analysis Retrieval Agent |
 
-The pipeline runs phases sequentially, in parallel, and through convergent execution depending on the stage, so no single bottleneck slows the investigation.
+The pipeline runs phases sequentially, in parallel and through convergent execution depending on the stage, so no single bottleneck slows the investigation.
 
 ---
 
@@ -67,14 +67,14 @@ The pipeline runs phases sequentially, in parallel, and through convergent execu
 **Analytics and benchmarking**
 - Performance metrics: Precision, Recall, F1-Score, AUC-ROC
 - Statistical significance testing with p-values and effect sizes
-- Multi-dataset comparison across Credit Card, PaySim, and MomtSim fraud datasets
-- Downloadable visualisation gallery with six chart types
+- Multi-dataset comparison across Credit Card, PaySim and MomtSim fraud datasets
+- Temporaray downloadable visualisation gallery with six chart types
 
 **User experience**
 - AI-powered chat interface with DeepSearch and Quick Templates
 - Agent mode selection: Auto / Fast / Expert / Heavy
 - Interface complexity modes: Easy / Focus / Balanced / Expert
-- Fully responsive across mobile, tablet, and desktop
+- Fully responsive across mobile, tablet and desktop
 
 ---
 
@@ -260,7 +260,7 @@ All limitations below are documented, academically justified and represent commo
 
 ## Acknowledgements
 
-- **Project Supervisor:** University of Bedfordshire
+- **Project Supervisor:** Department of Computing & Technology, University of Bedfordshire
 - **[Relevance AI](https://relevanceai.com):** Multi-agent workforce platform
 - **[Preact Team](https://preactjs.com):** Lightweight React alternative
 - **[Radix UI](https://www.radix-ui.com):** Accessible component primitives

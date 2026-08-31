@@ -18,7 +18,7 @@ Theia is a production-ready fraud detection platform powered by five specialised
 
 Most fraud detection tools rely on a single AI model making decisions alone. Theia takes a different approach. Five independent agents each examine a transaction from a distinct angle: threat intelligence, regulatory compliance, historical patterns, entity relationships and behavioural analysis, then cross-validate their findings before producing a final risk score. This is called a **Multi-Agent Retrieval-Augmented Generation (MARAG)** architecture.
 
-The result is a system that is more accurate, more explainable, and more auditable than conventional approaches.
+The result is a system that is more accurate, more explainable and more auditable than conventional approaches.
 
 ---
 
